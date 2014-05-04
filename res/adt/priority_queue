@@ -1,0 +1,6 @@
+ADT_FILE_0.1
+NAME = "priority_queue"
+VAR = {n}
+ANALYSIS = {worst, amortized, expected}
+FUNCTIONS = {construct, insert, peek, remove_min, empty, size, decrease_key, find}
+

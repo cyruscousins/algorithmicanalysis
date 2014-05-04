@@ -1,0 +1,6 @@
+ADT_FILE_0.1
+NAME = "single_source_shortest_path"
+VAR = {e, v}
+ANALYSIS = {worst, amortized, expected}
+FUNCTIONS = {shortest_path}
+

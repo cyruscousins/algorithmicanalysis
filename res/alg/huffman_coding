@@ -1,0 +1,6 @@
+ALG_FILE_0.2
+NAME = "huffman_prefix"
+ADT = "huffman_prefix_code"
+
+#worst, amortized, expected
+shortest_path: construct + 2 * s * insert + s * remove_min

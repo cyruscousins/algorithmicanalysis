@@ -1,0 +1,6 @@
+ALG_FILE_0.2
+NAME = "dijkstras_algorithm"
+ADT = "single_source_shortest_path"
+
+#worst, amortized, expected
+shortest_path: v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v, v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v, v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v

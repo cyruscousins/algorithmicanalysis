@@ -1,0 +1,6 @@
+ADT_FILE_0.1
+NAME = "partial_sort"
+VAR = {a, b}
+ANALYSIS = {worst, amortized, expected}
+FUNCTIONS = {partial_sort}
+
