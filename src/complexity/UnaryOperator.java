@@ -64,7 +64,7 @@ public class UnaryOperator extends FormulaNode {
 		  return new UnaryOperator(operationType, argument.substitute(s, f));
 	  }
 
-	  long circShiftL(long l, int shift){
+	  static long circShiftL(long l, int shift){
 		  return (l << shift) | (l >>> (64 - shift));
 	  }
 	  public long formulaHash(){

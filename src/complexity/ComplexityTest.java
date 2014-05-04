@@ -180,7 +180,7 @@ public class ComplexityTest {
 			
 			if(!epsilonCompare(d0, d1)){
 				failed = true;
-				System.err.println("Simplification Error: " + f.asString() + " -> " + s.asString() + " is invalid for " + v.asString());
+				System.err.println("Simplification Error: " + f.asString() + " -> " + s.asString() + " is invalid for " + v.asString() + ".  Original: " + d0 + ", Simplified: " + d1);
 			}
 		}
 		

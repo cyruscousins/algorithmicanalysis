@@ -2,6 +2,7 @@
 package complexity;
 
 import java.util.ArrayList;
+import java.util.Deque;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -96,6 +97,64 @@ public class FormulaParser {
 			  }
 		  }
 	  }
+  }
+  
+  //Pull * and + into groups.
+  private static FormulaNode expandOperatorTrees(FormulaNode f){
+	  if(f instanceof UnaryOperator){
+		  UnaryOperator u = (UnaryOperator)f;
+		  return new UnaryOperator(u.operationType, expandOperatorTrees(u.argument));
+	  }
+	  else if(f instanceof BinOpNode){
+		  BinOpNode b = (BinOpNode)f;
+		  int opType = b.operationType;
+		  
+		  if(!(opType == BinOpNode.ADD || opType == BinOpNode.MULTIPLY)){
+			  return new BinOpNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+		  }
+		  
+		  List<FormulaNode> nodes = new ArrayList<FormulaNode>();
+		  
+		  nodes.add(b.l);
+		  nodes.add(b.r);
+		  
+		  for(int i = 0; i < nodes.size(); i++){
+			  if(nodes.get(i) instanceof BinOpNode){
+				  BinOpNode thisNode = (BinOpNode)nodes.get(i);
+				  if(thisNode.operationType == opType){
+					  //Expand
+					  nodes.set(i, thisNode.l);
+					  nodes.add(i + 1, thisNode.r);
+					  i--; //And process this index again.
+				  }
+			  }
+		  }
+		  
+		  if(nodes.size() == 2){
+			  return new BinOpNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+		  }
+		  else{
+			  FormulaNode[] nodesArr = new FormulaNode[nodes.size()];
+			  for(int i = 0; i < nodes.size(); i++){
+				  nodesArr[i] = expandOperatorTrees(nodes.get(i));
+			  }
+			  
+			  int ocOp = -1;
+			  if (opType == BinOpNode.ADD){
+				  ocOp = OpCollectionNode.ADD;
+			  }
+			  else if (opType == BinOpNode.MULTIPLY){
+				  ocOp = OpCollectionNode.MULTIPLY;
+			  }
+
+			  OpCollectionNode o = new OpCollectionNode(nodesArr, nodesArr.length, ocOp);
+			  return o;
+		  }
+		  
+//		  Deque<FormulaNode> nodesToProcess = new Deque<FormulaNode>();
+//		  nodesToProcess.addLast(b.l)
+	  }
+	  else return f;
   }
 
   public static FormulaNode parseFormula(List<Object> s){
@@ -222,7 +281,7 @@ public class FormulaParser {
 	  }
 	  
 	  //Read variables and constants.
-	  return parseFormula(l);
+	  return expandOperatorTrees(parseFormula(l));
   }
   
   

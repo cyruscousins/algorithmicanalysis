@@ -229,13 +229,16 @@ public class BinOpNode extends FormulaNode{
 	  
 	  else if (operationType == CHOOSE){
 		  
-		  //TODO what is 0 choose 0?  What about negative numbers?
+		  //TODO what is 0 choose 0?
 		  if(nr.formulaEquals(nl)){
 			  return ConstantNode.ONE;
 		  }
 		  
 		  //
 		  if(nr instanceof ConstantNode){
+			  if(((ConstantNode)nr).value == 0){
+				  return ConstantNode.ONE;
+			  }
 			  if(((ConstantNode)nr).value == 1){
 				  return nl;
 			  }
@@ -466,6 +469,7 @@ public class BinOpNode extends FormulaNode{
   }
 
   long circShiftL(long l, int shift){
+	  shift %= 64;
 	  return (l << shift) | (l >>> (64 - shift));
   }
   
