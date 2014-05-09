@@ -1,10 +1,11 @@
-ALG_FILE_0.2
-NAME = "brodal_queue"
-ADT = "priority_queue"
+ALG_FILE_0.3
+NAME = "brodal queue"
+ADT = "priority queue"
+
+STRING "latexinfofile" "brodalqueue.tex"
 
 #worst, amortized, expected
 
-#linear time construct isn't really fair.
 construct: n, n, n
 insert: 1, 1, 1
 peek: log_2 n, log_2 n, log_2 n

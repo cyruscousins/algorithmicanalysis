@@ -29,6 +29,11 @@ public class AbstractDataType {
 		algorithms = new ArrayList<Algorithm>();
 	}
 	
+	//TODO do this.  Lower bounds?
+	String[] summarizeADT(){
+		
+	}
+	
 	
 	
 	//FILE PARSER:
@@ -47,7 +52,7 @@ ANALISIS name: (ARGUMENTS) -> RESULT
 */
 
 	//Match a quoted string
-	public static Pattern stringPattern = Pattern.compile("\"([a-zA-Z_]+)\"");
+	public static Pattern stringPattern = Pattern.compile("\"((?:[a-zA-Z_\\. ]|\\\")*)\"");
 	public static String matchQuote(String s){
 		Matcher matcher = stringPattern.matcher(s);
 		matcher.find();

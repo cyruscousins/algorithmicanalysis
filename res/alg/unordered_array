@@ -1,6 +1,6 @@
-ALG_FILE_0.2
-NAME = "unordered_array"
-ADT = "priority_queue"
+ALG_FILE_0.3
+NAME = "unordered array"
+ADT = "priority queue"
 
 #worst, amortized, expected
 construct: n, n, n

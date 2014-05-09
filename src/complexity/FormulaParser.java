@@ -68,7 +68,7 @@ public class FormulaParser {
   private static Pattern numPattern = Pattern.compile("~?(?:[0-9]+.?[0-9]*)|(?:.[0-9]+)"); //handle negative numbers (weakly).
   private static Pattern varPattern = Pattern.compile("[a-zA-Z][0-9a-zA-Z~_]*");
 
-  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:choose))");
+  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose))");
   
   private static void substituteBinaryOperators(List<Object> s, String[] operators, int[] opTypes){
 	  for(int i = 0; i < s.size(); i++){
@@ -127,6 +127,9 @@ public class FormulaParser {
 					  nodes.add(i + 1, thisNode.r);
 					  i--; //And process this index again.
 				  }
+				  else if (opType == BinOpNode.ADD && thisNode.operationType == BinOpNode.SUBTRACT){
+					  //TODO this.
+				  }
 			  }
 		  }
 		  
@@ -151,8 +154,6 @@ public class FormulaParser {
 			  return o;
 		  }
 		  
-//		  Deque<FormulaNode> nodesToProcess = new Deque<FormulaNode>();
-//		  nodesToProcess.addLast(b.l)
 	  }
 	  else return f;
   }
@@ -174,7 +175,7 @@ public class FormulaParser {
 			  if(parenDepth == 0){
 				  int nlen = i - start - 1;
 				  if(nlen > 0){
-					  ArrayList sub = new ArrayList();
+					  ArrayList<Object> sub = new ArrayList<>();
 					  
 					  s.remove(start);
 					  i--;
@@ -206,6 +207,16 @@ public class FormulaParser {
 	  }
 	  
 	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.EXPONENTIATE, BinOpNode.LOGARITHM, BinOpNode.CHOOSE});
+	  
+	  //Natural Logarithm: Has its own syntax.
+	  
+	  for(int i = 0; i < s.size(); i++){
+		  if(s.get(i).equals("ln")){
+			  s.set(i, new BinOpNode(BinOpNode.LOGARITHM, ConstantNode.E, (FormulaNode)s.remove(i + 1)));
+			  i--;
+		  }
+	  }
+	  
 	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.MULTIPLY, BinOpNode.DIVIDE});
 	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.ADD, BinOpNode.SUBTRACT});
 	  

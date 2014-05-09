@@ -1,8 +1,10 @@
-ALG_FILE_0.2
-NAME = "binary_heap"
-ADT = "priority_queue"
+ALG_FILE_0.3
+NAME = "binary heap"
+ADT = "priority queue"
 
+STRING "latexinfofile" "heap.tex"
 #worst, amortized, expected
+
 construct: n, n, n
 insert: n, log_2 n, log_2 n
 peek: 1, 1, 1

@@ -40,7 +40,6 @@ public abstract class FormulaNode {
 		  if(lastHash == nextHash && lastFormula.formulaEquals(nextFormula)) break;
 		  lastFormula = nextFormula;
 		  lastHash = nextHash;
-		  
 	  }
 	  return lastFormula;
   }

@@ -1,5 +1,5 @@
 ADT_FILE_0.1
-NAME = "optimal_prefix_code"
+NAME = "optimal prefix code"
 VAR = {s}
 ANALYSIS = {worst, amortized, expected}
 FUNCTIONS = {calculate_prefix_code}

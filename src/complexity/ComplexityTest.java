@@ -84,7 +84,7 @@ public class ComplexityTest {
 			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 2) * ((n ^ 2) / (n + m))   |" +
 			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" +
 			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Is this last one true?
-			"log_2 (n!) | n * log_2 n | (n choose 2) | n ^ 2" + //Log factorial and choose.
+			"log_2 (n!) | n * ln n | (n choose 2) | n ^ 2" + //Log factorial and choose.
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};

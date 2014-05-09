@@ -1,6 +1,6 @@
-ALG_FILE_0.2
-NAME = "priority_queue_partial_sort"
-ADT = "partial_sort"
+ALG_FILE_0.3
+NAME = "priority queue partial sort"
+ADT = "partial sort"
 
 #worst, amortized, expected
 partial_sort: construct + b * remove_min, construct + b * remove_min, construct + b * remove_min

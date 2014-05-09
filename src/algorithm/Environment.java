@@ -1,5 +1,6 @@
 package algorithm;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
@@ -14,59 +15,87 @@ public class Environment {
 		algorithms = new HashMap<String, Algorithm>();
 	}
 	
+	//////
+	//ADT:
+	
 	public AbstractDataType getADT(String name){
-		
-		AbstractDataType a = dataTypes.get(name);
-		
-		if(dataTypes.containsKey(name)){
-			return dataTypes.get(name);
-		}
-		else{
-			try{
-				FileReader f = new FileReader("res/adt/" + name);
-				a = AbstractDataType.loadAbstractDatatype(f);
-				f.close();
-				
-				if(a == null){
-					return null;
-				}
-				
-				dataTypes.put(name, a);
-				
-				return a;
-			}
-			catch(Exception e){
+		return dataTypes.get(name);
+	}
+
+	public AbstractDataType loadADT(String fileName){
+
+		try{
+			FileReader f = new FileReader("res/adt/" + fileName);
+			AbstractDataType a = AbstractDataType.loadAbstractDatatype(f);
+			f.close();
+			
+			if(a == null){
 				return null;
 			}
+			
+			dataTypes.put(a.name, a);
+			
+			return a;
+		}
+		catch(Exception e){
+			return null;
+		}
+	}
+
+	public void loadADTDirectory(String dirName){
+		if(!dirName.endsWith("/")){
+			dirName += "/";
+		}
+		File dir = new File(dirName);
+		if(!dir.isDirectory()){
+			System.err.println("Must call loadADTDirectory on a directory: \"" + dirName + " invalid");
+			return;
+		}
+		for(String f: dir.list()){
+			loadADT(f);
 		}
 	}
 	
-	public Algorithm getAlgorithm(String name){
-		
-		Algorithm a = algorithms.get(name);
-		
-		if(a != null){
-			return algorithms.get(name);
-		}
-		else{
-			try{
-				FileReader f = new FileReader("res/alg/" + name);
-				a = Algorithm.loadAlgorithm(this, f);
-				f.close();
+	////////////
+	//ALGORITHM:
 
-				if(a == null){
-					System.err.println("Failure to find algorithm \"" + name + "\"");
-					return null;
-				}
-				
-				algorithms.put(name, a);
-				return a;
-			}
-			catch(IOException e){
-				System.err.println("IO exception reading algorithm \"" + name + "\"");
-				e.printStackTrace();
+	public Algorithm getAlgorithm(String name){
+		return algorithms.get(name);
+	}
+	
+	public Algorithm loadAlgorithm(String filename){
+		Algorithm a;
+		try{
+			FileReader f = new FileReader("res/alg/" + filename);
+			a = Algorithm.loadAlgorithm(this, f);
+			f.close();
+
+			if(a == null){
+				System.err.println("Failure to load algorithm from \"" + filename + "\"");
 				return null;
 			}
+			
+			algorithms.put(a.name, a);
+			return a;
+		}
+		catch(IOException e){
+			System.err.println("IO exception reading algorithm \"" + filename + "\"");
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	public void loadAlgorithmDirectory(String dirName){
+		if(!dirName.endsWith("/")){
+			dirName += "/";
+		}
+		File dir = new File(dirName);
+		if(!dir.isDirectory()){
+			System.err.println("Must call loadAlgorithmDirectory on a directory: \"" + dirName + " invalid");
+			return;
+		}
+		for(String f: dir.list()){
+			loadAlgorithm(f);
 		}
 	}
 	

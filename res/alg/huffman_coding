@@ -1,6 +1,6 @@
-ALG_FILE_0.2
-NAME = "huffman_prefix"
-ADT = "huffman_prefix_code"
+ALG_FILE_0.3
+NAME = "huffman prefix"
+ADT = "optimal prefix code"
 
 #worst, amortized, expected
-shortest_path: construct + 2 * s * insert + s * remove_min
+shortest_path: construct + 2 * s * insert + s * remove_min, construct + 2 * s * insert + s * remove_min, construct + 2 * s * insert + s * remove_min

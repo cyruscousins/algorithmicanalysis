@@ -42,9 +42,11 @@ public class UnaryOperator extends FormulaNode {
 		  FormulaNode simp = simplify();
 		  if(simp instanceof UnaryOperator){
 			  UnaryOperator nn = (UnaryOperator)simp;
-			  
+			  if(nn.operationType == FACTORIAL){
+				  return new BinOpNode(BinOpNode.EXPONENTIATE, nn.argument, nn.argument);
+			  }
 		  }
-		return simplify();
+		return simp;
 	  }
 	  public String asString(){
 		  switch(operationType){

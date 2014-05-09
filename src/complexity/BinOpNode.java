@@ -80,6 +80,7 @@ public class BinOpNode extends FormulaNode{
 	  if(nl instanceof ConstantNode && nr instanceof ConstantNode){
 		  if(((ConstantNode)nr).value != 0) return new ConstantNode(eval(null));
 	  }
+	  
 	  //Operation with constant properties.
 	  //Must check right first to handle (ie ignore for now) divide by 0.
 	  if(nr instanceof ConstantNode){
@@ -251,8 +252,6 @@ public class BinOpNode extends FormulaNode{
 //			  }
 //			  FormulaNode
 		  }
-		  
-		  
 	  }
 
 	  //No known simplifications.  Standardize the order for commutative operations.
@@ -276,6 +275,31 @@ public class BinOpNode extends FormulaNode{
 //		  }
 //	  }
 //	  
+	  
+	  //Augment or form groups
+	  
+	  if(operationType == ADD || operationType == MULTIPLY){
+		  int collectionType = OpCollectionNode.MULTIPLY;
+		  if(operationType == ADD){
+			  collectionType = OpCollectionNode.ADD;
+		  }
+		  else{
+			  collectionType = OpCollectionNode.MULTIPLY;
+		  }
+		  
+		  if(nl instanceof OpCollectionNode && ((OpCollectionNode) nl).operator == collectionType){
+			  OpCollectionNode nlo = (OpCollectionNode) nl;
+			  if(nr instanceof OpCollectionNode){
+				  return nlo.combine((OpCollectionNode) nr).simplify();
+			  }
+			  else return nlo.pushLast(nr).simplify();
+		  }
+		  else if(nr instanceof OpCollectionNode && (((OpCollectionNode)nr).operator == collectionType)){
+			  return ((OpCollectionNode)nr).pushFirst(nl).simplify();
+		  }
+		  
+	  }
+	  
       return new BinOpNode(operationType, nl, nr);
       
   }
@@ -375,11 +399,22 @@ public class BinOpNode extends FormulaNode{
 			return nn;
 			//return new BinOpNode(operationType, l, r);
 		} else if(operationType == LOGARITHM){
-			if(nr instanceof UnaryOperator && ((UnaryOperator)nr).operationType == UnaryOperator.FACTORIAL){
-				FormulaNode factoriand = ((UnaryOperator)nr).argument.simplify(); //TODO can we use bigO here?  Even though it goes inside a log?  Probably not.
-				return new BinOpNode(MULTIPLY, factoriand.bigO(), new BinOpNode(LOGARITHM, l, factoriand));
+			FormulaNode nll;
+			
+			if(nl instanceof ConstantNode){
+				nll = ConstantNode.E;
 			}
-			return nn;
+			else{
+				nll = nl;
+			}
+			
+			if(nr instanceof UnaryOperator && ((UnaryOperator)nr).operationType == UnaryOperator.FACTORIAL){
+
+				FormulaNode factoriand = ((UnaryOperator)nr).argument.simplify(); //TODO can we use bigO here?  Even though it goes inside a log?  I think so?
+				return new BinOpNode(MULTIPLY, factoriand.bigO(), new BinOpNode(LOGARITHM, nll, factoriand));
+			}
+			
+			return new BinOpNode(LOGARITHM, nll, nr);
 		}
 		else if(operationType == CHOOSE){
 			
@@ -431,7 +466,7 @@ public class BinOpNode extends FormulaNode{
   public String asString(){
 	  if(operationType == LOGARITHM && l instanceof ConstantNode){
 		  if(l == ConstantNode.E){
-			  return "log" + r.asString();
+			  return "log(" + r.asString() + ")";
 		  }
 		  else{
 			  return "log_" + l.asString() + "(" + r.asString() + ")";
@@ -440,21 +475,28 @@ public class BinOpNode extends FormulaNode{
     return "(" + l.asString() + " " + opStrings[operationType] + " " + r.asString() + ")";
   }
   
+  private static String trimParens(String s){
+	  if(s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'){
+		  return s.substring(1, s.length() - 2);
+	  }
+	  return s;
+  }
+  
   public String asLatexString(){
 	  if(operationType == LOGARITHM){
 		  return "\\" + asString();
 	  }
 	  else if(operationType == DIVIDE){
-		  return "\\frac{" + l.asLatexString() + "}{" + r.asLatexString() + "}";
+		  return "\\frac{" + trimParens(l.asLatexString()) + "}{" + trimParens(r.asLatexString()) + "}";
 	  }
 	  else if(operationType == MULTIPLY){
 		  return "(" + l.asLatexString() + " \\cdot " + r.asLatexString() + ")";
 	  }
 	  else if(operationType == EXPONENTIATE){
-		  return l.asLatexString() + " ^ { " + r.asLatexString() + "}";
+		  return l.asLatexString() + " ^ { " + trimParens(r.asLatexString()) + "}";
 	  }
 	  else if (operationType == CHOOSE){
-		  return "\\binom{" + l.asLatexString() + "}{" + r.asLatexString() + "}";
+		  return "\\binom{" + trimParens(l.asLatexString()) + "}{" + trimParens(r.asLatexString()) + "}";
 	  }
 	  else return "(" + l.asLatexString() + " " + opStrings[operationType] + " " + r.asLatexString() + ")";
   }

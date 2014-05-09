@@ -22,10 +22,18 @@ public class Algorithm {
 	public AbstractDataType type;
 	public HashMap<String, Function> functions;
 	
+	public HashMap<String, String> strings;
+
 	public Algorithm(AbstractDataType type, String name, HashMap<String, Function> functions) {
 		this.type = type;
 		this.name = name;
 		this.functions = functions;
+	}
+	public Algorithm(AbstractDataType type, String name, HashMap<String, Function> functions, HashMap<String, String> strings) {
+		this.type = type;
+		this.name = name;
+		this.functions = functions;
+		this.strings = strings;
 	}
 	
 	public String[] summarizeAlgorithm(){
@@ -42,7 +50,7 @@ public class Algorithm {
 					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big)$");
 
 				} else{
-					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big) \\in \\bigO \\big(" + fCostBigO + "\\big)$");
+					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big) = \\bigO \\big(" + fCostBigO + "\\big)$");
 				}
 			}
 		}
@@ -61,11 +69,12 @@ public class Algorithm {
 			for(String s: functions.keySet()){
 				String fCost = functions.get(s).costs.get(analysisType).asLatexString();
 				String fCostBigO = functions.get(s).costs.get(analysisType).takeBigO().asLatexString();
+
 				if(fCost.equals(fCostBigO)){
 					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big)$");
 
 				} else{
-					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big) \\in \\bigO \\big(" + fCostBigO + "\\big)$");
+					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big) = \\bigO \\big(" + fCostBigO + "\\big)$");
 				}
 			}
 		}
@@ -338,12 +347,19 @@ ADT = "ADT_NAME"
 FUNNAME: (expression), (expression), ...
 */
 	
-	//Match a quoted string
-	public static Pattern stringPattern = Pattern.compile("\"([a-zA-Z_]+)\"");
+	public static Pattern stringPattern = Pattern.compile("\"((?:[a-zA-Z_\\. ]|(?:\\\\\"))*)\"");
 	public static String matchQuote(String s){
 		Matcher matcher = stringPattern.matcher(s);
 		matcher.find();
 		return matcher.group(1);
+	}
+	public static String[] matchQuotes(String s){
+		ArrayList<String> l = new ArrayList<>();
+		Matcher matcher = stringPattern.matcher(s);
+		while(matcher.find()){
+			l.add(matcher.group(1));
+		}
+		return l.toArray(new String[l.size()]);
 	}
 
 	//Return the strings in a set.
@@ -359,7 +375,7 @@ FUNNAME: (expression), (expression), ...
 		
 		//Validate header
 		String l = r.readLine().trim();
-		if(!l.equals("ALG_FILE_0.2")){
+		if(!l.equals("ALG_FILE_0.3")){
 			System.err.println("Failure to read ALG file: header mismatch");
 			return null;
 		}
@@ -368,7 +384,9 @@ FUNNAME: (expression), (expression), ...
 		String name = null;
 		AbstractDataType adt = null;
 		
-		HashMap<String, Function> functions = new HashMap<String, Function>();
+		HashMap<String, Function> functions = new HashMap<>();
+		
+		HashMap<String, String> strings = new HashMap<>();
 		
 		while(true){
 			l = r.readLine();
@@ -394,6 +412,14 @@ FUNNAME: (expression), (expression), ...
 					}
 				}
 			}
+			else if(l.startsWith("STRING")){
+				String[] s = matchQuotes(l);
+				if(s.length != 2){
+					System.err.println("Error: line \"" + l + "\" must contain exactly 2 string arguments.  Found " + s.length + ".");
+					return null;
+				}
+				strings.put(s[0], s[1]);
+			}
 			else{
 				String[] split = l.split(":");
 				
@@ -404,6 +430,16 @@ FUNNAME: (expression), (expression), ...
 				
 				if(expStrings.length != adt.analysisTypes.length){
 					System.err.println("Insufficient analysis types.");
+					System.err.println("\tExpected:");
+					for(int i = 0; i < adt.analysisTypes.length; i++){
+						System.err.println("\t" + adt.analysisTypes[i]);
+					}
+					System.err.println("\tFound:");
+					for(int i = 0; i < expStrings.length; i++){
+						System.err.println("\t" + expStrings[i]);
+					}
+					
+					return null;
 				}
 				
 				HashMap<String, FormulaNode> fmap = new HashMap<String, FormulaNode>();
@@ -420,7 +456,7 @@ FUNNAME: (expression), (expression), ...
 //			}
 		}
 		
-		Algorithm newAlg = new Algorithm(adt, name, functions);
+		Algorithm newAlg = new Algorithm(adt, name, functions, strings);
 		
 		adt.algorithms.add(newAlg);
 		
