@@ -234,19 +234,19 @@ public class OpCollectionNode extends FormulaNode{
 		return true;
 	}
 	
-	public String asString() {
-		String s = "(" + data[0].asString();
+	public String asStringRecurse() {
+		String s = "(" + data[0].asStringRecurse();
 		for(int i = 1; i < len; i++){
-			s += " " + opStrings[operator] + " " + data[i].asString();
+			s += " " + opStrings[operator] + " " + data[i].asStringRecurse();
 		}
 		s += ")";
 		return s;
 	}
 	
-	public String asLatexString() {
-		String s = "(" + data[0].asLatexString();
+	public String asLatexStringRecurse() {
+		String s = "(" + data[0].asLatexStringRecurse();
 		for(int i = 1; i < len; i++){
-			s += " " + latexOpStrings[operator] + " " + data[i].asLatexString();
+			s += " " + latexOpStrings[operator] + " " + data[i].asLatexStringRecurse();
 		}
 		s += ")";
 		return s;
@@ -262,13 +262,13 @@ public class OpCollectionNode extends FormulaNode{
 			ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE, new VariableNode("x")
 		};
 		OpCollectionNode o = new OpCollectionNode(data, data.length, ADD);
-		System.out.println(o.asString());
-		System.out.println(o.simplify().asString());
+		System.out.println(o.asStringRecurse());
+		System.out.println(o.simplify().asStringRecurse());
 		
 
 		o = new OpCollectionNode(data, data.length, MULTIPLY);
-		System.out.println(o.asString());
-		System.out.println(o.simplify().asString());
+		System.out.println(o.asStringRecurse());
+		System.out.println(o.simplify().asStringRecurse());
 		
 	}
 }

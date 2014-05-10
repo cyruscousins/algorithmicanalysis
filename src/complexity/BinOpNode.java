@@ -78,7 +78,7 @@ public class BinOpNode extends FormulaNode{
 	  
 	  //Simplify constant compositions.
 	  if(nl instanceof ConstantNode && nr instanceof ConstantNode){
-		  if(((ConstantNode)nr).value != 0) return new ConstantNode(eval(null));
+		  if(((ConstantNode)nr).value != 0) return new ConstantNode(new BinOpNode(operationType, nl, nr).eval(null));
 	  }
 	  
 	  //Operation with constant properties.
@@ -410,11 +410,11 @@ public class BinOpNode extends FormulaNode{
 			
 			if(nr instanceof UnaryOperator && ((UnaryOperator)nr).operationType == UnaryOperator.FACTORIAL){
 
-				FormulaNode factoriand = ((UnaryOperator)nr).argument.simplify(); //TODO can we use bigO here?  Even though it goes inside a log?  I think so?
+				FormulaNode factoriand = ((UnaryOperator)nr).argument.simplify();
 				return new BinOpNode(MULTIPLY, factoriand.bigO(), new BinOpNode(LOGARITHM, nll, factoriand));
 			}
 			
-			return new BinOpNode(LOGARITHM, nll, nr);
+			return new BinOpNode(LOGARITHM, nll, nr.takeBigO());
 		}
 		else if(operationType == CHOOSE){
 			
@@ -463,42 +463,40 @@ public class BinOpNode extends FormulaNode{
 		  return simp.bigO();
 	  }
   }
-  public String asString(){
+  public String asStringRecurse(){
 	  if(operationType == LOGARITHM && l instanceof ConstantNode){
 		  if(l == ConstantNode.E){
-			  return "log(" + r.asString() + ")";
+			  return "log(" + r.asStringRecurse() + ")";
 		  }
 		  else{
-			  return "log_" + l.asString() + "(" + r.asString() + ")";
+			  return "log_" + l.asStringRecurse() + "(" + r.asStringRecurse() + ")";
 		  }
 	  }
-    return "(" + l.asString() + " " + opStrings[operationType] + " " + r.asString() + ")";
+    return "(" + l.asStringRecurse() + " " + opStrings[operationType] + " " + r.asStringRecurse() + ")";
   }
   
-  private static String trimParens(String s){
-	  if(s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'){
-		  return s.substring(1, s.length() - 2);
-	  }
-	  return s;
-  }
-  
-  public String asLatexString(){
+  public String asLatexStringRecurse(){
 	  if(operationType == LOGARITHM){
-		  return "\\" + asString();
+		  if (l == ConstantNode.E){
+			  return "\\log(" + trimParens(r.asLatexStringRecurse()) + ")";
+			 }
+		  else{
+			  return "\\log_{" + trimParens(l.asLatexStringRecurse()) + "}(" + trimParens(r.asLatexStringRecurse()) + ")";
+		  }
 	  }
 	  else if(operationType == DIVIDE){
-		  return "\\frac{" + trimParens(l.asLatexString()) + "}{" + trimParens(r.asLatexString()) + "}";
+		  return "\\frac{" + trimParens(l.asLatexStringRecurse()) + "}{" + trimParens(r.asLatexStringRecurse()) + "}";
 	  }
 	  else if(operationType == MULTIPLY){
-		  return "(" + l.asLatexString() + " \\cdot " + r.asLatexString() + ")";
+		  return "(" + l.asLatexStringRecurse() + " \\cdot " + r.asLatexStringRecurse() + ")";
 	  }
 	  else if(operationType == EXPONENTIATE){
-		  return l.asLatexString() + " ^ { " + trimParens(r.asLatexString()) + "}";
+		  return l.asLatexStringRecurse() + " ^ { " + trimParens(r.asLatexStringRecurse()) + "}";
 	  }
 	  else if (operationType == CHOOSE){
-		  return "\\binom{" + trimParens(l.asLatexString()) + "}{" + trimParens(r.asLatexString()) + "}";
+		  return "\\binom{" + trimParens(l.asLatexStringRecurse()) + "}{" + trimParens(r.asLatexStringRecurse()) + "}";
 	  }
-	  else return "(" + l.asLatexString() + " " + opStrings[operationType] + " " + r.asLatexString() + ")";
+	  else return "(" + l.asLatexStringRecurse() + " " + opStrings[operationType] + " " + r.asLatexStringRecurse() + ")";
   }
   
   public BinOpNode substitute(String s, FormulaNode f){

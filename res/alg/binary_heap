@@ -6,9 +6,9 @@ STRING "latexinfofile" "heap.tex"
 #worst, amortized, expected
 
 construct: n, n, n
-insert: n, log_2 n, log_2 n
+insert: (n + 1) + ceil(log_2 (n + 1)), ceil(log_2 (n + 1)), ceil(log_2 (n + 1))
 peek: 1, 1, 1
-remove_min: log_2 n, log_2 n, log_2 n
+remove_min: ceil(log_2 n), ceil(log_2 n), ceil(log_2 n)
 empty: 1, 1, 1
 size: 1, 1, 1
 decrease_key: log_2 n, log_2 n, log_2 n

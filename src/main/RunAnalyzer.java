@@ -126,7 +126,7 @@ public class RunAnalyzer {
 		String[] formulae = "v | v * log_2 v | (v ^ (3 / 2)) | v ^ 2".split("\\|");
 		for(String formula : formulae){
 
-			stream.println("\\subsection[Analysis of Dijkstra's with constraints.]{Analysis of Dijkstra's with $e =" + FormulaParser.parseFormula(formula).asLatexString() + "$.}");
+			stream.println("\\subsection[Analysis of Dijkstra's with constraints.]{Analysis of Dijkstra's with $e =" + FormulaParser.parseFormula(formula).asLatexStringRecurse() + "$.}");
 //			stream.println("\\par\n\\bigskip\n\n\\textbf{Analysis of Dijkstra's with $e =" + FormulaParser.parseFormula(formula).asLatexString() + "$.}");
 //			stream.println("\\par\n\\bigskip\n\n\\textbf{Analysis of Dijkstra's with $e =" + formula + "$.}");
 			for(int i = 0; i < priorityQueues.length; i++){

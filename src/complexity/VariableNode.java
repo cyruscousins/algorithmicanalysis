@@ -8,11 +8,11 @@ public class VariableNode extends FormulaNode{
   public double eval(VarSet v){
     return v.get(varName);
   }
-  public String asString(){
+  public String asStringRecurse(){
     return varName;
   }
   
-  public String asLatexString(){
+  public String asLatexStringRecurse(){
 	  if(varName.length() > 1){
 		  return "\\text{\\texttt{" + varName.replaceAll("_", "\\\\_") + "}}";
 	  }

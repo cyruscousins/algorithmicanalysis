@@ -34,16 +34,27 @@ public class LatexStream {
 	//Includes and definitions.
 	private void printEnvironment(){
 		println(
+				
+				//Packages
 
 				"\\usepackage{amssymb, amsmath}\n" + 
-				"\\usepackage{fullpage}\n" + 
+				"\\usepackage{mathtools}\n" +
 				"\\usepackage{verbatim}\n" + 
+				
 				"\\usepackage{indentfirst}\n" + 
 				"\\usepackage{multicol}\n" +
+				"\\usepackage{hyperref}\n" +
+
+				//"\\usepackage{fullpage}\n" + 
 				"\\usepackage[landscape,margin=.5in]{geometry}\n" +
+
 				"\\usepackage[utf8]{inputenc}" +
 				
-				"\\newcommand{\\bigO}{\\mathcal{O}}\n"
+				
+				"\\newcommand{\\bigO}{\\mathcal{O}}\n" +
+
+				"\\DeclarePairedDelimiter{\\ceil}{\\lceil}{\\rceil}\n" +
+				"\\DeclarePairedDelimiter{\\floor}{\\lfloor}{\\rfloor}\n"
 		);
 	}
 	

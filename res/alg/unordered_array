@@ -2,9 +2,11 @@ ALG_FILE_0.3
 NAME = "unordered array"
 ADT = "priority queue"
 
+STRING "exactanalysis" "true
+
 #worst, amortized, expected
 construct: n, n, n
-insert: n, 1, 1
+insert: n, 2, 2
 peek: n, n, n
 remove_min: n, n, n
 empty: 1, 1, 1

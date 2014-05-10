@@ -12,7 +12,7 @@ public abstract class FormulaNode {
   }
   
   public String toString(){
-	  return super.toString() + ": " + asString();
+	  return super.toString() + ": " + asStringRecurse();
   }
   
   public FormulaNode substitute(String s, FormulaNode f){
@@ -22,9 +22,24 @@ public abstract class FormulaNode {
   public abstract long formulaHash();
   public abstract boolean formulaEquals(FormulaNode f);
 
-  public abstract String asString();
+  public abstract String asStringRecurse();
+  public String asLatexStringRecurse(){
+	  return asStringRecurse();
+  }
+  
+  public String asString(){
+	  return trimParens(asString());
+  }
+  
   public String asLatexString(){
-	  return asString();
+	  return trimParens(asLatexStringRecurse());
+  }
+
+  static String trimParens(String s){
+	  if(s.charAt(0) == '(' && s.charAt(s.length() - 1) == ')'){
+		  return s.substring(1, s.length() - 1);
+	  }
+	  return s;
   }
   
   //Final:

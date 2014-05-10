@@ -55,7 +55,7 @@ public class FormulaParser {
   private static FormulaNode apply(int op, FormulaNode f0, FormulaNode f1){
 	  if((f0 == null) ^ (op == BinOpNode.NOP)){
 		  //Invalid, must have an op and a node, or neither.
-		  System.out.println("Apply error: " + op + " " + ((f0 == null) ? f0 : f0.asString()) + " " + ((f1 == null) ? f1 : f1.asString()));
+		  System.out.println("Apply error: " + op + " " + ((f0 == null) ? f0 : f0.asStringRecurse()) + " " + ((f1 == null) ? f1 : f1.asStringRecurse()));
 		  return null;
 	  }
 	  else if(f0 == null && op == BinOpNode.NOP){
@@ -68,7 +68,7 @@ public class FormulaParser {
   private static Pattern numPattern = Pattern.compile("~?(?:[0-9]+.?[0-9]*)|(?:.[0-9]+)"); //handle negative numbers (weakly).
   private static Pattern varPattern = Pattern.compile("[a-zA-Z][0-9a-zA-Z~_]*");
 
-  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose))");
+  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose)|(?:sin)|(?:cos)|(?:floor)|(?:ceil))");
   
   private static void substituteBinaryOperators(List<Object> s, String[] operators, int[] opTypes){
 	  for(int i = 0; i < s.size(); i++){
@@ -84,10 +84,19 @@ public class FormulaParser {
 	  }
   }
   
+  private static void substitutePrefixUnaryOperators(List<Object> s, int[] opTypes){
+	  for(int i = s.size() - 1; i >= 0; i--){ //RIGHT associativity.
+		  for(int j = 0; j < opTypes.length; j++){
+			  if(s.get(i).equals(UnaryOperator.opStrings[opTypes[j]])){
+				  s.set(i, new UnaryOperator(opTypes[j], (FormulaNode)(s.remove(i + 1))));
+			  }
+		  }
+	  }
+  }
+  
   private static void substituteInfixBinaryOperators(List<Object> s, int[] opTypes){
 	  for(int i = 0; i < s.size(); i++){
 		  for(int j = 0; j < opTypes.length; j++){
-			  //System.out.println("i: " + i + ", j: " + j);
 			  if(s.get(i).equals(BinOpNode.opStrings[opTypes[j]])){
 				  s.set(i, new BinOpNode(opTypes[j], (FormulaNode)s.get(i - 1), (FormulaNode)s.get(i + 1)));
 				  s.remove(i + 1);
@@ -206,9 +215,11 @@ public class FormulaParser {
 		  }
 	  }
 	  
+	  substitutePrefixUnaryOperators(s, new int[]{UnaryOperator.FLOOR, UnaryOperator.CEIL, UnaryOperator.SINE, UnaryOperator.COSINE});
+	  
 	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.EXPONENTIATE, BinOpNode.LOGARITHM, BinOpNode.CHOOSE});
 	  
-	  //Natural Logarithm: Has its own syntax.
+	  //Natural Logarithm: Has its own syntax (slightly different from prefix unary in representation).
 	  
 	  for(int i = 0; i < s.size(); i++){
 		  if(s.get(i).equals("ln")){
@@ -409,7 +420,7 @@ public class FormulaParser {
 	for(int i = 0; i < tests.length; i++){
 		//System.out.println(tests[i]);
 		FormulaNode f = parseFormula(tests[i]);
-		System.out.println(tests[i] + " = " + ((f == null) ? f : f.asString()));
+		System.out.println(tests[i] + " = " + ((f == null) ? f : f.asStringRecurse()));
 	}
   }
   

@@ -24,7 +24,7 @@ public class ConstantNode extends FormulaNode{
 		return null;
 	  }
   }
-  public String asString(){
+  public String asStringRecurse(){
 	  long lval = (long)value;
 	  double frac = value - lval;
 	  

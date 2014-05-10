@@ -3,7 +3,10 @@ package complexity;
 public class UnaryOperator extends FormulaNode {
 	public static final int NOP = -1;
 	
-	public static final int FACTORIAL = 1, SINE = 2, COSINE = 3;
+	public static final int FACTORIAL = 0, FLOOR = 1, CEIL = 2, SINE = 3, COSINE = 4;
+	
+	public static final String[] opStrings = new String[]{"!", "floor", "ceil", "sin", "cos"};
+	private static final boolean[] isBoolValued = new boolean[]{true, true, true, false, false};
 	
 	int operationType;
 	FormulaNode argument;
@@ -22,21 +25,36 @@ public class UnaryOperator extends FormulaNode {
 		return result;
 	}
 	  public double eval(VarSet v){
-		  double argEval = argument.eval(v);
+		  double argVal = argument.eval(v);
 		  switch(operationType){
 			  case FACTORIAL:
-				  return dfactorial(argEval);
+				  return dfactorial(argVal);
+			  case FLOOR:
+				  return Math.ceil(argVal);
+			  case CEIL:
+				  return Math.ceil(argVal);
 			  case SINE:
-				  return Math.sin(argEval);
+				  return Math.sin(argVal);
 			  case COSINE:
-				  return Math.cos(argEval);
+				  return Math.cos(argVal);
 		  }
 		  System.err.println("Invalid Unary Operator");
 		  return -1;
 	  }
 	  public FormulaNode simplify(){
+		  FormulaNode argSimp = argument.simplify();
+		  if(argSimp instanceof ConstantNode){
+			  return new ConstantNode(new UnaryOperator(operationType, argSimp).eval(null));
+		  }
+		  else if(argSimp instanceof UnaryOperator 
+				&& (operationType == CEIL || operationType == FLOOR) //floor/ceil of an integer is just the integer.
+				&& argSimp instanceof UnaryOperator 
+				&& isBoolValued[((UnaryOperator)argSimp).operationType]){
+			  return argSimp;
+		  }
 		  return new UnaryOperator(operationType, argument.simplify());
 	  }
+	  
 	  public FormulaNode bigO(){
 		  
 		  FormulaNode simp = simplify();
@@ -45,21 +63,46 @@ public class UnaryOperator extends FormulaNode {
 			  if(nn.operationType == FACTORIAL){
 				  return new BinOpNode(BinOpNode.EXPONENTIATE, nn.argument, nn.argument);
 			  }
+			  else if(nn.operationType == CEIL || nn.operationType == FLOOR){
+				  return nn.argument;
+			  }
 		  }
 		return simp;
 	  }
-	  public String asString(){
+	  
+	  public String asStringRecurse(){
 		  switch(operationType){
 			  case FACTORIAL:
-				  return argument.asString() + "!"; //TODO use gamma of notation?
+				  return argument.asStringRecurse() + "!"; //TODO use gamma of notation?
+			  
+			  case FLOOR:
+			  case CEIL:
 			  case SINE:
-				  return "sin " + argument.asString();
 			  case COSINE:
-				  return "cos " + argument.asString();
+				  return opStrings[operationType] + " " + argument.asStringRecurse();
+			  
+			  default:
+				  System.err.println("Invalid Unary Operator: asString.");
+				  return null;
 		  }
-		  System.err.println("Invalid Unary Operator: asString.");
-		  return null;
-		  
+	  }
+	  
+	  public String asLatexStringRecurse(){
+		  switch(operationType){
+		  	case FACTORIAL:
+		  		return argument.asLatexStringRecurse() + "!";
+		  	case FLOOR:
+		  		return "\\floor{" + trimParens(argument.asLatexStringRecurse()) + "}";
+		  	case CEIL:
+		  		return "\\ceil{" + trimParens(argument.asLatexStringRecurse()) + "}";
+		  	case SINE:
+		  		return "\\sin(" + trimParens(argument.asLatexStringRecurse()) + ")";
+		  	case COSINE:
+		  		return "\\cos(" + trimParens(argument.asLatexStringRecurse()) + ")";
+		  	default:
+				  System.err.println("Invalid Unary Operator: asString.");
+				  return null;
+		  }
 	  }
 	  
 	  public FormulaNode substitute(String s, FormulaNode f){

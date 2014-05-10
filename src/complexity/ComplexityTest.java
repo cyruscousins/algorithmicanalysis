@@ -26,10 +26,10 @@ public class ComplexityTest {
 		System.out.println("Equality Tester");
 		for(int i = 0; i < test.length; i += 2){
 			if(test[i + 0].formulaEquals(test[i + 1])){
-				System.out.println(test[i + 0].asString() + " = " + test[i + 1].asString());
+				System.out.println(test[i + 0].asStringRecurse() + " = " + test[i + 1].asStringRecurse());
 			}
 			else{
-				System.err.println(test[i + 0].asString() + " != " + test[i + 1].asString());
+				System.err.println(test[i + 0].asStringRecurse() + " != " + test[i + 1].asStringRecurse());
 			}
 		}
 	}
@@ -46,7 +46,9 @@ public class ComplexityTest {
 				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
 				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
 				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
-				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   " +
+				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
+				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
+				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
 				"", "\\|");
 
 //		System.out.println("KEY:");
@@ -64,11 +66,11 @@ public class ComplexityTest {
 			
 			FormulaNode key = test[i + 1];
 			if(key.formulaEquals(s)){
-				System.out.println("Simplification success: " + f.asString() + " -> " + s.asString() + " = " + key.asString());
+				System.out.println("Simplification success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}
 			else{
-				System.out.println("Simplification failure: " + f.asString() + " -> " + s.asString() + " != " + key.asString());
+				System.out.println("Simplification failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
 			}
 		}
 		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
@@ -80,11 +82,13 @@ public class ComplexityTest {
 		FormulaNode[] test = FormulaParser.parseFormulae(
 			"n|n   |   n + (n * n)|n^2   |   2 * n|n   |   n ^ 2 - n|n ^ 2   |" +
 			"n * 3 * n / 4 * n|n^3   |   (5 + n + 4 / 3) / n + 7|1   |   (n * 4 * m / 3 + 7) / ((n + 8) * m)|1   |" +
+			"2 ^ (2 * n) | 2 ^ (2 * n)   |   n ^ (1 + (2 * m) / 2) | n ^ m   |" + //Basic exponentiation
 			"(n ^ 2) + (n ^ 3) | (n ^ 3)   |   n + (n + m) | (n + m)   |   (n ^ 2) + ((n ^ 2) + m) | (n ^ 2) + m   |   (n ^ 2) + ((n + m) ^ 2) | (n + m) ^ 2   |" +
 			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 2) * ((n ^ 2) / (n + m))   |" +
 			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" +
-			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Is this last one true?
-			"log_2 (n!) | n * ln n | (n choose 2) | n ^ 2" + //Log factorial and choose.
+			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Multivariate bigO with exponentiation.
+			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
+			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ (floor n)   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};
@@ -100,17 +104,17 @@ public class ComplexityTest {
 				valueSuccess++;
 			}
 			else{
-				System.err.println("Serious error: Value failure for " + f.asLatexString() + " -> " + s.asLatexString());
+				System.err.println("Serious error: Value failure for " + f.asLatexStringRecurse() + " -> " + s.asLatexStringRecurse());
 			}
 			
 			//Test accuracy
 			FormulaNode key = test[i + 1];
 			if(key.formulaEquals(s)){
-				System.out.println("BigO success: " + f.asString() + " -> " + s.asString() + " = " + key.asString());
+				System.out.println("BigO success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}
 			else{
-				System.out.println("BigO failure: " + f.asString() + " -> " + s.asString() + " != " + key.asString());
+				System.out.println("BigO failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
 			}
 		}
 		
@@ -119,7 +123,7 @@ public class ComplexityTest {
 			FormulaNode f = new Formula(test[i]).simplify();
 			FormulaNode fn = new Formula(new BinOpNode(BinOpNode.DIVIDE, f, new VariableNode("n"))).simplify();
 			if(BinOpNode.xInBigOofY(f, fn)){
-				System.out.println("BigO Error: " + f.asString() + " -> " + fn.asString() + " is innaccurate.");
+				System.out.println("BigO Error: " + f.asStringRecurse() + " -> " + fn.asStringRecurse() + " is innaccurate.");
 			}
 		}
 		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
@@ -146,7 +150,7 @@ public class ComplexityTest {
 		}
 		
 		if(d0 >= d1){
-			System.err.println("Failure: " + f0.asString() + " -> " + d0 + " > " + f1.asString() + " -> " + d1);
+			System.err.println("Failure: " + f0.asStringRecurse() + " -> " + d0 + " > " + f1.asStringRecurse() + " -> " + d1);
 		}
 		
 		return d0 < d1;
@@ -180,7 +184,7 @@ public class ComplexityTest {
 			
 			if(!epsilonCompare(d0, d1)){
 				failed = true;
-				System.err.println("Simplification Error: " + f.asString() + " -> " + s.asString() + " is invalid for " + v.asString() + ".  Original: " + d0 + ", Simplified: " + d1);
+				System.err.println("Simplification Error: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " is invalid for " + v.asString() + ".  Original: " + d0 + ", Simplified: " + d1);
 			}
 		}
 		
