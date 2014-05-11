@@ -69,7 +69,7 @@ public class RunAnalyzer {
 		postSubstitution.put("n", new VariableNode("e"));
 		
 		for(int i = 0; i < priorityQueues.length; i++){
-			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
+			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "construct, insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
 
 			stream.printStrings(newAlg.summarizeAlgorithm(bigs, littles));
 		

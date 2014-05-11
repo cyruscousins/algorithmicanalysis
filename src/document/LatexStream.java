@@ -49,7 +49,7 @@ public class LatexStream {
 				//"\\usepackage{fullpage}\n" + 
 				"\\usepackage[landscape,margin=.8in]{geometry}\n" +
 
-				"\\usepackage[utf8]{inputenc}" +
+				"\\usepackage[utf8]{inputenc}\n\n" +
 				
 				
 				"\\newcommand{\\bigO}{\\mathcal{O}}\n" +

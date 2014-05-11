@@ -401,6 +401,18 @@ public class BinOpNode extends FormulaNode{
 	    
 	    //TODO handle these properly.
 		if(nn.operationType == EXPONENTIATE){
+			if(nl instanceof ConstantNode && nr instanceof BinOpNode){
+				//This is a bit of a hack to get rid of problems like 2 ^ (1 + n)
+				BinOpNode nrb = (BinOpNode)nr;
+				if(nrb.operationType == ADD || nrb.operationType == MULTIPLY){
+					if(nrb.l instanceof ConstantNode){
+						nr = nrb.r;
+					}
+					if(nrb.r instanceof ConstantNode){
+						nr = nrb.l;
+					}
+				}
+			}
 			if(nr instanceof UnaryOperator && (((UnaryOperator)nr).operationType == UnaryOperator.CEIL || ((UnaryOperator)nr).operationType == UnaryOperator.FLOOR)){
 				return new BinOpNode(EXPONENTIATE, nl, ((UnaryOperator)nr).argument);
 			}

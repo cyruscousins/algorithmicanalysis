@@ -94,7 +94,7 @@ public class ComplexityTest {
 			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
 			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
-			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |" +
+			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n" +
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};
