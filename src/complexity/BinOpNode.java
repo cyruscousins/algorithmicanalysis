@@ -394,10 +394,19 @@ public class BinOpNode extends FormulaNode{
 		      }
 	    }
 	    
+	    //For substitution, we must have one way containment but NOT the other.  TODO This needs to be made more formal.
+	    if(nn.operationType == SUBTRACT){
+	    	if(xInBigOofY(nr, nl) && !xInBigOofY(nl, nr)){
+	    		return nl;
+	    	}
+	    }
+	    
 	    //TODO handle these properly.
 		if(nn.operationType == EXPONENTIATE){
-			return nn;
-			//return new BinOpNode(operationType, l, r);
+			if(nr instanceof UnaryOperator && (((UnaryOperator)nr).operationType == UnaryOperator.CEIL || ((UnaryOperator)nr).operationType == UnaryOperator.FLOOR)){
+				return new BinOpNode(EXPONENTIATE, nl, ((UnaryOperator)nr).argument);
+			}
+			else return nn;
 		} else if(operationType == LOGARITHM){
 			FormulaNode nll;
 			

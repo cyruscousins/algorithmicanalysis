@@ -44,9 +44,10 @@ public class LatexStream {
 				"\\usepackage{indentfirst}\n" + 
 				"\\usepackage{multicol}\n" +
 				"\\usepackage{hyperref}\n" +
+				"\\usepackage{enumerate}\n" +
 
 				//"\\usepackage{fullpage}\n" + 
-				"\\usepackage[landscape,margin=.5in]{geometry}\n" +
+				"\\usepackage[landscape,margin=.8in]{geometry}\n" +
 
 				"\\usepackage[utf8]{inputenc}" +
 				

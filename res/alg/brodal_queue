@@ -3,6 +3,7 @@ NAME = "brodal queue"
 ADT = "priority queue"
 
 STRING "latexinfofile" "brodalqueue.tex"
+STRING "objecttypename" "data structure"
 
 #worst, amortized, expected
 

@@ -2,12 +2,16 @@ ALG_FILE_0.3
 NAME = "ordered array"
 ADT = "priority queue"
 
+STRING "latexinfofile" "orderedarray.tex"
+STRING "exactanalysis" "true"
+STRING "objecttypename" "data structure"
+
 #worst, amortized, expected
-construct: n * log_2 n, n * log_2 n, n * log_2 n
-insert: n, n, n
+construct: n * ceil(log_2 n) - 2 ^ (ceil (log_2 n)) + 1, n * ceil(log_2 n) - 2 ^ (ceil (log_2 n)) + 1, n * ceil(log_2 n) - 2 ^ (ceil (log_2 n)) + 1
+insert: 2 * n + 1, n + 2, n + 2
 peek: 1, 1, 1
 remove_min: 1, 1, 1
 empty: 1, 1, 1
 size: 1, 1, 1
-decrease_key: log_2 n, log_2 n, log_2 n
-find: log_2 n, log_2 n, log_2 n
+decrease_key: n, n, n
+find: ceil(log_2 n), ceil(log_2 n), ceil(log_2 n)

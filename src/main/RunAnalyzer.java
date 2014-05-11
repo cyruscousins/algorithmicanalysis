@@ -33,19 +33,52 @@ public class RunAnalyzer {
 			priorityQueues[i] = environment.getAlgorithm(algorithmNames[i]);
 		}
 
-		Algorithm dijkstras = environment.getAlgorithm("dijkstras_algorithm");
-		Algorithm partialSort = environment.getAlgorithm("priority_queue_partial_sort");
+		Algorithm dijkstras = environment.getAlgorithm("dijkstras algorithm");
+		Algorithm partialSort = environment.getAlgorithm("priority queue partial sort");
 		
 		
 		LatexStream stream = new LatexStream(System.out);
 
 		//Basic Test Document:
 		
-		stream.printTitledHeader(14, true, "Basic Priority Queue Properties", "An Overview of Priority Queues", "Cyrus Cousins", "Spring 2014");
+		stream.printTitledHeader(12, true, "Basic Priority Queue Properties", "An Overview of Priority Queues", "Cyrus Cousins", "Spring 2014");
 		
 		for(int i = 0; i < priorityQueues.length; i++){
 			stream.printAlgorithmInfo(priorityQueues[i]);
 		}
+		
+		
+		
+		
+		
+		
+
+		//Dijkstra's analysis
+		
+		stream.println("\\pagebreak");
+		stream.println("\\section{Analysis of Dijkstra's algorithm with various priority queue structures.}");
+		
+//		stream.println("\\subsection{Summary of Dijkstra's Algorithm}");
+		
+		stream.printStrings(dijkstras.summarizeAlgorithm());
+		
+		VariableMapping postSubstitution = new VariableMapping();
+		postSubstitution.put("n", new VariableNode("e"));
+		
+		for(int i = 0; i < priorityQueues.length; i++){
+			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
+
+			stream.printStrings(newAlg.summarizeAlgorithm());
+		
+		}
+		
+		
+		
+		
+		
+		
+		
+		
 		
 		stream.closeDocument();
 		
@@ -94,24 +127,24 @@ public class RunAnalyzer {
 		
 		stream.println("\\end{multicols}");
 		
-		//Dijkstra's analysis
-		
-		stream.println("\\pagebreak");
-		stream.println("\\section{Analysis of Dijkstra's algorithm with various priority queue structures.}");
-		
-//		stream.println("\\subsection{Summary of Dijkstra's Algorithm}");
-		
-		stream.printStrings(dijkstras.summarizeAlgorithm());
-		
-		VariableMapping postSubstitution = new VariableMapping();
-		postSubstitution.put("n", new VariableNode("e"));
-		
-		for(int i = 0; i < priorityQueues.length; i++){
-			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
-
-			stream.printStrings(newAlg.summarizeAlgorithm());
-		
-		}
+//		//Dijkstra's analysis
+//		
+//		stream.println("\\pagebreak");
+//		stream.println("\\section{Analysis of Dijkstra's algorithm with various priority queue structures.}");
+//		
+////		stream.println("\\subsection{Summary of Dijkstra's Algorithm}");
+//		
+//		stream.printStrings(dijkstras.summarizeAlgorithm());
+//		
+//		postSubstitution = new VariableMapping();
+//		postSubstitution.put("n", new VariableNode("e"));
+//		
+//		for(int i = 0; i < priorityQueues.length; i++){
+//			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
+//
+//			stream.printStrings(newAlg.summarizeAlgorithm());
+//		
+//		}
 		
 		//Dijkstra's with constraints on graph size
 

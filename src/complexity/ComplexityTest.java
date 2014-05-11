@@ -39,10 +39,10 @@ public class ComplexityTest {
 		System.out.println("\n\nSIMPLIFIER TESTS\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
 				"n|n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
-				"n * n|n^2   |   n * (n * (n / n))|n^2   |   n * n * n|n^3   |   (n * n) * (n * n) | n^4   |" +
+				"n * n | n^2   |   n * (n * (n / n)) | n^2   |   n * n * n | n^3   |   (n * n) * (n * n) | n^4   |" +
 				"(n ^ 4) / (n ^ 2) | (n ^ 2)   |   (n ^ 4) / (n ^ 3) | n   |   (n ^ 2) / (n ^ 3) | (n ^ ~1)   |" +
 				"(2 * n * (2 log (n ^ 2))) - (2 * n * (2 log (n ^ 2)))|0   |   (2 * n * m) / (2 * n * m)|1   |" +
-				"(n + m) - (m + n) | 0   |   ((n + m) * (m + n)) / ((m + n) * (n + m)) | 1   |   ((n + m) ^ 1) * (1 / (n + m)) | 1   |" + 
+				"(n + m) - (m + n) | 0   |   ((n + m) * (m + n)) / ((m + n) * (n + m)) | 1   |   ((n + m) ^ 1) * (1 / (n + m)) | 1   |" +
 				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
 				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
 				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
@@ -87,6 +87,7 @@ public class ComplexityTest {
 			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 2) * ((n ^ 2) / (n + m))   |" +
 			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" +
 			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Multivariate bigO with exponentiation.
+			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
 			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ (floor n)   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"", "\\|");

@@ -3,13 +3,16 @@ NAME = "binary heap"
 ADT = "priority queue"
 
 STRING "latexinfofile" "heap.tex"
+STRING "exactanalysis" "true"
+STRING "objecttypename" "data structure"
+
 #worst, amortized, expected
 
-construct: n, n, n
+construct: 2^(ceil(log_2 n)) * 2, 2^(ceil(log_2 n)) * 2, 2^(ceil(log_2 n)) * 2
 insert: (n + 1) + ceil(log_2 (n + 1)), ceil(log_2 (n + 1)), ceil(log_2 (n + 1))
 peek: 1, 1, 1
 remove_min: ceil(log_2 n), ceil(log_2 n), ceil(log_2 n)
 empty: 1, 1, 1
 size: 1, 1, 1
-decrease_key: log_2 n, log_2 n, log_2 n
+decrease_key: ceil(log_2 n), ceil(log_2 n), ceil(log_2 (n / 2))
 find: n, n, n

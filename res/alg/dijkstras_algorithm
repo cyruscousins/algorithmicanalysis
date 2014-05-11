@@ -2,5 +2,7 @@ ALG_FILE_0.3
 NAME = "dijkstras algorithm"
 ADT = "single source shortest path"
 
+STRING "objecttypename" "algorithm"
+
 #worst, amortized, expected
 shortest_path: v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v, v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v, v + ( v * insert ) + ( v * ( empty + remove_min ) ) + (e * ( 1 + decrease_key ) ) + v

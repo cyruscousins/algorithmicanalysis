@@ -28,6 +28,8 @@ public class Algorithm {
 		this.type = type;
 		this.name = name;
 		this.functions = functions;
+		
+		this.strings = new HashMap<String, String>();
 	}
 	public Algorithm(AbstractDataType type, String name, HashMap<String, Function> functions, HashMap<String, String> strings) {
 		this.type = type;
@@ -39,18 +41,31 @@ public class Algorithm {
 	public String[] summarizeAlgorithm(){
 		ArrayList<String> summary = new ArrayList<String>();
 		
+		String formalName = name.replaceAll("_", "\\\\_") + ", a " + type.name.replaceAll("_", "\\\\_");
+		
+		if(strings.containsKey("objecttypename")){
+			formalName += " " + strings.get("objecttypename").replaceAll("_", "\\\\_");
+		}
+		
 //		summary.add("\\subsection{" + name + " $\\in$ " + type.name + "}");
-		summary.add("\\subsection{" + name.replaceAll("_", "\\\\_") + ", a " + type.name.replaceAll("_", "\\\\_") + "}");
+		summary.add("\\subsection{Complexity Analysis of " + formalName + "}");
 		for(String analysisType: type.analysisTypes){
 			summary.add("\\subsubsection{" + analysisType + " analysis}");
 			for(String s: functions.keySet()){
 				String fCost = functions.get(s).costs.get(analysisType).asLatexString();
 				String fCostBigO = functions.get(s).costs.get(analysisType).takeBigO().asLatexString();
+				String nameStr = s.replaceAll("_", "\\\\_");
+				
 				if(fCost.equals(fCostBigO)){
-					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big)$");
-
+					summary.add("\\texttt{" + nameStr + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big)$");
 				} else{
-					summary.add("\\texttt{" + s.replaceAll("_", "\\\\_") + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big) = \\bigO \\big(" + fCostBigO + "\\big)$");
+					
+					if(strings.containsKey("exactanalysis") && strings.get("exactanalysis").equals("true")){
+						summary.add("\\texttt{" + nameStr + "}" + " \\linebreak[2]$ = \\big(" + fCost + "\\big) $ \\linebreak[3]$ \\in \\bigO \\big(" + fCostBigO + "\\big)$");
+					}
+					else{
+						summary.add("\\texttt{" + nameStr + "}" + " \\linebreak[2]$ \\in \\bigO\\big(" + fCost + "\\big) $ \\linebreak[3]$ = \\bigO \\big(" + fCostBigO + "\\big)$");
+					}
 				}
 			}
 		}
@@ -107,13 +122,12 @@ public class Algorithm {
 		AbstractDataType newType = type;
 		HashMap<String, Function> newFunctions = new HashMap<String, Function>();
 		
-		
 		for(Function f : functions.values()){
 			HashMap<String, FormulaNode> newCosts = new HashMap<String, FormulaNode>();
 			
 			for(String analysisType: type.analysisTypes){
 				FormulaNode newNode = f.costs.get(analysisType);
-
+				
 				//Perform function substitutions
 				for(String functionToSub: functionsToSub){
 //					System.out.println(functionToSub + ":");

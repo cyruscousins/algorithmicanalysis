@@ -2,6 +2,8 @@ ALG_FILE_0.3
 NAME = "fibonacci heap"
 ADT = "priority queue"
 
+STRING "objecttypename" "data structure"
+
 #worst, amortized, expected
 
 construct: n, n, n

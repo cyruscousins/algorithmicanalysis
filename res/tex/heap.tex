@@ -1,1 +1,9 @@
-Heaps are fast and good.
+Perhaps the quintisential priority queue data structure, heaps are popular for their simplicity and speed.  Asymptotically superior data structures exist, but heaps are still widely used in practice due to their low overhead, small constant cost factors, and practicality.  Discussion of interesting exact costs follow.
+
+\begin{enumerate}[a):]
+
+\item \texttt{construct}: Using the linear time heap construction algorithm, analysis through convergent series yields the bound of $2^{\ceil{\log_2 n}}$.
+
+\item $E[$\texttt{decrease\_key}$]$: This expectation holds when the position of the key to be decreased is assumed to be random and the value to be decreased to is minimal for the heap\footnote{This decision was made because a more complicated assumption, which could yield a lower bound, would involve making assumptions about the values in the heap that are likely to be violated frequently.} and $n$ is given by $2^x - 1$ for some $x \in \mathbb{Z}$.  For other $n$, this is still an upper bound.  Now, $E[$\texttt{decrease\_key}$] = \sum \frac{1}{n} \ceil{\log_2 n} = \frac{1}{n} \sum \ceil{\log_2 n}$, which by a counting argument is bounded above by $\ceil{\log_2 \frac{n}{2}}$.
+
+\end{enumerate}
