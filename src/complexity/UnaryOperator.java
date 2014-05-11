@@ -79,7 +79,7 @@ public class UnaryOperator extends FormulaNode {
 			  case CEIL:
 			  case SINE:
 			  case COSINE:
-				  return opStrings[operationType] + " " + argument.asStringRecurse();
+				  return opStrings[operationType] + "(" + argument.asStringRecurse() + ")";
 			  
 			  default:
 				  System.err.println("Invalid Unary Operator: asString.");

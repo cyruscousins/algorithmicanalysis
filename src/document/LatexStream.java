@@ -134,8 +134,12 @@ public class LatexStream {
 			println("\\input{" + "res/tex/" + algorithm.strings.get("latexinfofile") + "}");
 		}
 		
-		String[] algStrings = algorithm.summarizeAlgorithm(); //TODO refactor this function to take strings for \section and \subsection.
+		String[] algStrings = algorithm.summarizeAlgorithm(null, null); //TODO refactor this function to take strings for \section and \subsection.
 		printStrings(algStrings);
+		
+	}
+	
+	public void printAlgorithmInfo(Algorithm algorithm, String[] littles, String[] bigs){
 		
 	}
 }

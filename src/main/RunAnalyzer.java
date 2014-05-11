@@ -60,7 +60,9 @@ public class RunAnalyzer {
 		
 //		stream.println("\\subsection{Summary of Dijkstra's Algorithm}");
 		
-		stream.printStrings(dijkstras.summarizeAlgorithm());
+		String[] bigs = new String[]{"v"}, littles = new String[]{"e"};
+		
+		stream.printStrings(dijkstras.summarizeAlgorithm(bigs, littles));
 		
 		VariableMapping postSubstitution = new VariableMapping();
 		postSubstitution.put("n", new VariableNode("e"));
@@ -68,7 +70,7 @@ public class RunAnalyzer {
 		for(int i = 0; i < priorityQueues.length; i++){
 			Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
 
-			stream.printStrings(newAlg.summarizeAlgorithm());
+			stream.printStrings(newAlg.summarizeAlgorithm(bigs, littles));
 		
 		}
 		

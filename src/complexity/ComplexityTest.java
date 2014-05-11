@@ -11,6 +11,7 @@ public class ComplexityTest {
 		runEqualityTests();
 		runSimplifierTests();
 		runBigOTests();
+		runBigOSubstitutionTests();
 		
 	}
 	
@@ -65,6 +66,9 @@ public class ComplexityTest {
 			if(testValueEqual(new String[]{"n", "m"}, f, s)) valueSuccess++;
 			
 			FormulaNode key = test[i + 1];
+			if(!(key.equals(key.takeSimplified()))){
+				System.err.println("Simplification test error: \"" + key.asString() + "\" is not fully simplified.");
+			}
 			if(key.formulaEquals(s)){
 				System.out.println("Simplification success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
@@ -89,14 +93,15 @@ public class ComplexityTest {
 			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Multivariate bigO with exponentiation.
 			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
 			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
-			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ (floor n)   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
+			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
+			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |" +
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};
 		
 		int valueSuccess = 0;
 		int totalSuccess = 0;
-		for(int i = 0; i < test.length; i+= 2){
+		for(int i = 0; i < test.length; i += 2){
 			FormulaNode f = test[i];
 			FormulaNode s = new Formula(f).takeBigO();
 			
@@ -110,6 +115,11 @@ public class ComplexityTest {
 			
 			//Test accuracy
 			FormulaNode key = test[i + 1];
+			
+			if(!key.formulaEquals(key.takeBigO())){
+				System.err.println("BigO test error: key" + key + " is not in normative form.");
+			}
+			
 			if(key.formulaEquals(s)){
 				System.out.println("BigO success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
@@ -129,6 +139,39 @@ public class ComplexityTest {
 		}
 		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
 		System.out.println("Value success: " + valueSuccess + " / " + test.length / 2);
+	}
+	
+	private static String[] littles = new String[]{"a", "c"}, bigs = new String[]{"b", "d"};
+	public static void runBigOSubstitutionTests(){
+		System.out.println("\n\nBIGO SUBSTITUTIONTESTS:\n");
+		FormulaNode[] test = FormulaParser.parseFormulae(
+				"a | a   |   b | b   |   a + d | a + d   |" + //Trivial
+				"a * b | a * b   |   a + b | b   |   2 ^ (a + b) | 2 ^ b   |   a ^ b | a ^ b   |" + //Basic
+				"a ^ (b + a) | a ^ b   |   a ^ (b - a) | a ^ b   |   a ^ (a - b) | a ^ (a - b)   |   a * b + b ^ 2 | b ^ 2   |   a * b + b | a * b   |   (a * b ^ 2) + (a * b) | a * b ^ 2   |" + //Complicated
+				"(a * c) + (b * d) | b * d   |   (a * c) + (b * d ^ 2) | b * d ^ 2   |"	+	//Multivariate
+				"", "\\|");
+		
+		int totalSuccess = 0;
+		
+		for(int i = 0; i < test.length; i += 2){
+			FormulaNode f = test[i];
+			FormulaNode s = f.takeBigO(littles, bigs);
+			FormulaNode key = test[i + 1];
+			
+			if(!key.formulaEquals(key.takeBigO(littles, bigs))){
+				System.err.println("BIGO SUBSTITUTION TEST ERROR: key " + key.asString() + " is not in normative form.");
+			}
+			
+			if(s.formulaEquals(key)){
+				System.out.println("BigO substitution success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
+				totalSuccess++;
+			}
+			else{
+				System.out.println("BigO substitution failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
+			}
+		}
+		
+		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
 	}
 	
 	static boolean testBigOApprox(String[] args, FormulaNode f0, FormulaNode f1){

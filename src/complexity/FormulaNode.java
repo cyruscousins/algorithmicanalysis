@@ -11,6 +11,11 @@ public abstract class FormulaNode {
 	  return this;
   }
   
+  //Take bigO, where it is known that x is in bigO(y).
+  FormulaNode bigOVarSub(String x, FormulaNode y){
+	  return this;
+  }
+  
   public String toString(){
 	  return super.toString() + ": " + asStringRecurse();
   }
@@ -28,7 +33,7 @@ public abstract class FormulaNode {
   }
   
   public String asString(){
-	  return trimParens(asString());
+	  return trimParens(asStringRecurse());
   }
   
   public String asLatexString(){
@@ -71,5 +76,17 @@ public abstract class FormulaNode {
 		  lastHash = nextHash;
 	  }
 	  return lastFormula;
+  }
+  
+  public FormulaNode takeBigO(String[] littles, String[] bigs){
+	  FormulaNode cur = takeBigO();
+	  if(littles == null){
+		  return cur;
+	  }
+	  
+	  for(int i = 0; i < littles.length; i++){
+		  cur = cur.bigOVarSub(littles[i], new VariableNode(bigs[i])).takeBigO();
+	  }
+	  return cur;
   }
 }

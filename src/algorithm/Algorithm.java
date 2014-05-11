@@ -38,7 +38,8 @@ public class Algorithm {
 		this.strings = strings;
 	}
 	
-	public String[] summarizeAlgorithm(){
+	int LINEBREAK = 1; //Latex constant.
+	public String[] summarizeAlgorithm(String[] bigOLittles, String[] bigOBigs){
 		ArrayList<String> summary = new ArrayList<String>();
 		
 		String formalName = name.replaceAll("_", "\\\\_") + ", a " + type.name.replaceAll("_", "\\\\_");
@@ -54,22 +55,30 @@ public class Algorithm {
 			for(String s: functions.keySet()){
 				String fCost = functions.get(s).costs.get(analysisType).asLatexString();
 				String fCostBigO = functions.get(s).costs.get(analysisType).takeBigO().asLatexString();
+				String fCostBigOsub = functions.get(s).costs.get(analysisType).takeBigO(bigOLittles, bigOBigs).asLatexString();
 				String nameStr = s.replaceAll("_", "\\\\_");
 				
-				if(fCost.equals(fCostBigO)){
-					summary.add("\\texttt{" + nameStr + "}" + " $ \\in \\bigO\\big(" + fCost + "\\big)$");
-				} else{
+				String lineBreak = " \\null \\hfill \\null \\linebreak[" + LINEBREAK + "]";
+				
+				String line = "\\texttt{" + nameStr + "}";
+				if(!fCost.equals(fCostBigO)){
+					//If cost is not the same as bigO cost, print cost.
+					line += lineBreak + "= $\\big(" + fCost + "\\big)$";
 					
-					if(strings.containsKey("exactanalysis") && strings.get("exactanalysis").equals("true")){
-						summary.add("\\texttt{" + nameStr + "}" + " \\linebreak[2]$ = \\big(" + fCost + "\\big) $ \\linebreak[3]$ \\in \\bigO \\big(" + fCostBigO + "\\big)$");
-					}
-					else{
-						summary.add("\\texttt{" + nameStr + "}" + " \\linebreak[2]$ \\in \\bigO\\big(" + fCost + "\\big) $ \\linebreak[3]$ = \\bigO \\big(" + fCostBigO + "\\big)$");
-					}
 				}
+				line += lineBreak + "$\\in$ $\\bigO \\big(" + fCostBigO + "\\big)$";
+				if(!fCostBigO.equals(fCostBigOsub)){
+					line += lineBreak + "= $\\bigO \\big(" + fCostBigOsub + "\\big)$";
+				}
+				
+				summary.add(line);
 			}
 		}
 		return summary.toArray(new String[summary.size()]);
+	}
+	
+	public String[] summarizeAlgorithm(){
+		return summarizeAlgorithm(null, null);
 	}
 	
 	public String[] summarizeAlgorithmSimple(){

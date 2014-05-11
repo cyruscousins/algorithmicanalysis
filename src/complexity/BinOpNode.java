@@ -19,7 +19,7 @@ public class BinOpNode extends FormulaNode{
 	  return new BinOpNode(operationType, r, l);
   }
   
-  //TODO this is straight up lazy.
+  //TODO this is quite lazy.
   private static double dChoose(double n, double k){
 	  return UnaryOperator.dfactorial(n) / (UnaryOperator.dfactorial(k) * UnaryOperator.dfactorial(n - k));
   }
@@ -362,15 +362,13 @@ public class BinOpNode extends FormulaNode{
 	    if (nn.operationType == ADD || nn.operationType == MULTIPLY || nn.operationType == SUBTRACT){
 	      //One or fewer nodes could be constants, here we throw them out.
 	      if(nl instanceof ConstantNode && ((ConstantNode)nl).value > 0){
-	//    	  System.out.println("SIMPLIFY L");
+	    	  if(nn.operationType == SUBTRACT){
+	    		  return new BinOpNode(MULTIPLY, ConstantNode.MINUS_ONE, nr.bigO()).bigO();
+	    	  }
 	        return nr.bigO();
 	      }
 	      else if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	//    	  System.out.println("SIMPLIFY R");
-	    	  if(nn.operationType == SUBTRACT){
-	    		  return new BinOpNode(MULTIPLY, ConstantNode.MINUS_ONE, nl.bigO()).bigO();
-	    	  }
-	        return nl.bigO();
+	        	return nl.bigO();
 	      }
 	      
 	    }
@@ -472,6 +470,35 @@ public class BinOpNode extends FormulaNode{
 		  return simp.bigO();
 	  }
   }
+
+  FormulaNode bigOVarSub(String x, FormulaNode y){
+	  
+//	  if(!(operationType == ADD || operationType == MULTIPLY || operationType == DIVIDE)) return this;
+	  
+	  FormulaNode sl = l.bigOVarSub(x, y);
+	  FormulaNode sr = r.bigOVarSub(x, y);
+
+	  FormulaNode lSub = sl.substitute(x, y).bigO();
+	  FormulaNode rSub = sr.substitute(x, y).bigO();
+	  
+	  if(operationType == ADD){
+		  if(xInBigOofY(lSub, rSub)){
+			  return rSub;
+		  }
+
+		  if(xInBigOofY(rSub, lSub)){
+			  return lSub;
+		  }
+	  }
+	  else if(operationType == SUBTRACT){
+		  if(xInBigOofY(rSub, lSub) && !xInBigOofY(lSub, rSub)){
+			  return lSub;
+		  }
+	  }
+	  
+	  return new BinOpNode(operationType, sl, sr);
+  }
+  
   public String asStringRecurse(){
 	  if(operationType == LOGARITHM && l instanceof ConstantNode){
 		  if(l == ConstantNode.E){
@@ -500,7 +527,15 @@ public class BinOpNode extends FormulaNode{
 		  return "(" + l.asLatexStringRecurse() + " \\cdot " + r.asLatexStringRecurse() + ")";
 	  }
 	  else if(operationType == EXPONENTIATE){
-		  return l.asLatexStringRecurse() + " ^ { " + trimParens(r.asLatexStringRecurse()) + "}";
+		  String base = l.asLatexStringRecurse();
+		  String exponent = trimParens(r.asLatexStringRecurse());
+		  return base + " ^ {" + exponent + "}";
+//		  if(l instanceof BinOpNode && ((BinOpNode)l).operationType == DIVIDE){
+//			  return base + " ^ " + exponent;
+//		  }
+//		  else{
+//			  return trimParens(base) + " ^ {" + exponent + "}";
+//		  }
 	  }
 	  else if (operationType == CHOOSE){
 		  return "\\binom{" + trimParens(l.asLatexStringRecurse()) + "}{" + trimParens(r.asLatexStringRecurse()) + "}";
