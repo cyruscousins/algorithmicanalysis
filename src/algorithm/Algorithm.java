@@ -63,8 +63,7 @@ public class Algorithm {
 				String line = "\\texttt{" + nameStr + "}";
 				if(!fCost.equals(fCostBigO)){
 					//If cost is not the same as bigO cost, print cost.
-					line += lineBreak + "= $\\big(" + fCost + "\\big)$";
-					
+					line += lineBreak + "$= " + fCost + "$";
 				}
 				line += lineBreak + "$\\in$ $\\bigO \\big(" + fCostBigO + "\\big)$";
 				if(!fCostBigO.equals(fCostBigOsub)){

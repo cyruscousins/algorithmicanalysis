@@ -2,6 +2,7 @@ ALG_FILE_0.3
 NAME = "fibonacci heap"
 ADT = "priority queue"
 
+STRING "latexinfofile" "fibonacciheap.tex"
 STRING "objecttypename" "data structure"
 
 #worst, amortized, expected

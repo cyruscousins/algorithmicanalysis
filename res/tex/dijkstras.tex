@@ -1,0 +1,15 @@
+Dijkstra's Algorithm for Single Source Shortest Path, often shortened to Dijkstra's Algorithm is a classic single source shortest path.  Originally published without using a priority queue with an $\bigO(v^2)$ running time, the use of a binary heap, and subsequently a fibonacci heap, to keep track of the costs to each vertex has improved the running time to $\bigO(e \log v)$ and $\bigO(e + v \log v)$, respectively.  An interactive visualization for Dijkstra's Algorithm can be found \href{http://www.cs.usfca.edu/~galles/visualization/Dijkstra.html}{here}.
+
+\par
+\bigskip
+
+Here the complexity of the \texttt{shortest\_path} operation is shown, based on analysis by Andrew Winslow \url{http://www.cs.tufts.edu/comp/260/lectures/lecture-5-fibonacci-heaps.pdf}\footnote{In this analysis, repeated insertion, that is $(v \cdot $\texttt{insert}) is used in the initialization phase.  I changed this to \texttt{construct} to obtain lower worst case bounds for some queue types.}.  The bounds obtained when using the various priority queues through accurate analysis are obtained automatically through the following substitutions and a priori asymptotic information.
+
+\begin{enumerate}[1.]
+
+\item \texttt{construct} $\rightarrow$ \texttt{construct}$\{n \mapsto v\}$
+\item \texttt{empty} $\rightarrow$ \texttt{empty}$\{n \mapsto v\}$
+\item \texttt{remove\_min} $\rightarrow$ \texttt{remove\_min}$\{n \mapsto v\}$
+\item $v \in \bigO(e)$
+
+\end{enumerate}
