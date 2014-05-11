@@ -2,6 +2,7 @@ ALG_FILE_0.3
 NAME = "unordered array"
 ADT = "priority queue"
 
+STRING "latexinfofile" "unorderedarray.tex"
 STRING "exactanalysis" "true"
 STRING "objecttypename" "data structure"
 
@@ -9,7 +10,7 @@ STRING "objecttypename" "data structure"
 construct: n, n, n
 insert: n + 1, 2, 2
 peek: n, n, n
-remove_min: n + 1, n + 1, n + 1
+remove_min: n, n, n
 empty: 1, 1, 1
 size: 1, 1, 1
 decrease_key: n, n, n

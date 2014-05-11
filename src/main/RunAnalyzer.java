@@ -57,7 +57,8 @@ public class RunAnalyzer {
 		
 		stream.println("\\pagebreak");
 		stream.println("\\section{Analysis of Dijkstra's algorithm with various priority queue structures.}");
-		
+
+		stream.println("\\input{" + "res/tex/" + dijkstras.strings.get("latexinfofile") + "}");
 //		stream.println("\\subsection{Summary of Dijkstra's Algorithm}");
 		
 		String[] bigs = new String[]{"v"}, littles = new String[]{"e"};

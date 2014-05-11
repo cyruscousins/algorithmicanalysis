@@ -1,11 +1,11 @@
 
-An ordered array is a highly ordered but simple data structure that can be used to somewhat efficiently perform priority queue operations.  If care is taken when making some basic decisions regarding the array implementation, good bounds can be obtained for the various priority queue operations.  Less ordered data structures such as heaps can obtain lower bounds for some of the operations.  The surprising aspects of the technical details of the algorithmic specifics follow.
-
+An ordered array is a highly ordered but simple data structure that can be used to somewhat efficiently perform priority queue operations.  If care is taken when making some basic decisions regarding the array implementation, good bounds can be obtained.  Like in the unordered array, we assume an implementation that must copy on a resize, leading to the difference between the worst case and amortized .  The surprising aspects of the technical details of the algorithmic specifics follow.
+ be obtained for the various priority queue operations.  Less ordered data structures such as heaps can obtain lower bounds for some of the operations
 \begin{enumerate}[a):]
 
 \item \texttt{remove\_min}: If removes are popped from the left and adds push to the left when space to the left is available, removing the minimum element can be implemented in constant time.
 
-\item \texttt{construct}: Construct is $\Omega{n \log n}$ by the sorting lower bound, therefore sorting an input set to implement construct for an ordered array is an optimal method.  This outstrips the naïve method of repeated \texttt{insert}, which requires $\Theta(n ^ 2)$ time (the naïve technique is essentially insertion sort).  The analysis for the runtime of \texttt{construct} assumes mergesort: this was done because of the consistency, simplicity, and asymptotic optimality of mergesort and in no way suggests that this decision was necessary.
+\item \texttt{construct}: Construct is $\Omega(n \log n)$ by the sorting lower bound, therefore sorting an input set to implement construct for an ordered array is an optimal method.  This outstrips the naïve method of repeated \texttt{insert}, which requires $\Theta(n ^ 2)$ time (the naïve technique is essentially insertion sort).  The analysis for the runtime of \texttt{construct} assumes mergesort: this was done because of the consistency, simplicity, and asymptotic optimality of mergesort and in no way suggests that this decision was necessary.
 
 \end{enumerate}
 

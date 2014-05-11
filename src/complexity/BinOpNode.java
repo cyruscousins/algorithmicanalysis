@@ -482,6 +482,18 @@ public class BinOpNode extends FormulaNode{
 	  FormulaNode rSub = sr.substitute(x, y).bigO();
 	  
 	  if(operationType == ADD){
+		  if(xInBigOofY(lSub, sr)){
+			  return sr;
+		  }
+
+		  if(xInBigOofY(rSub, sl)){
+			  return sl;
+		  }
+		  
+		  //TODO do both ever need to be substituted?
+		  
+		  /*
+		  
 		  if(xInBigOofY(lSub, rSub)){
 			  return rSub;
 		  }
@@ -489,10 +501,14 @@ public class BinOpNode extends FormulaNode{
 		  if(xInBigOofY(rSub, lSub)){
 			  return lSub;
 		  }
+		  
+		   */
+		  
+		  
 	  }
 	  else if(operationType == SUBTRACT){
-		  if(xInBigOofY(rSub, lSub) && !xInBigOofY(lSub, rSub)){
-			  return lSub;
+		  if(xInBigOofY(rSub, sl) && !xInBigOofY(sl, sr)){
+			  return sl;
 		  }
 	  }
 	  

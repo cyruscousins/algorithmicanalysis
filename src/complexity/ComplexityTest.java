@@ -145,9 +145,10 @@ public class ComplexityTest {
 	public static void runBigOSubstitutionTests(){
 		System.out.println("\n\nBIGO SUBSTITUTIONTESTS:\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
-				"a | a   |   b | b   |   a + d | a + d   |" + //Trivial
+				"a | a   |   b | b   |   a + d | a + d   |   b - a | b   |" + //Trivial
 				"a * b | a * b   |   a + b | b   |   2 ^ (a + b) | 2 ^ b   |   a ^ b | a ^ b   |" + //Basic
 				"a ^ (b + a) | a ^ b   |   a ^ (b - a) | a ^ b   |   a ^ (a - b) | a ^ (a - b)   |   a * b + b ^ 2 | b ^ 2   |   a * b + b | a * b   |   (a * b ^ 2) + (a * b) | a * b ^ 2   |" + //Complicated
+				"b + a * log_2(b) | b + a * ln b   |   (a + b) + (a * log_2(b)) | b + a * ln b   |" +
 				"(a * c) + (b * d) | b * d   |   (a * c) + (b * d ^ 2) | b * d ^ 2   |"	+	//Multivariate
 				"", "\\|");
 		
