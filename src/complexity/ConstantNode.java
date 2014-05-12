@@ -11,7 +11,7 @@ public class ConstantNode extends FormulaNode{
   public ConstantNode(double value){
 	  this.value = value;
   }
-  public double eval(VarSet v){
+  public double evaluate(VarSet v){
     return value;
   }
   //Calculate the bigO of the tree.  Assumes that simplify has been called.

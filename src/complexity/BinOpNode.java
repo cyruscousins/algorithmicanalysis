@@ -24,9 +24,9 @@ public class BinOpNode extends FormulaNode{
 	  return UnaryOperator.dfactorial(n) / (UnaryOperator.dfactorial(k) * UnaryOperator.dfactorial(n - k));
   }
   
-  public double eval(VarSet v){
-    double v0 = l.eval(v);
-    double v1 = r.eval(v);
+  public double evaluate(VarSet v){
+    double v0 = l.evaluate(v);
+    double v1 = r.evaluate(v);
     switch (operationType){
       case ADD:
         return v0 + v1;
@@ -78,7 +78,7 @@ public class BinOpNode extends FormulaNode{
 	  
 	  //Simplify constant compositions.
 	  if(nl instanceof ConstantNode && nr instanceof ConstantNode){
-		  if(((ConstantNode)nr).value != 0) return new ConstantNode(new BinOpNode(operationType, nl, nr).eval(null));
+		  if(((ConstantNode)nr).value != 0) return new ConstantNode(new BinOpNode(operationType, nl, nr).evaluate(null));
 	  }
 	  
 	  //Operation with constant properties.
@@ -580,11 +580,6 @@ public class BinOpNode extends FormulaNode{
 	  else return new BinOpNode(operationType, nl, nr);
   }
 
-  long circShiftL(long l, int shift){
-	  shift %= 64;
-	  return (l << shift) | (l >>> (64 - shift));
-  }
-  
   public long formulaHash(){
 	  return (operationType * 11) ^ circShiftL(l.formulaHash() ^ r.formulaHash(), 5);
   }

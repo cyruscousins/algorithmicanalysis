@@ -2,7 +2,7 @@ package complexity;
 
 public abstract class FormulaNode {
 	
-  public abstract double eval(VarSet v);
+  public abstract double evaluate(VarSet v);
   
   FormulaNode simplify(){
 	  return this;
@@ -22,6 +22,12 @@ public abstract class FormulaNode {
   
   public FormulaNode substitute(String s, FormulaNode f){
 	  return this;
+  }
+
+  //For hashing
+  static long circShiftL(long l, int shift){
+	  shift %= 64;
+	  return (l << shift) | (l >>> (64 - shift));
   }
   
   public abstract long formulaHash();

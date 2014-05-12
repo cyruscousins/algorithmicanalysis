@@ -17,6 +17,13 @@ public class VarSet {
 	public double get(String s){
 		return vars.get(s);
 	}
+	public double remove(String s){
+		return vars.remove(s);
+	}
+	public boolean has(String s){
+		return vars.containsKey(s);
+	}
+	
 	
 	public String asString(){
 		String r = "{";

@@ -24,8 +24,8 @@ public class UnaryOperator extends FormulaNode {
 		}
 		return result;
 	}
-	  public double eval(VarSet v){
-		  double argVal = argument.eval(v);
+	  public double evaluate(VarSet v){
+		  double argVal = argument.evaluate(v);
 		  switch(operationType){
 			  case FACTORIAL:
 				  return dfactorial(argVal);
@@ -44,7 +44,7 @@ public class UnaryOperator extends FormulaNode {
 	  public FormulaNode simplify(){
 		  FormulaNode argSimp = argument.simplify();
 		  if(argSimp instanceof ConstantNode){
-			  return new ConstantNode(new UnaryOperator(operationType, argSimp).eval(null));
+			  return new ConstantNode(new UnaryOperator(operationType, argSimp).evaluate(null));
 		  }
 		  else if(argSimp instanceof UnaryOperator 
 				&& (operationType == CEIL || operationType == FLOOR) //floor/ceil of an integer is just the integer.
@@ -109,9 +109,6 @@ public class UnaryOperator extends FormulaNode {
 		  return new UnaryOperator(operationType, argument.substitute(s, f));
 	  }
 
-	  static long circShiftL(long l, int shift){
-		  return (l << shift) | (l >>> (64 - shift));
-	  }
 	  public long formulaHash(){
 		  return operationType * 27 ^ circShiftL(argument.formulaHash(), 7);
 	  }

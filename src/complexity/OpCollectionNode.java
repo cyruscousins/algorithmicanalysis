@@ -72,19 +72,19 @@ public class OpCollectionNode extends FormulaNode{
 		return newNode;
 	}
 	
-	public double eval(VarSet v){
+	public double evaluate(VarSet v){
 		double val;
 		switch(operator){
 			case ADD:
 				val = 0;
 				for(int i = 0; i < data.length; i++){
-					val += data[i].eval(v);
+					val += data[i].evaluate(v);
 				}
 				break;
 			case MULTIPLY:
 				val = 1;
 				for(int i = 0; i < data.length; i++){
-					val *= data[i].eval(v);
+					val *= data[i].evaluate(v);
 				}
 				break;
 			default:
@@ -189,11 +189,6 @@ public class OpCollectionNode extends FormulaNode{
 	}
 	
 	return new OpCollectionNode(newData, len, operator);
-  }
-
-  long circShiftL(long l, int shift){
-	  shift %= 64;
-	  return (l << shift) | (l >>> (64 - shift));
   }
 
 	@Override

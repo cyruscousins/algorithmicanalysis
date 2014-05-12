@@ -9,6 +9,7 @@ public class ComplexityTest {
 	public static void main(String[] args){
 
 		runEqualityTests();
+		runValueTests();
 		runSimplifierTests();
 		runBigOTests();
 		runBigOSubstitutionTests();
@@ -31,6 +32,22 @@ public class ComplexityTest {
 			}
 			else{
 				System.err.println(test[i + 0].asStringRecurse() + " != " + test[i + 1].asStringRecurse());
+			}
+		}
+	}
+	
+	public static void runValueTests(){
+		FormulaNode[] tests = new FormulaNode[]{FormulaParser.parseFormula("4!"), new Summation(ConstantNode.ZERO, new ConstantNode(5), FormulaParser.parseFormula("i"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ 2"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ i"), "i")};
+		double[] correctValues = new double[]{24, 15, 30, 90};
+		
+		VarSet empty = new VarSet();
+		for(int i = 0; i < tests.length; i++){
+			double val = tests[i].evaluate(empty);
+			if(epsilonCompare(val, correctValues[i])){
+				System.out.println("Value test " + i + " passed: " + tests[i].asString() + " -> " + correctValues[i]);
+			}
+			else{
+				System.out.println("Value test " + i + " failed: " + tests[i].asString() + " -> " + val + " != " + correctValues[i]);
 			}
 		}
 	}
@@ -187,8 +204,8 @@ public class ComplexityTest {
 			v.put(args[i], x);
 		}
 		
-		double d0 = f0.eval(v);
-		double d1 = f1.eval(v) * c;
+		double d0 = f0.evaluate(v);
+		double d1 = f1.evaluate(v) * c;
 		
 		if(d0 == Double.POSITIVE_INFINITY || d1 == Double.POSITIVE_INFINITY){
 			return testBigOApprox(args, f0, f1, x / 10, c);
@@ -224,8 +241,8 @@ public class ComplexityTest {
 				v.put(args[j] + "pi", (int)val + 1);
 			}
 			
-			double d0 = f.eval(v);
-			double d1 = s.eval(v);
+			double d0 = f.evaluate(v);
+			double d1 = s.evaluate(v);
 			
 			if(!epsilonCompare(d0, d1)){
 				failed = true;

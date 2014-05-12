@@ -5,7 +5,7 @@ public class VariableNode extends FormulaNode{
   public VariableNode(String s){
 	  this.varName = s;
   }
-  public double eval(VarSet v){
+  public double evaluate(VarSet v){
     return v.get(varName);
   }
   public String asStringRecurse(){
