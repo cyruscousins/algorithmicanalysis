@@ -2,6 +2,7 @@ package color;
 
 import java.awt.Color;
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,13 +23,20 @@ public class ColorDatabase {
 		}
 	}
 	
+	//Color database from XKCD
 	public ColorDatabase(){
 		colors = new ArrayList<Integer>(512);
 		names = new ArrayList<String>(512);
 		
 		//Load database
 		try{
-			BufferedReader reader = new BufferedReader(new FileReader("res/color/xkcd.csv"));
+			
+			//APPLET MODE:
+			
+			File f = new File("res/color/xkcd.csv");
+			BufferedReader reader = new BufferedReader(new FileReader(f));
+
+//			BufferedReader reader = new BufferedReader(new FileReader("res/color/xkcd.csv"));
 
 			while(reader.ready()){
 				String line = reader.readLine();

@@ -17,6 +17,8 @@ public class GraphRenderer implements Renderable{
 	int xMax, yMax;
 	int xStep, yStep;
 	
+	int granularity = 1;
+	
 	FormulaNode[] formulae;
 	Color[] colors;
 	
@@ -42,7 +44,7 @@ public class GraphRenderer implements Renderable{
 		this.var = var;
 	}
 
-	  public GraphRenderer(RenderInfo info, int x, int y, int xSize, int ySize,
+	public GraphRenderer(RenderInfo info, int x, int y, int xSize, int ySize,
 			int xMax, int yMax, int xStep, int yStep, FormulaNode[] formulae, Color[] colors, String var) {
 		this.info = info;
 		this.x = x;
@@ -85,26 +87,37 @@ public class GraphRenderer implements Renderable{
 		  drawLine(g, xp, yp, xp + xSize, yp, 10);
 
 		  for(int i = 0; i < formulae.length; i++){
-			  if(colors != null) g.setColor(colors[i]);
-			  v.put(var, xMin);
-			  int lastX = 0;
-			  int lastY = (int)(formulae[i].eval(v) * yScale);
-			  for(int x = xMin + 1; x < xMax; x++){
-				  v.put(var, x);
-				  int nextX = (int)(x * xScale);
-				  int nextY = (int)(formulae[i].eval(v) * yScale);
-				  
-				  if(nextY > ySize) break; //TODO linear interpolate to the edge of the graph.
-				  
-				  
-				  drawLine(g, xp + lastX, yp - lastY, xp + nextX, yp - nextY, 2);
-				  
-				  lastX = nextX;
-				  lastY = nextY;
-			  }
+			  if(formulae[i] == null) continue;
 			  
-			  g.drawString(formulae[i].asString(), xp + 20, yp + (textHeight * 3 / 2) * i + textHeight * 3);
-		  }
+			  System.out.println("Rendering " + formulae[i].asString());
+			  
+			  try{
+				  
+				  if(colors != null) g.setColor(colors[i]);
+				  v.put(var, xMin);
+				  int lastX = 0;
+				  int lastY = (int)(formulae[i].evaluate(v) * yScale);
+				  for(int x = xMin + 1; x < xMax; x+= granularity){
+					  v.put(var, x);
+					  int nextX = (int)(x * xScale);
+					  int nextY = (int)(formulae[i].evaluate(v) * yScale);
+					  
+					  if(nextY > ySize) break; //TODO linear interpolate to the edge of the graph.
+					  
+					  
+					  drawLine(g, xp + lastX, yp - lastY, xp + nextX, yp - nextY, 2);
+					  
+					  lastX = nextX;
+					  lastY = nextY;
+				  }
+				  g.drawString(formulae[i].asString(), xp + 20, yp + (textHeight * 3 / 2) * i + textHeight * 3);
+			  }
+			  catch(Exception e){
+				  e.printStackTrace();
+				  g.drawString(formulae[i].asString() + " (failed to render)", xp + 20, yp + (textHeight * 3 / 2) * i + textHeight * 3);
+
+			  }
+  		  }
 	  }
 
 	void drawLine(Graphics2D g, int x0, int y0, int x1, int y1, int fragments){

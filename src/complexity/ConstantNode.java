@@ -29,6 +29,16 @@ public class ConstantNode extends FormulaNode{
 	  double frac = value - lval;
 	  
 	  if(frac < .001){
+		  return ("" + (lval)).replace("-", "~");
+	  }
+	  return ("" + (lval)).replace("-", "~");
+  }
+  
+  public String asLatexStringRecurse(){
+	  long lval = (long)value;
+	  double frac = value - lval;
+	  
+	  if(frac < .001){
 		  return "" + (lval);
 	  }
 	  return "" + value;

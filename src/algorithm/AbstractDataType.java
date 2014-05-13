@@ -11,11 +11,11 @@ import java.util.regex.Pattern;
 
 public class AbstractDataType {
 	
-	String name;
+	public String name;
 	
-	String[] functions;
-	String[] analysisTypes;
-	String[] variables;
+	public String[] functions;
+	public String[] analysisTypes;
+	public String[] variables;
 	
 	//Additional data.
 	List<Algorithm> algorithms;
@@ -31,7 +31,7 @@ public class AbstractDataType {
 	
 	//TODO do this.  Lower bounds?
 	String[] summarizeADT(){
-		
+		return null;
 	}
 	
 	
@@ -116,5 +116,12 @@ ANALISIS name: (ARGUMENTS) -> RESULT
 			return null;
 		}
 		return new AbstractDataType(name, functions, analysisTypes, vars);
+	}
+
+	public boolean hasAnalysisType(String a){
+		for(int i = 0; i < analysisTypes.length; i++){
+			if(analysisTypes[i].equals(a)) return true;
+		}
+		return false;
 	}
 }

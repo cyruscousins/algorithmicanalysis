@@ -99,4 +99,8 @@ public class Environment {
 		}
 	}
 	
+	public String[] getAlgorithmNames(){
+		return algorithms.keySet().toArray(new String[algorithms.size()]);
+	}
+	
 }

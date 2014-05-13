@@ -10,6 +10,7 @@ public class ComplexityTest {
 
 		runEqualityTests();
 		runValueTests();
+		runStringTests();
 		runSimplifierTests();
 		runBigOTests();
 		runBigOSubstitutionTests();
@@ -50,6 +51,46 @@ public class ComplexityTest {
 				System.out.println("Value test " + i + " failed: " + tests[i].asString() + " -> " + val + " != " + correctValues[i]);
 			}
 		}
+	}
+	
+	public static void runStringTests(){
+
+		System.out.println("\n\nSIMPLIFIER TESTS\n");
+		FormulaNode[] test = FormulaParser.parseFormulae("n|n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
+				"n * n | n^2   |   n * (n * (n / n)) | n^2   |   n * n * n | n^3   |   (n * n) * (n * n) | n^4   |" +
+				"(n ^ 4) / (n ^ 2) | (n ^ 2)   |   (n ^ 4) / (n ^ 3) | n   |   (n ^ 2) / (n ^ 3) | (n ^ ~1)   |" +
+				"(2 * n * (2 log (n ^ 2))) - (2 * n * (2 log (n ^ 2)))|0   |   (2 * n * m) / (2 * n * m)|1   |" +
+				"(n + m) - (m + n) | 0   |   ((n + m) * (m + n)) / ((m + n) * (n + m)) | 1   |   ((n + m) ^ 1) * (1 / (n + m)) | 1   |" +
+				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
+				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
+				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
+				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
+				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
+				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |",  //ceil and floor
+				"\\|");
+		
+				//TODO add summations
+		
+		int success = 0;
+		for(int i = 0; i < test.length; i++){
+			FormulaNode res;
+			try{
+				res = FormulaParser.parseFormula(test[i].asString());
+			}
+			catch(Exception e){
+				System.err.println("Error parsing \"" + test[i].asString() + "\".");
+				e.printStackTrace();
+				continue;
+			}
+			if(!test[i].formulaEquals(res)){
+				System.out.println("STRING FAILURE: " + test[i].asString() + " -> " + res.asString());
+			}
+			else{
+				System.out.println("STRING SUCCESS: " + test[i].asString() + " -> " + res.asString());
+				success++;
+			}
+		}
+		System.out.println("Success: " + success + " / " + test.length);
 	}
 	
 	public static void runSimplifierTests(){

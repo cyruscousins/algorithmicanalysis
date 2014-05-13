@@ -117,6 +117,7 @@ public class LatexStream {
 	
 	public void closeDocument(){
 		println("\\end{document}");
+		out.close();
 	}
 	
 	///////////////////////////////////////////
@@ -134,12 +135,30 @@ public class LatexStream {
 			println("\\input{" + "res/tex/" + algorithm.strings.get("latexinfofile") + "}");
 		}
 		
-		String[] algStrings = algorithm.summarizeAlgorithm(null, null); //TODO refactor this function to take strings for \section and \subsection.
+		String[] algStrings = algorithm.summarizeAlgorithm(null, null);
 		printStrings(algStrings);
 		
 	}
 	
 	public void printAlgorithmInfo(Algorithm algorithm, String[] littles, String[] bigs){
+		println("\\section{" + algorithm.name.replace("_", "\\_") + "}");
+		
+		if(algorithm.strings.containsKey("latexinfofile")){
+			println("\\input{" + "res/tex/" + algorithm.strings.get("latexinfofile") + "}");
+		}
+		
+		String[] algStrings = algorithm.summarizeAlgorithm(littles, bigs);
+		printStrings(algStrings);
+	}
+	
+	public void comparePractical(String section, String infoFile, AbstractDataType adt, Algorithm[] algorithms, int max){
+		println("\\section{" + section + "}");
+		
+		if(infoFile != null){
+			println("\\include{" + infoFile + "}");
+			println("\\subsection{" + "Practical Analysis of " + adt.name + "}");
+		}
+		
 		
 	}
 }

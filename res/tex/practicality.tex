@@ -1,0 +1,46 @@
+``Practical Analysis'' of algorithms is a term that often refers to the timing of implementations on real machines, which is subject to the idiosynchrasies of implementation details and hardware characteristics: often such analysis is valuable for little more than determining that some algorithm is faster than some other algorithm for some input data.  
+
+Practical analysis is usually contrasted with traditional theoretical analysis using \href{http://en.wikipedia.org/wiki/Big_O_notation}{Landau notation}.  Landau notation is mathematically precise, but disregards constant factors and lower order terms associated with the analysis of an algorithm, so by itself it is not always suitable for practical purposes.  Practical analysis through experimentation suffers from similar flaws: it is difficult to generalize the results of an experiment to experiments using different datasets and on different machines\footnote{Effects of caching and branch prediction are notoriously hard to profile and model theoretically, and can result in wildly different results between machines on different data sets when the machines are otherwise similarly powerful.}.  
+
+In this section I offer a compromise, maintaining the mathematical rigor of traditional complexity analysis while combining it with the practicality of practical analysis.  Here the strategy is to model an algorithm as a function of its input, where the function is valued by the total cost of running the algorithm on the inputs.
+
+\subsection{Simple Example}
+
+As a simple example, I provide a practical analysis of HeapSort.  The basic algorithm is as follows:
+
+\par
+\bigskip
+
+\texttt{HeapSort}$(a)$ = \texttt{construct} + $\sum{i = 0}^{a-1}$ \texttt{remove_min}
+
+\par
+\bigskip
+
+And when a binary heap is substituted in, we are left with the following:
+
+\par
+\bigskip
+
+\texttt{HeapSort} = (2 \cdot n) + \sum_{i = 0}^n \ceil{log_2 i}
+
+\par
+\bigskip
+
+This substitution was performed on a heapsort, using a heap with \texttt{construct} $ = (2 \cdot n)$ and \texttt{remove_min} 
+The formal rules for this substitution were as follows:
+
+\begin{enumerate}
+
+\item \texttt{construct} \rightarrow \texttt{construct}$\{n \mapsto a\}$
+
+\item \texttt{remove_min} \rightarrow \texttt{remove_min}$\{n \mapsto i\}$
+
+\end{enumerate}
+
+\subsection{Advantages and Disadvantages}
+
+As can be seen from the previous example, the result obtained is not necessarily a closed form equation because of the summations involved, but if an algorithm can be expressed as a polynomial number of suboperations, it can be possible to calculate the cost of an instance of an algorithm \textit{without actually performing it}, in significantly less time.  If, for instance, an algorithm were to solve a polynomial number of instances of boolean satisfiability, the time required for the algorithm to terminate could be predicted on instances far too large to be practically evaluated.
+
+In addition to the performance advantages to this approach, the varying and unpredictable costs inflicted by compilers and processors vanish with this theoretical approach.  Any assumptions made in this approach are clear: however this is also a great disadvantage in that assumptions about the speed of various operations need by made for this approach to be effective and useful.
+
+
