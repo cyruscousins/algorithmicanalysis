@@ -2,6 +2,6 @@
 
 sh prepareapplet.sh
 
-cp -r META-INF/ bin/META-INF
+cp -rf META-INF/ bin/META-INF
 cd bin
 jar cfM ../complexity.jar ./
