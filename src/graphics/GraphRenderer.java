@@ -17,7 +17,7 @@ public class GraphRenderer implements Renderable{
 	int xMax, yMax;
 	int xStep, yStep;
 	
-	int granularity = 1;
+	int granularity = 2;
 	
 	FormulaNode[] formulae;
 	Color[] colors;
@@ -89,7 +89,7 @@ public class GraphRenderer implements Renderable{
 		  for(int i = 0; i < formulae.length; i++){
 			  if(formulae[i] == null) continue;
 			  
-			  System.out.println("Rendering " + formulae[i].asString());
+//			  System.out.println("Rendering " + formulae[i].asString());
 			  
 			  try{
 				  
@@ -97,8 +97,12 @@ public class GraphRenderer implements Renderable{
 				  v.put(var, xMin);
 				  int lastX = 0;
 				  int lastY = (int)(formulae[i].evaluate(v) * yScale);
-				  for(int x = xMin + 1; x < xMax; x+= granularity){
+				  //for(int x = xMin + 1; x < xMax; x+= granularity){
+				  for(int xx = 0; xx < xSize; xx+=granularity){
+					  double x = xMin + (xMax - xMin) * xx / (double) xSize;
 					  v.put(var, x);
+
+						  
 					  int nextX = (int)(x * xScale);
 					  int nextY = (int)(formulae[i].evaluate(v) * yScale);
 					  

@@ -73,13 +73,13 @@ public class UnaryOperatorNode extends FormulaNode {
 	  public String asStringRecurse(){
 		  switch(operationType){
 			  case FACTORIAL:
-				  return argument.asStringRecurse() + "!"; //TODO use gamma of notation?
+				  return "(" + argument.asStringRecurse() + "!" + ")"; //TODO use gamma of notation?
 			  
 			  case FLOOR:
 			  case CEIL:
 			  case SINE:
 			  case COSINE:
-				  return opStrings[operationType] + "(" + argument.asStringRecurse() + ")";
+				  return "(" + opStrings[operationType] + "(" + argument.asStringRecurse() + ")" + ")";
 			  
 			  default:
 				  System.err.println("Invalid Unary Operator: asString.");

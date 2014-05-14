@@ -19,9 +19,12 @@ public class BinaryOperatorNode extends FormulaNode{
 	  return new BinaryOperatorNode(operationType, r, l);
   }
   
-  //TODO this is quite lazy.
-  private static double dChoose(double n, double k){
-	  return UnaryOperatorNode.dfactorial(n) / (UnaryOperatorNode.dfactorial(k) * UnaryOperatorNode.dfactorial(n - k));
+  private static double dChoose(double n, double km){
+	double val = 1;
+	for(int k = 0; k < km; k++){
+	    val *= (n-k) / (k+1);
+	}
+	return val;
   }
   
   public double evaluate(VarSet v){

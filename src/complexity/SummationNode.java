@@ -32,7 +32,7 @@ public class SummationNode extends FormulaNode{
 		}
 		
 		if(Double.isNaN(oldVarValue)){
-			v.remove(varName);
+			if(v.has(varName)) v.remove(varName);
 		}
 		else{
 			v.put(varName, oldVarValue);
@@ -103,6 +103,11 @@ public class SummationNode extends FormulaNode{
 		return simp;
 	}
 	
+	public FormulaNode substitute(String s, FormulaNode f){
+		
+		//TODO reuse this if no change.
+		return new SummationNode(lower.substitute(s, f), upper.substitute(s, f), inner.substitute(s, f), varName);
+	}
 	@Override
 	public long formulaHash() {
 		return circShiftL(lower.formulaHash(), 3) ^ circShiftL(upper.formulaHash(), 5) ^ circShiftL(inner.formulaHash(), 7);
@@ -117,7 +122,9 @@ public class SummationNode extends FormulaNode{
 	}
 	@Override
 	public String asStringRecurse() {
-		return "sum " + varName + " from " + lower.asStringRecurse() + " to " + upper.asStringRecurse() + " of " + inner.asStringRecurse();
+		
+		return "(" + "sum " + varName + " from " + lower.asStringRecurse() + " to " + upper.asStringRecurse() + " of " + inner.asStringRecurse() + ")";
+		
 	}
 	
 	public String asLatexStringRecurse() {
