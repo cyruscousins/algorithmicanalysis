@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -68,7 +69,7 @@ ANALISIS name: (ARGUMENTS) -> RESULT
 		return setStr.split(", *");
 	}
 	
-	public static AbstractDataType loadAbstractDatatype(FileReader f) throws IOException{
+	public static AbstractDataType loadAbstractDatatype(Reader f) throws IOException{
 		BufferedReader r = new BufferedReader(f);
 		
 		//Validate header

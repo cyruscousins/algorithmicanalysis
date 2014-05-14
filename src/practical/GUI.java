@@ -87,14 +87,16 @@ public class GUI extends JPanel implements ActionListener, ChangeListener{
 
 
 		//LOAD FONT
-		File ff = null;
 		Font fraw = null;;
 		Font f2 = null;
 		try{
-			ff = new File("res/font/Gregscript.ttf");
-			fraw = Font.createFont(Font.TRUETYPE_FONT, ff);
+//			ff = new File("res/font/Gregscript.ttf");
+//			fraw = Font.createFont(Font.TRUETYPE_FONT, ff);
+//			f2 = fraw.deriveFont(Font.PLAIN, 32f);
+			
+			fraw = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("res/font/Gregscript.ttf"));
 			f2 = fraw.deriveFont(Font.PLAIN, 32f);
-		}
+			}
 		catch(Exception e){
 			e.printStackTrace();
 		}

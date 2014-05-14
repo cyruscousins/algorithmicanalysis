@@ -3,6 +3,7 @@ package algorithm;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.Reader;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -206,7 +207,7 @@ FUNNAME: (expression), (expression), ...
 		String setStr = matcher.group(1);
 		return setStr.split(", *");
 	}
-	public static Algorithm loadAlgorithm(Environment e, FileReader f) throws IOException{
+	public static Algorithm loadAlgorithm(Environment e, Reader f) throws IOException{
 		BufferedReader r = new BufferedReader(f);
 		
 		//Validate header

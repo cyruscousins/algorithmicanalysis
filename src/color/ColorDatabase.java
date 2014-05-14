@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -31,10 +33,11 @@ public class ColorDatabase {
 		//Load database
 		try{
 			
-			//APPLET MODE:
+//			File f = new File("res/color/xkcd.csv");
+//			BufferedReader reader = new BufferedReader(new FileReader(f));
 			
-			File f = new File("res/color/xkcd.csv");
-			BufferedReader reader = new BufferedReader(new FileReader(f));
+			InputStream s = getClass().getClassLoader().getResourceAsStream("res/color/xkcd.csv");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(s));
 
 //			BufferedReader reader = new BufferedReader(new FileReader("res/color/xkcd.csv"));
 
