@@ -5,7 +5,7 @@ import java.util.List;
 
 public class OpCollectionNode extends FormulaNode{
 	public static final int ADD = 0, MULTIPLY = 1;
-	private static final int[] toBinOpMap = new int[]{BinOpNode.ADD, BinOpNode.MULTIPLY};
+	private static final int[] toBinOpMap = new int[]{BinaryOperatorNode.ADD, BinaryOperatorNode.MULTIPLY};
 	int operator;
 	
 	String[] opStrings = new String[]{"+", "*"};
@@ -115,7 +115,7 @@ public class OpCollectionNode extends FormulaNode{
 		
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
-				FormulaNode attempt = new BinOpNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
+				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
 				FormulaNode simp = attempt.simplify();
 				if(!simp.formulaEquals(attempt)){
 					//Simplification was successful, this means that the terms were combined.
@@ -133,7 +133,7 @@ public class OpCollectionNode extends FormulaNode{
 			return nodes.get(0);
 		}
 		else if(nodes.size() == 2){
-			return new BinOpNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
+			return new BinaryOperatorNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
 		}
 		else{
 			return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
@@ -157,7 +157,7 @@ public class OpCollectionNode extends FormulaNode{
 		
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
-				FormulaNode attempt = new BinOpNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
+				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
 				FormulaNode bigo = attempt.bigO();
 				if(!bigo.formulaEquals(attempt)){
 					//Simplification was successful, this means that the terms were combined.
@@ -175,7 +175,7 @@ public class OpCollectionNode extends FormulaNode{
 			return nodes.get(0);
 		}
 		else if(nodes.size() == 2){
-			return new BinOpNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
+			return new BinaryOperatorNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
 		}
 		else{
 			return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);

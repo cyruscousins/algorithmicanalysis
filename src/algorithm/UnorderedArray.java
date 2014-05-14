@@ -23,13 +23,13 @@ public class UnorderedArray extends PriorityQueue{
 		for(int i = 0; i < fnames.length; i++){
 			HashMap<String, FormulaNode> complexity = new HashMap<String, FormulaNode>();
 			complexity.put("worst case cost", worstCosts[i]);
-			complexity.put("worst case bigO", worstCosts[i].bigO());
+//			complexity.put("worst case bigO", worstCosts[i].bigO());
 
 			complexity.put("amortized cost", amortizedCosts[i]);
-			complexity.put("amortized bigO", amortizedCosts[i].bigO());
+//			complexity.put("amortized bigO", amortizedCosts[i].bigO());
 			
 			complexity.put("expected cost", expectedCosts[i]);
-			complexity.put("expected bigO", expectedCosts[i].bigO());
+//			complexity.put("expected bigO", expectedCosts[i].bigO());
 			
 			Function f = new Function(fnames[i], complexity);
 			PQMAP.put(fnames[i], f);
@@ -44,11 +44,11 @@ public class UnorderedArray extends PriorityQueue{
 
 	RenderInfo info;
 	
-	public UnorderedArray(TextStream text, RenderInfo info, int startSize){
-		super(text, PQMAP);
-		this.info = info;
-		data = new int[startSize];
-	}
+//	public UnorderedArray(TextStream text, RenderInfo info, int startSize){
+//		super(text, PQMAP);
+//		this.info = info;
+//		data = new int[startSize];
+//	}
 	
 	public void put(int i, Renderer r){
 		

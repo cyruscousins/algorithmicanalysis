@@ -80,7 +80,7 @@ public class Main {
 		
 		r.put("Colors", c);
 		
-		FormulaNode form = new BinOpNode(BinOpNode.ADD, new VariableNode("n"), new BinOpNode(BinOpNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
+		FormulaNode form = new BinaryOperatorNode(BinaryOperatorNode.ADD, new VariableNode("n"), new BinaryOperatorNode(BinaryOperatorNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
 		
 		r.put("Formula", new FormulaRenderer(form, 100, 50));
 		
@@ -93,8 +93,8 @@ public class Main {
 		
 		//Grapher:
 		FormulaNode[] fn = FormulaParser.parseFormulae("n | n * (2 log n) | n ^ 2 | n ^ 3", "\\|");
-		GraphRenderer gr = new GraphRenderer(ri, 600, 100, 400, 400, 100, 10000, 10, 1000, fn, "n"); //TODO fix graphing module!
-		r.put("Graphs", gr);
+//		GraphRenderer gr = new GraphRenderer(ri, 600, 100, 400, 400, 100, 10000, 10, 1000, fn, "n"); //TODO fix graphing module!
+//		r.put("Graphs", gr);
 		
 //		r.render((Graphics2D)f.getGraphics(), 0, 0, 800, 600);
 		
@@ -110,19 +110,19 @@ public class Main {
 //		}
 
 		int[] data = new int[]{1, 8, 5, 9, 6, 2, 3, 4, 12, 11, 16, 7, 15, 10, 13, 14};
-		UnorderedArray a = new UnorderedArray(out, ri, 8);
+//		UnorderedArray a = new UnorderedArray(out, ri, 8);
 		
-		for(int i = 0; i < 16; i++){
-			a.put(data[i], r);
-			try{
-				Thread.sleep(500);
-			}
-			catch(Exception e){ }
-		}
-		
-		try{
-			Thread.sleep(10000);
-		}
-		catch(Exception e){ }
+//		for(int i = 0; i < 16; i++){
+//			a.put(data[i], r);
+//			try{
+//				Thread.sleep(500);
+//			}
+//			catch(Exception e){ }
+//		}
+//		
+//		try{
+//			Thread.sleep(10000);
+//		}
+//		catch(Exception e){ }
 	}
 }

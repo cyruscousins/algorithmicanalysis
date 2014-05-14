@@ -1,6 +1,6 @@
 package complexity;
 
-public class UnaryOperator extends FormulaNode {
+public class UnaryOperatorNode extends FormulaNode {
 	public static final int NOP = -1;
 	
 	public static final int FACTORIAL = 0, FLOOR = 1, CEIL = 2, SINE = 3, COSINE = 4;
@@ -11,7 +11,7 @@ public class UnaryOperator extends FormulaNode {
 	int operationType;
 	FormulaNode argument;
 	
-	public UnaryOperator(int operationType, FormulaNode argument) {
+	public UnaryOperatorNode(int operationType, FormulaNode argument) {
 		this.operationType = operationType;
 		this.argument = argument;
 	}
@@ -44,24 +44,24 @@ public class UnaryOperator extends FormulaNode {
 	  public FormulaNode simplify(){
 		  FormulaNode argSimp = argument.simplify();
 		  if(argSimp instanceof ConstantNode){
-			  return new ConstantNode(new UnaryOperator(operationType, argSimp).evaluate(null));
+			  return new ConstantNode(new UnaryOperatorNode(operationType, argSimp).evaluate(null));
 		  }
-		  else if(argSimp instanceof UnaryOperator 
+		  else if(argSimp instanceof UnaryOperatorNode 
 				&& (operationType == CEIL || operationType == FLOOR) //floor/ceil of an integer is just the integer.
-				&& argSimp instanceof UnaryOperator 
-				&& isBoolValued[((UnaryOperator)argSimp).operationType]){
+				&& argSimp instanceof UnaryOperatorNode 
+				&& isBoolValued[((UnaryOperatorNode)argSimp).operationType]){
 			  return argSimp;
 		  }
-		  return new UnaryOperator(operationType, argument.simplify());
+		  return new UnaryOperatorNode(operationType, argument.simplify());
 	  }
 	  
 	  public FormulaNode bigO(){
 		  
 		  FormulaNode simp = simplify();
-		  if(simp instanceof UnaryOperator){
-			  UnaryOperator nn = (UnaryOperator)simp;
+		  if(simp instanceof UnaryOperatorNode){
+			  UnaryOperatorNode nn = (UnaryOperatorNode)simp;
 			  if(nn.operationType == FACTORIAL){
-				  return new BinOpNode(BinOpNode.EXPONENTIATE, nn.argument, nn.argument);
+				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, nn.argument, nn.argument);
 			  }
 			  else if(nn.operationType == CEIL || nn.operationType == FLOOR){
 				  return nn.argument;
@@ -106,14 +106,14 @@ public class UnaryOperator extends FormulaNode {
 	  }
 	  
 	  public FormulaNode substitute(String s, FormulaNode f){
-		  return new UnaryOperator(operationType, argument.substitute(s, f));
+		  return new UnaryOperatorNode(operationType, argument.substitute(s, f));
 	  }
 
 	  public long formulaHash(){
 		  return operationType * 27 ^ circShiftL(argument.formulaHash(), 7);
 	  }
 	  public boolean formulaEquals(FormulaNode f){
-		  return (f instanceof UnaryOperator && ((UnaryOperator)f).operationType == operationType && ((UnaryOperator)f).argument.formulaEquals(argument));
+		  return (f instanceof UnaryOperatorNode && ((UnaryOperatorNode)f).operationType == operationType && ((UnaryOperatorNode)f).argument.formulaEquals(argument));
 	  }
 	
 }

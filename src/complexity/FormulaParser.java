@@ -36,33 +36,33 @@ public class FormulaParser {
   private static int parseOperator(String s){
 	  switch(s){
 		  case "+":
-			  return BinOpNode.ADD;
+			  return BinaryOperatorNode.ADD;
 		  case "-":
-			  return BinOpNode.SUBTRACT;
+			  return BinaryOperatorNode.SUBTRACT;
 		  case "*":
-			  return BinOpNode.MULTIPLY;
+			  return BinaryOperatorNode.MULTIPLY;
 		  case "/":
-			  return BinOpNode.DIVIDE;
+			  return BinaryOperatorNode.DIVIDE;
 		  case "log":
-			  return BinOpNode.LOGARITHM;
+			  return BinaryOperatorNode.LOGARITHM;
 		  case "^":
-			  return BinOpNode.EXPONENTIATE;
+			  return BinaryOperatorNode.EXPONENTIATE;
 		  default:
-		      return BinOpNode.NOP;
+		      return BinaryOperatorNode.NOP;
 	  }
   }
   
   private static FormulaNode apply(int op, FormulaNode f0, FormulaNode f1){
-	  if((f0 == null) ^ (op == BinOpNode.NOP)){
+	  if((f0 == null) ^ (op == BinaryOperatorNode.NOP)){
 		  //Invalid, must have an op and a node, or neither.
 		  System.out.println("Apply error: " + op + " " + ((f0 == null) ? f0 : f0.asStringRecurse()) + " " + ((f1 == null) ? f1 : f1.asStringRecurse()));
 		  return null;
 	  }
-	  else if(f0 == null && op == BinOpNode.NOP){
+	  else if(f0 == null && op == BinaryOperatorNode.NOP){
 		  //First node, no op has been selected and f0 doesn't exist.
 		  return f1;
 	  }
-	  else return new BinOpNode(op, f0, f1);
+	  else return new BinaryOperatorNode(op, f0, f1);
   }
   
   private static Pattern numPattern = Pattern.compile("~?(?:[0-9]+.?[0-9]*)|(?:.[0-9]+)"); //handle negative numbers (weakly).
@@ -74,7 +74,7 @@ public class FormulaParser {
 	  for(int i = 0; i < s.size(); i++){
 		  for(int j = 0; j < operators.length; j++){
 			  if(s.get(i).equals(operators[j])){
-				  s.set(i, new BinOpNode(opTypes[j], (FormulaNode)s.get(i - 1), (FormulaNode)s.get(i + 1)));
+				  s.set(i, new BinaryOperatorNode(opTypes[j], (FormulaNode)s.get(i - 1), (FormulaNode)s.get(i + 1)));
 				  s.remove(i + 1);
 				  s.remove(i - 1);
 				  i--;
@@ -87,8 +87,8 @@ public class FormulaParser {
   private static void substitutePrefixUnaryOperators(List<Object> s, int[] opTypes){
 	  for(int i = s.size() - 1; i >= 0; i--){ //RIGHT associativity.
 		  for(int j = 0; j < opTypes.length; j++){
-			  if(s.get(i).equals(UnaryOperator.opStrings[opTypes[j]])){
-				  s.set(i, new UnaryOperator(opTypes[j], (FormulaNode)(s.remove(i + 1))));
+			  if(s.get(i).equals(UnaryOperatorNode.opStrings[opTypes[j]])){
+				  s.set(i, new UnaryOperatorNode(opTypes[j], (FormulaNode)(s.remove(i + 1))));
 			  }
 		  }
 	  }
@@ -97,8 +97,8 @@ public class FormulaParser {
   private static void substituteInfixBinaryOperators(List<Object> s, int[] opTypes){
 	  for(int i = 0; i < s.size(); i++){
 		  for(int j = 0; j < opTypes.length; j++){
-			  if(s.get(i).equals(BinOpNode.opStrings[opTypes[j]])){
-				  s.set(i, new BinOpNode(opTypes[j], (FormulaNode)s.get(i - 1), (FormulaNode)s.get(i + 1)));
+			  if(s.get(i).equals(BinaryOperatorNode.opStrings[opTypes[j]])){
+				  s.set(i, new BinaryOperatorNode(opTypes[j], (FormulaNode)s.get(i - 1), (FormulaNode)s.get(i + 1)));
 				  s.remove(i + 1);
 				  s.remove(i - 1);
 				  i--;
@@ -110,16 +110,16 @@ public class FormulaParser {
   
   //Pull * and + into groups.
   private static FormulaNode expandOperatorTrees(FormulaNode f){
-	  if(f instanceof UnaryOperator){
-		  UnaryOperator u = (UnaryOperator)f;
-		  return new UnaryOperator(u.operationType, expandOperatorTrees(u.argument));
+	  if(f instanceof UnaryOperatorNode){
+		  UnaryOperatorNode u = (UnaryOperatorNode)f;
+		  return new UnaryOperatorNode(u.operationType, expandOperatorTrees(u.argument));
 	  }
-	  else if(f instanceof BinOpNode){
-		  BinOpNode b = (BinOpNode)f;
+	  else if(f instanceof BinaryOperatorNode){
+		  BinaryOperatorNode b = (BinaryOperatorNode)f;
 		  int opType = b.operationType;
 		  
-		  if(!(opType == BinOpNode.ADD || opType == BinOpNode.MULTIPLY)){
-			  return new BinOpNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+		  if(!(opType == BinaryOperatorNode.ADD || opType == BinaryOperatorNode.MULTIPLY)){
+			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
 		  }
 		  
 		  List<FormulaNode> nodes = new ArrayList<FormulaNode>();
@@ -128,22 +128,22 @@ public class FormulaParser {
 		  nodes.add(b.r);
 		  
 		  for(int i = 0; i < nodes.size(); i++){
-			  if(nodes.get(i) instanceof BinOpNode){
-				  BinOpNode thisNode = (BinOpNode)nodes.get(i);
+			  if(nodes.get(i) instanceof BinaryOperatorNode){
+				  BinaryOperatorNode thisNode = (BinaryOperatorNode)nodes.get(i);
 				  if(thisNode.operationType == opType){
 					  //Expand
 					  nodes.set(i, thisNode.l);
 					  nodes.add(i + 1, thisNode.r);
 					  i--; //And process this index again.
 				  }
-				  else if (opType == BinOpNode.ADD && thisNode.operationType == BinOpNode.SUBTRACT){
+				  else if (opType == BinaryOperatorNode.ADD && thisNode.operationType == BinaryOperatorNode.SUBTRACT){
 					  //TODO this.
 				  }
 			  }
 		  }
 		  
 		  if(nodes.size() == 2){
-			  return new BinOpNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
 		  }
 		  else{
 			  FormulaNode[] nodesArr = new FormulaNode[nodes.size()];
@@ -152,10 +152,10 @@ public class FormulaParser {
 			  }
 			  
 			  int ocOp = -1;
-			  if (opType == BinOpNode.ADD){
+			  if (opType == BinaryOperatorNode.ADD){
 				  ocOp = OpCollectionNode.ADD;
 			  }
-			  else if (opType == BinOpNode.MULTIPLY){
+			  else if (opType == BinaryOperatorNode.MULTIPLY){
 				  ocOp = OpCollectionNode.MULTIPLY;
 			  }
 
@@ -209,27 +209,27 @@ public class FormulaParser {
 	  
 	  for(int i = 0; i < s.size(); i++){
 		  if(s.get(i).equals("!")){
-			  s.set(i - 1, new UnaryOperator(UnaryOperator.FACTORIAL, (FormulaNode)s.get(i - 1)));
+			  s.set(i - 1, new UnaryOperatorNode(UnaryOperatorNode.FACTORIAL, (FormulaNode)s.get(i - 1)));
 			  s.remove(i);
 			  i--;
 		  }
 	  }
 	  
-	  substitutePrefixUnaryOperators(s, new int[]{UnaryOperator.FLOOR, UnaryOperator.CEIL, UnaryOperator.SINE, UnaryOperator.COSINE});
+	  substitutePrefixUnaryOperators(s, new int[]{UnaryOperatorNode.FLOOR, UnaryOperatorNode.CEIL, UnaryOperatorNode.SINE, UnaryOperatorNode.COSINE});
 	  
-	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.EXPONENTIATE, BinOpNode.LOGARITHM, BinOpNode.CHOOSE});
+	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.EXPONENTIATE, BinaryOperatorNode.LOGARITHM, BinaryOperatorNode.CHOOSE});
 	  
 	  //Natural Logarithm: Has its own syntax (slightly different from prefix unary in representation).
 	  
 	  for(int i = 0; i < s.size(); i++){
 		  if(s.get(i).equals("ln")){
-			  s.set(i, new BinOpNode(BinOpNode.LOGARITHM, ConstantNode.E, (FormulaNode)s.remove(i + 1)));
+			  s.set(i, new BinaryOperatorNode(BinaryOperatorNode.LOGARITHM, ConstantNode.E, (FormulaNode)s.remove(i + 1)));
 			  i--;
 		  }
 	  }
 	  
-	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.MULTIPLY, BinOpNode.DIVIDE});
-	  substituteInfixBinaryOperators(s, new int[]{BinOpNode.ADD, BinOpNode.SUBTRACT});
+	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.MULTIPLY, BinaryOperatorNode.DIVIDE});
+	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.ADD, BinaryOperatorNode.SUBTRACT});
 	  
 //	  System.out.println("RESULT:");
 //	  for(int i = 0; i < s.size(); i++){
@@ -317,7 +317,7 @@ public class FormulaParser {
 //	  System.out.println("");
 	  
 	  FormulaNode f0 = null;
-	  int lastOp = BinOpNode.NOP;
+	  int lastOp = BinaryOperatorNode.NOP;
 	  
 	  int parenDepth = 0;
 	  int start = -1; //Initialization unneccessary, this variable will be set before use on valid input, and this function is not called without validation.
@@ -344,8 +344,8 @@ public class FormulaParser {
 		  }
 		  else if(parenDepth == 0){
 			  int binOp = parseOperator(s[i]);
-			  if(binOp != BinOpNode.NOP){
-				  if(lastOp != BinOpNode.NOP){
+			  if(binOp != BinaryOperatorNode.NOP){
+				  if(lastOp != BinaryOperatorNode.NOP){
 					  //This is bad
 					  System.err.println("Multiple Operators Detected?");
 				  }
@@ -365,12 +365,12 @@ public class FormulaParser {
 				  }
 				  FormulaNode f1 = new ConstantNode(val);
 				  f0 = apply(lastOp, f0, f1);
-				  lastOp = BinOpNode.NOP;
+				  lastOp = BinaryOperatorNode.NOP;
 			  }
 			  else if (varPattern.matcher(s[i]).matches()){
 				  FormulaNode f1 = new VariableNode(s[i]);
 				  f0 = apply(lastOp, f0, f1);
-				  lastOp = BinOpNode.NOP;
+				  lastOp = BinaryOperatorNode.NOP;
 			  }
 			  else{
 				  System.err.println("String \"" + s[i] +"\" not recognized.");

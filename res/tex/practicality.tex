@@ -1,6 +1,6 @@
 ``Practical Analysis'' of algorithms is a term that often refers to the timing of implementations on real machines, which is subject to the idiosynchrasies of implementation details and hardware characteristics: often such analysis is valuable for little more than determining that some algorithm is faster than some other algorithm for some input data.  
 
-Practical analysis is usually contrasted with traditional theoretical analysis using \href{http://en.wikipedia.org/wiki/Big_O_notation}{Landau notation}.  Landau notation is mathematically precise, but disregards constant factors and lower order terms associated with the analysis of an algorithm, so by itself it is not always suitable for practical purposes.  Practical analysis through experimentation suffers from similar flaws: it is difficult to generalize the results of an experiment to experiments using different datasets and on different machines\footnote{Effects of caching and branch prediction are notoriously hard to profile and model theoretically, and can result in wildly different results between machines on different data sets when the machines are otherwise similarly powerful.}.  
+Practical analysis is usually contrasted with traditional theoretical analysis using \href{http://en.wikipedia.org/wiki/Big\_O\_notation}{Landau notation}.  Landau notation is mathematically precise, but disregards constant factors and lower order terms associated with the analysis of an algorithm, so by itself it is not always suitable for practical purposes.  Practical analysis through experimentation suffers from similar flaws: it is difficult to generalize the results of an experiment to experiments using different datasets and on different machines\footnote{Effects of caching and branch prediction are notoriously hard to profile and model theoretically, and can result in wildly different results between machines on different data sets when the machines are otherwise similarly powerful.}.  
 
 In this section I offer a compromise, maintaining the mathematical rigor of traditional complexity analysis while combining it with the practicality of practical analysis.  Here the strategy is to model an algorithm as a function of its input, where the function is valued by the total cost of running the algorithm on the inputs.
 
@@ -11,7 +11,7 @@ As a simple example, I provide a practical analysis of HeapSort.  The basic algo
 \par
 \bigskip
 
-\texttt{HeapSort}$(a)$ = \texttt{construct} + $\sum{i = 0}^{a-1}$ \texttt{remove_min}
+\texttt{HeapSort} $(a) =$ \texttt{construct} $+ \sum_{i = 0}^{a-1}$ \texttt{remove\_min}
 
 \par
 \bigskip
@@ -21,19 +21,19 @@ And when a binary heap is substituted in, we are left with the following:
 \par
 \bigskip
 
-\texttt{HeapSort} = (2 \cdot n) + \sum_{i = 0}^n \ceil{log_2 i}
+\texttt{HeapSort} = $(2 \cdot n) + \sum_{i = 0}^n \ceil{\log_2 i}$
 
 \par
 \bigskip
 
-This substitution was performed on a heapsort, using a heap with \texttt{construct} $ = (2 \cdot n)$ and \texttt{remove_min} 
+This substitution was performed on a heapsort, using a heap with \texttt{construct} $ = (2 \cdot n)$ and \texttt{remove\_min} 
 The formal rules for this substitution were as follows:
 
 \begin{enumerate}
 
-\item \texttt{construct} \rightarrow \texttt{construct}$\{n \mapsto a\}$
+\item \texttt{construct} $\rightarrow$ \texttt{construct}$\{n \mapsto a\}$
 
-\item \texttt{remove_min} \rightarrow \texttt{remove_min}$\{n \mapsto i\}$
+\item \texttt{remove\_min} $\rightarrow$ \texttt{remove\_min}$\{n \mapsto i\}$
 
 \end{enumerate}
 

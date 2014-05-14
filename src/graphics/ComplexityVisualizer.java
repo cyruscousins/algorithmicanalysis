@@ -29,7 +29,7 @@ public class ComplexityVisualizer implements Renderable{
 		
 		algorithm = FormulaParser.parseFormula("v + ( v * insert ) + ( v * ( isEmpty + removeMin ) ) + (e * ( 1 + decreaseKey ) ) + v");
 	
-		algorithms = new Algorithm[]{Algorithm.unorderedArray, Algorithm.orderedArray, Algorithm.heap};
+//		algorithms = new Algorithm[]{Algorithm.unorderedArray, Algorithm.orderedArray, Algorithm.heap};
 	}
 	
 	public void render(Graphics2D g, int x0, int y0){
@@ -60,8 +60,8 @@ public class ComplexityVisualizer implements Renderable{
 			  g.drawString("With " + algorithms[i].name, x0, yRun);
 			  yRun += textHeight;
 			  
-			  g.drawString(new Formula(algorithms[i].substituteAlgorithm("amortized bigO", algorithm, m)).takeBigO().asString(), x0, yRun);
-			  yRun += textHeight;
+//			  g.drawString(new Formula(algorithms[i].substituteAlgorithm("amortized bigO", algorithm, m)).takeBigO().asString(), x0, yRun);
+//			  yRun += textHeight;
 		  }
 		  
 		  

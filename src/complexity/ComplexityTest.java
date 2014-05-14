@@ -190,8 +190,8 @@ public class ComplexityTest {
 		for(int i = 0; i < test.length; i++){
 			//TODO Does this only holds for polynomials?  I think we need to ensure that all args are polynomial.
 			FormulaNode f = new Formula(test[i]).simplify();
-			FormulaNode fn = new Formula(new BinOpNode(BinOpNode.DIVIDE, f, new VariableNode("n"))).simplify();
-			if(BinOpNode.xInBigOofY(f, fn)){
+			FormulaNode fn = new Formula(new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, f, new VariableNode("n"))).simplify();
+			if(BinaryOperatorNode.xInBigOofY(f, fn)){
 				System.out.println("BigO Error: " + f.asStringRecurse() + " -> " + fn.asStringRecurse() + " is innaccurate.");
 			}
 		}

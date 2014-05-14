@@ -2,7 +2,7 @@ package algorithm;
 
 import java.util.HashMap;
 
-public abstract class PriorityQueue extends Algorithm{
+public abstract class PriorityQueue{
 	
 	protected static final String[] functionNames = new String[]{"insert", "removeMin", "isEmpty", "size", "decreaseKey"};
 	public final String[] getFunctionNames(){
@@ -15,8 +15,8 @@ public abstract class PriorityQueue extends Algorithm{
 	
 	TextStream text;
 	
-	public PriorityQueue(TextStream text, HashMap<String, Function> functions){
-		this.text = text;
-		this.functions = functions;
-	}
+//	public PriorityQueue(TextStream text, HashMap<String, Function> functions){
+//		this.text = text;
+//		this.functions = functions;
+//	}
 }
