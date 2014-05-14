@@ -14,5 +14,6 @@ peek: 1, 1, 1
 remove_min: ceil(log_2 n), ceil(log_2 n), ceil(log_2 n)
 empty: 1, 1, 1
 size: 1, 1, 1
-decrease_key: ceil(log_2 n), ceil(log_2 n), ceil(log_2 (n)) - 1
+#decrease_key: ceil(log_2 n), ceil(log_2 n), ceil(log_2 (n)) - 1
+decrease_key: ceil(log_2 n), ceil(log_2 n), (sum i from 1 to n of (ceil(log_2 (i)))) / n
 find: n, n, n

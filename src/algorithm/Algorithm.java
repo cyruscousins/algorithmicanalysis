@@ -281,6 +281,10 @@ FUNNAME: (expression), (expression), ...
 				
 				for(int i = 0; i < expStrings.length; i++){
 					FormulaNode fnode = FormulaParser.parseFormula(expStrings[i]);
+					if(fnode == null){
+						System.err.println("Error parsing \"" + expStrings[i] + "\".");
+						return null;
+					}
 					fmap.put(adt.analysisTypes[i], fnode);
 				}
 				

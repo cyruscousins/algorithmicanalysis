@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import algorithm.UnorderedArray;
 import color.ColorDatabase;
 
-import complexity.BinOpNode;
+import complexity.BinaryOperatorNode;
 import complexity.ConstantNode;
 import complexity.FormulaNode;
 import complexity.FormulaParser;
@@ -93,7 +93,7 @@ public class ComplexityAnalyzerTest {
 		r.put("Hex", RenderableShape.regularPolygon(400, 400, 6, 100));
 		r.put("Circle", RenderableShape.regularPolygon(500, 500, 100, 100));
 		
-		FormulaNode form = new BinOpNode(BinOpNode.ADD, new VariableNode("n"), new BinOpNode(BinOpNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
+		FormulaNode form = new BinaryOperatorNode(BinaryOperatorNode.ADD, new VariableNode("n"), new BinaryOperatorNode(BinaryOperatorNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
 		
 		r.put("Formula", new FormulaRenderer(form, 100, 50));
 		

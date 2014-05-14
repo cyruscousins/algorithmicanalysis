@@ -68,7 +68,8 @@ public class FormulaParser {
   private static Pattern numPattern = Pattern.compile("~?(?:[0-9]+.?[0-9]*)|(?:.[0-9]+)"); //handle negative numbers (weakly).
   private static Pattern varPattern = Pattern.compile("[a-zA-Z][0-9a-zA-Z~_]*");
 
-  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose)|(?:sin)|(?:cos)|(?:floor)|(?:ceil))");
+  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose)|(?:sin)|(?:cos)|(?:floor)|(?:ceil)|(?:sum)|" +
+  		"(?:of)|(?:from)|(?:to))");
   
   private static void substituteBinaryOperators(List<Object> s, String[] operators, int[] opTypes){
 	  for(int i = 0; i < s.size(); i++){
@@ -201,9 +202,23 @@ public class FormulaParser {
 		  }
 	  }
 	  
-//	  for(int i = 0; i < s.size(); i++){
-//		  System.out.println(s.get(i));
-//	  }
+	  //First do summations
+	  
+	  for(int i = s.size() - 8; i >= 0; i--){
+		  if(s.get(i).equals("sum")){
+			  
+			  if(s.get(i + 2).equals("from") && s.get(i + 4).equals("to") && s.get(i + 6).equals("of")){
+				  FormulaNode sum = new SummationNode((FormulaNode)(s.get(i + 3)), (FormulaNode)(s.get(i + 5)), (FormulaNode)(s.get(i + 7)), ((VariableNode)s.get(i + 1)).varName);
+				  s.set(i, sum);
+				  for(int j = 7; j > 0; j--){
+					  s.remove(i + j);
+				  }
+			  }
+			  else{
+				  System.err.println("Summation Error.");
+			  }
+		  }
+	  }
 	  
 	  //Handle right associative operations (!)
 	  
@@ -259,6 +274,7 @@ public class FormulaParser {
 	  
 	  if(!validate(s)){
 		  //Issue some sort of error message.
+		  System.err.println("Basic validation of \"" + s + "\" has failed.");
 		  return null;
 	  }
 	  
@@ -415,13 +431,13 @@ public class FormulaParser {
 	  return f;
   }
   
-  public static void main(String[] args){
-	String[] tests = "n|n*n|n^n|(n+m)|n*(2 log n)|n * log_2 n|log_2 (n!)".split("\\|");
-	for(int i = 0; i < tests.length; i++){
-		//System.out.println(tests[i]);
-		FormulaNode f = parseFormula(tests[i]);
-		System.out.println(tests[i] + " = " + ((f == null) ? f : f.asStringRecurse()));
-	}
-  }
+//  public static void main(String[] args){
+//	String[] tests = "n|n*n|n^n|(n+m)|n*(2 log n)|n * log_2 n|log_2 (n!)".split("\\|");
+//	for(int i = 0; i < tests.length; i++){
+//		//System.out.println(tests[i]);
+//		FormulaNode f = parseFormula(tests[i]);
+//		System.out.println(tests[i] + " = " + ((f == null) ? f : f.asStringRecurse()));
+//	}
+//  }
   
 }

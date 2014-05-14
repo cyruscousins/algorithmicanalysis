@@ -375,11 +375,21 @@ public class BinaryOperatorNode extends FormulaNode{
 	    
 	    else if (nn.operationType == DIVIDE){
 	      if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	        return nl.bigO();
+	    	  return nl.bigO();
 	      }
 	      else if(nl instanceof ConstantNode){
 	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.bigO(), ConstantNode.MINUS_ONE).bigO();
 	      }
+	      
+	      //TOTAL HACK:
+	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).l.formulaEquals(nr)){
+	    	  return ((BinaryOperatorNode)nl).r;
+	      }
+	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).r.formulaEquals(nr)){
+	    	  return ((BinaryOperatorNode)nl).l;
+	      }
+	      
+	      
 	    }
 	    
 	    //Check if one op is bigo of the other.
@@ -397,6 +407,15 @@ public class BinaryOperatorNode extends FormulaNode{
 	    	if(xInBigOofY(nr, nl) && !xInBigOofY(nl, nr)){
 	    		return nl;
 	    	}
+	    	
+	    	//TODO this is not inaccurate, but sometimes these are 0s?
+		      if(xInBigOofY(nl, nr)){
+		    	  return nr;
+		      }
+		      if(xInBigOofY(nr, nl)){
+		    	  return nl;
+		      }
+	    	
 	    }
 	    
 	    //TODO handle these properly.
@@ -523,6 +542,12 @@ public class BinaryOperatorNode extends FormulaNode{
 			  return sl;
 		  }
 	  }
+	  
+//	  else if (operationType == DIVISION){
+//		  if(xInBigOofY(rSub, sl) && !xInBigOofY(sl, sr))){
+//			  return sl;
+//		  }
+//	  }
 	  
 	  return new BinaryOperatorNode(operationType, sl, sr);
   }

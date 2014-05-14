@@ -6,6 +6,7 @@ import algorithm.Algorithm;
 import algorithm.UnorderedArray;
 
 public class ComplexityTest {
+
 	public static void main(String[] args){
 
 		runEqualityTests();
@@ -38,7 +39,9 @@ public class ComplexityTest {
 	}
 	
 	public static void runValueTests(){
-		FormulaNode[] tests = new FormulaNode[]{FormulaParser.parseFormula("4!"), new Summation(ConstantNode.ZERO, new ConstantNode(5), FormulaParser.parseFormula("i"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ 2"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ i"), "i")};
+		FormulaNode[] tests = FormulaParser.parseFormulae(
+				"4! | sum i from 0 to 5 of i | sum i from 0 to 4 of (i ^ i)", "\\|");
+		//= new FormulaNode[]{FormulaParser.parseFormula("4!"), new Summation(ConstantNode.ZERO, new ConstantNode(5), FormulaParser.parseFormula("i"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ 2"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ i"), "i")};
 		double[] correctValues = new double[]{24, 15, 30, 90};
 		
 		VarSet empty = new VarSet();
@@ -66,8 +69,9 @@ public class ComplexityTest {
 				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
 				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
-				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |",  //ceil and floor
-				"\\|");
+				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
+				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
+				"", "\\|");
 		
 				//TODO add summations
 		
@@ -108,6 +112,7 @@ public class ComplexityTest {
 				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
 				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
+				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
 				"", "\\|");
 
 //		System.out.println("KEY:");
@@ -144,6 +149,7 @@ public class ComplexityTest {
 		FormulaNode[] test = FormulaParser.parseFormulae(
 			"n|n   |   n + (n * n)|n^2   |   2 * n|n   |   n ^ 2 - n|n ^ 2   |" +
 			"n * 3 * n / 4 * n|n^3   |   (5 + n + 4 / 3) / n + 7|1   |   (n * 4 * m / 3 + 7) / ((n + 8) * m)|1   |" +
+			"n * log_2 n / n | ln n   |   n * m * log_2 n / n | m * ln n   |" + //Commutativity
 			"2 ^ (2 * n) | 2 ^ (2 * n)   |   n ^ (1 + (2 * m) / 2) | n ^ m   |" + //Basic exponentiation
 			"(n ^ 2) + (n ^ 3) | (n ^ 3)   |   n + (n + m) | (n + m)   |   (n ^ 2) + ((n ^ 2) + m) | (n ^ 2) + m   |   (n ^ 2) + ((n + m) ^ 2) | (n + m) ^ 2   |" +
 			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 2) * ((n ^ 2) / (n + m))   |" +
@@ -152,7 +158,8 @@ public class ComplexityTest {
 			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
 			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
-			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n" +
+			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n   |" +
+			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | ln n   |" + //Summations
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};

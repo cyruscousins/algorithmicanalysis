@@ -5,6 +5,7 @@ public class ConstantNode extends FormulaNode{
   //Common constants, reuse them.
   public static final ConstantNode ONE = new ConstantNode(1), ZERO = new ConstantNode(0), MINUS_ONE = new ConstantNode(-1);
   public static final ConstantNode E = new ConstantNode(Math.E);
+  public static final ConstantNode TWO = new ConstantNode(2);
   
   
   public double value;
