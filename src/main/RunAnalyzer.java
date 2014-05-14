@@ -61,6 +61,8 @@ public class RunAnalyzer {
 		
 		stream.printTitledHeader(12, true, "Basic Priority Queue Properties", "An Overview of Priority Queues", "Cyrus Cousins", "Spring 2014");
 		
+		stream.println("This document was generated automatically, using only the data in the algorithms database.  Introductory segments for each algorithm were written out, and are maintained as metadata in the algorithm database.");
+		
 		for(int i = 0; i < priorityQueues.length; i++){
 			stream.printAlgorithmInfo(priorityQueues[i]);
 		}
@@ -146,7 +148,7 @@ public class RunAnalyzer {
 		stream.print("We can quickly see that \\texttt{partial\\_sort(A, 4)} = $\\begin{bmatrix} 0 & 1 & 5 & 6 \\end{bmatrix}$, but it is a nontrivial problem, because the problem of partial sorting becomes more difficult as both the size of the original list and the number of elements to be sorted grow.");
 		
 		stream.println("Popular naïve techniques for partial sort include sorting the list and extracting the first $m$ items, in $\\Theta(n \\log n + m)$ time, and extracting the minimum $m$ times, in $\\Theta(n \\cdot m)$ time.  The latter is probably the technique you used to sort the above list manually.  ");
-		stream.print("Under a comparison model, we can easily show this lower bound of $\\Omega(a + b \\log b)$ via a reduction from the sorting $\\Omega(b \\log b)$ lower bound, as a list of $b$ items can be ''partial sorted'' using parameters $a', b'$ both equal to $b$.  The $\\Omega\\big(a\\big)$ term of the lower bound can be derived through an adversarial argument: clearly all the data must be examined in an arbitrary partial sorting.  Fibonacci heaps and Brodal queues also meet this bound, and a quick look at the formulae shows that any data structure with linear time construction and $\\log n$ min removal cost will as well.");
+		stream.print("Under a comparison model, we can easily show this lower bound of $\\Omega(a + b \\log b)$ via a reduction from the sorting $\\Omega(b \\log b)$ lower bound, as a list of $b$ items can be ``partial sorted'' using parameters $a', b'$ both equal to $b$.  The $\\Omega\\big(a\\big)$ term of the lower bound can be derived through an adversarial argument: clearly all the data must be examined in an arbitrary partial sorting.  Fibonacci heaps and Brodal queues also meet this bound, and a quick look at the formulae shows that any data structure with linear time construction and $\\log n$ min removal cost will as well.");
 		
 		stream.println("Let's see how a data structure construction with repeated extraction algorithm works:");
 		
@@ -178,7 +180,7 @@ public class RunAnalyzer {
 		stream.println("Here we see that the sorted array performs on par with the naïve sorting based technique (this should come as no surprise, as it is essentially the same algorithm), and we also see that a binary heap meets the lower bound of $\\bigO\\big(n \\log n\\big)$.  This technique, which is equivalent to a heapsort that terminates early, is a popular technique, but more advanced techniques exist that match the lower bound in complexity.");
 		
 		stream.println("\\input{res/tex/practicality.tex}");
-		stream.println("To further explore the Partial Sorting problem and practical analysis of these algoriths, including optial algorithms, check out \\url{www.cs.tufts.edu/\\noexpand~ccousi01/algorithms/complexityapplet.html}.");
+		stream.println("To further explore the Partial Sorting problem and practical analysis of these algoriths, including optial algorithms, check out \\url{http://www.eecs.tufts.edu/\\noexpand~ccousi01/algorithms/complexityapplet.html}.");
 
 		stream.closeDocument();
 		
@@ -204,11 +206,17 @@ public class RunAnalyzer {
 		
 		stream.printTitledHeader(12, false, "A Case Study of Practical and Theoretical Analysis of Priority Queues", "My Final Project for Algorithms II, Tufts University", "Cyrus Cousins", "Spring 2014");
 		
-		stream.println("Herein I show the program I have written to perform traditional theoretical analysis.  The standard results for analysis of Dijkstra's Algorith with arrays, binary heaps, and Fibonacci heaps are obtained.  The Dijkstra's analysis may be viewed \\href{www.cs.tufts.edu/\\noexpand~ccousi01/algorithms/dijkstras.pdf}{here}, and a formal introduction and analysis of each queue analyzed may be viewed \\href{www.cs.tufts.edu/~ccousi01/algorithms/priorityqueues.pdf}{here}");
+		stream.println("\\section{Introduction}");
+		
+		stream.println("\\input{res/tex/introduction.tex}");
+		
+		stream.println("\\section{Overview}");
+		
+		stream.println("Herein I show the program I have written to perform traditional theoretical analysis.  The standard results for analysis of Dijkstra's Algorithm with arrays, binary heaps, and Fibonacci heaps are obtained.  The Dijkstra's analysis may be viewed \\href{http://www.eecs.tufts.edu/\\noexpand~ccousi01/algorithms/dijkstras.pdf}{here}, and a formal introduction and analysis of each queue analyzed may be viewed \\href{http://www.eecs.tufts.edu/~ccousi01/algorithms/priorityqueues.pdf}{here}");
 		
 		stream.println("\\par\n\\bigskip");
 		
-		stream.println("Also analyzed are several naïve priority queue based partial sorting algorithms: these can be found \\href{www.cs.tufts.edu/\\noexpand~ccousi01/algorithms/partialsort.pdf}.  An applet demonstrating the practical analysis of these algorithms can be found \\href{www.cs.tufts.edu/\\noexpand~ccousi01/algorithms/complexityapplet.html}{here}\\footnote{The applet is very large, and I have found it to not work very consistently.  The \\href{www.cs.tufts.edu/\\noexpand~ccousi01/algorithms/complexity.jar}{standalone downloadable application} offers better reliability.}  This algorithm is slightly less powerful than the software that performed the rest of the analysis (being by nature restricted to singlevariate analysis), but is an excellent demonstration of the analytic properties of the software I have created.");
+		stream.println("Also analyzed are several naïve priority queue based partial sorting algorithms: these can be found \\href{http://www.eecs.tufts.edu/\\noexpand~ccousi01/algorithms/partialsort.pdf}{here}.  An applet demonstrating the practical analysis of these algorithms can be found \\href{http://www.eecs.tufts.edu/\\noexpand~ccousi01/algorithms/complexityapplet.html}{here}\\footnote{The applet is very large, and I have found it to not work very consistently.  The \\href{http://www.eecs.tufts.edu/\\noexpand~ccousi01/algorithms/complexity.jar}{standalone downloadable application} offers much better reliability.}.");
 
 		stream.println("\\par\n\\bigskip");
 		

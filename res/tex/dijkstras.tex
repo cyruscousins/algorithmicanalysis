@@ -3,7 +3,7 @@ Dijkstra's Algorithm for Single Source Shortest Path, often shortened to Dijkstr
 \par
 \bigskip
 
-Here the complexity of the \texttt{shortest\_path} operation is shown, based on analysis by Andrew Winslow \url{http://www.cs.tufts.edu/comp/260/lectures/lecture-5-fibonacci-heaps.pdf}\footnote{In this analysis, repeated insertion, that is $(v \cdot $\texttt{insert}) is used in the initialization phase.  I changed this to \texttt{construct} to obtain lower worst case bounds for some queue types.}.  The bounds obtained when using the various priority queues through accurate analysis are obtained automatically through the following substitutions and a priori asymptotic information.
+Here the complexity of the \texttt{shortest\_path} operation is shown, based on analysis by Andrew Winslow \url{http://www.cs.tufts.edu/comp/260/lectures/lecture-5-fibonacci-heaps.pdf}\footnote{In this analysis, repeated insertion, that is $(v \cdot $\texttt{insert}) is used in the initialization phase.  I changed this to \texttt{construct} to obtain lower worst case bounds for some queue types.}.  The bounds obtained when using the various priority queues through accurate analysis are obtained automatically through the following substitutions and a priori asymptotic information:
 
 \begin{enumerate}[1.]
 
@@ -13,3 +13,6 @@ Here the complexity of the \texttt{shortest\_path} operation is shown, based on 
 \item $v \in \bigO(e)$
 
 \end{enumerate}
+
+Expressions of the form \texttt{operation1} $\rightarrow$ \texttt{operation2}$\{a \mapsto b\}$ simply mean that in the algorithm, \texttt{operation1} of variable $b$ is a placeholder function, that can be substituted in for a particular class of function that achieves preserves the accuracy of the algorithm.  Here this function is represented by \texttt{operation2}, and in this context the variables of \texttt{operation2} are obtained via the mapping (here $n$ in a priority queue maps to $v$ in Dijkstra's algorithm).
+

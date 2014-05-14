@@ -38,7 +38,7 @@ public class Algorithm {
 		this.strings = strings;
 	}
 	
-	int LINEBREAK = 1; //Latex constant.
+	public static final int LINEBREAK = 1; //Latex constant.
 	public String[] summarizeAlgorithm(String[] bigOLittles, String[] bigOBigs){
 		ArrayList<String> summary = new ArrayList<String>();
 		
@@ -58,7 +58,8 @@ public class Algorithm {
 				String fCostBigOsub = functions.get(s).costs.get(analysisType).takeBigO(bigOLittles, bigOBigs).asLatexString();
 				String nameStr = s.replaceAll("_", "\\\\_");
 				
-				String lineBreak = " \\null \\hfill \\null \\linebreak[" + LINEBREAK + "]";
+//				String lineBreak = " \\null \\hfill \\null \\linebreak[" + LINEBREAK + "]";
+				String lineBreak = " \\linebreak[" + LINEBREAK + "]";
 				
 				String line = "\\texttt{" + nameStr + "}";
 				if(!fCost.equals(fCostBigO)){

@@ -128,6 +128,6 @@ public class SummationNode extends FormulaNode{
 	}
 	
 	public String asLatexStringRecurse() {
-		return "\\sum_{" + trimParens(lower.asLatexString()) + "}^{" + trimParens(upper.asLatexString()) + "}\\big(" + trimParens(inner.asLatexString()) + "\\big)";
+		return "\\sum_{" + varName + " =  " + trimParens(lower.asLatexString()) + "}^{" + trimParens(upper.asLatexString()) + "}\\big(" + trimParens(inner.asLatexString()) + "\\big)";
 	}
 }
