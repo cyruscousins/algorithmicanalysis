@@ -66,7 +66,8 @@ public class RunAnalyzer {
 		}
 		
 		stream.closeDocument();
-		
+
+
 		//Dijkstra's analysis
 		
 		try{
@@ -115,7 +116,7 @@ public class RunAnalyzer {
 //			stream.println("\\par\n\\bigskip\n\n\\textbf{Analysis of Dijkstra's with $e =" + FormulaParser.parseFormula(formula).asLatexString() + "$.}");
 //			stream.println("\\par\n\\bigskip\n\n\\textbf{Analysis of Dijkstra's with $e =" + formula + "$.}");
 			for(int i = 0; i < priorityQueues.length; i++){
-				Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "construct, empty, remove_min, decrease_key".split(", "), postSubstitution);
+				Algorithm newAlg = dijkstras.substituteIn(priorityQueues[i], "insert, empty, remove_min, decrease_key".split(", "), postSubstitution);
 				
 				newAlg = newAlg.substituteIn(", $e \\in \\bigO\\big(" + formula + "\\big)$", "e", FormulaParser.parseFormula(formula));
 				stream.println("\\par\\bigskip");
@@ -131,12 +132,7 @@ public class RunAnalyzer {
 		}
 		catch(Exception e){
 			e.printStackTrace();
-			System.exit(1);
 		}
-		
-		stream.printTitledHeader(12, true, "Partial Sorting and Practical vs Theoretical Analysis", null, "Cyrus Cousins", "Spring 2014");
-		
-		
 		stream.println("\\section{Analysis of Partial Sort}");
 		stream.println("\\subsection{Introduction to Partial Sorting}");
 		stream.print("Partial sorting refers to the idea of obtaining the first $b$ values of a set of $a$ in sorted order.");
@@ -177,44 +173,15 @@ public class RunAnalyzer {
 		stream.println("\\subsection{Partial Sort conclusions}");
 		stream.println("Here we see that the sorted array performs on par with the naïve sorting based technique (this should come as no surprise, as it is essentially the same algorithm), and we also see that a binary heap meets the lower bound of $\\bigO\\big(n \\log n\\big)$.  This technique, which is equivalent to a heapsort that terminates early, is a popular technique, but more advanced techniques exist that match the lower bound in complexity.");
 		
-		stream.println("\\include{practicality.tex}");
-		stream.println("To further explore the Partial Sorting problem and practical analysis of these algoriths, including optial algorithms, check out \\url{www.cs.tufts.edu/~ccousi01/algorithms/complexityapplet.html}.");
-
-		stream.closeDocument();
-		
 		
 		//TODO: Practical analysis.
 		
 		Algorithm[] partialSortsToCompare = new Algorithm[]{partialSortAlgs[0], partialSortAlgs[1], partialSortAlgs[2]};
 		
-//		stream.comparePractical("Partial Sort Practical Analysis", "practicality.tex", partialSortsToCompare, 500);
+		stream.comparePractical("Partial Sort Practical Analysis", "practicality.tex", partialSortsToCompare, 500);
 		
 		
 		//stream.println("\\pagebreak\n\\null \\hfill \\textbf{Thanks for Listening!} \\hfill \\null");
-		
-		stream.closeDocument();
-		
-		try{
-			stream = new LatexStream(new PrintStream(new FileOutputStream(new File("out/tex/overview.tex"))));
-		}
-		catch(Exception e){
-			e.printStackTrace();
-			System.exit(1);
-		}
-		
-		stream.printTitledHeader(12, true, "A Case Study of Practical and Theoretical Analysis of Priority Queues", "My Final Project for Algorithms II, Tufts University", "Cyrus Cousins", "Spring 2014");
-		
-		stream.println("Herein I show the program I have written to perform traditional theoretical analysis.  The standard results for analysis of Dijkstra's Algorith with arrays, binary heaps, and Fibonacci heaps are obtained.  The Dijkstra's analysis may be viewed \\href{here}{www.cs.tufts.edu/~ccousi01/algorithms/dijkstras.pdf}, and a formal introduction and analysis of each queue analyzed may be viewed \\href{here}{www.cs.tufts.edu/~ccousi01/algorithms/dijkstras.pdf}");
-		
-		stream.println("\\par\n\\bigskip");
-		
-		stream.println("Also analyzed are several naïve priority queue based partial sorting algorithms: these can be found \\href{here}{www.cs.tufts.edu/~ccousi01/partialsort.pdf}.  An applet demonstrating the practical analysis of these algorithms can be found \\href{here}{www.cs.tufts.edu/~ccousi01/dijkstras.pdf}\footnote{The applet is very large, and I have found it to not work very consistently.  The \\href{standalone downloadable application}{www.cs.tufts.edu/~ccousi01/algorithms/complexity.jar} offers better reliability.  This algorithm is slightly less powerful than the software that performed the rest of the analysis (being by nature restricted to singlevariate analysis), but is an excellent demonstration of the analytic properties of the software I have created.");
-
-		stream.println("\\par\n\\bigskip");
-		
-		stream.println("It's pretty difficult to define exactly what this software can be used for, but I believe the ability to automate the analysis process could:");
-		
-		stream.println("\\begin{enumerate}\n \\item Make automated error checking in textbooks and publications a possibility.\n\\item Make more intelligent educational tools that help students understand and solve probles, as well as generate unique problems.\n\\item Aid in writing books and papers by taking simple logical input and perforing mathematical operations and typesetting it automatically.  The documents I have produced with it certainly aim to do so, and it seems as though the same should be possible for more complicated results.\n\\end{enumerate}");
 		
 		stream.closeDocument();
 		

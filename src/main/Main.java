@@ -93,8 +93,8 @@ public class Main {
 		
 		//Grapher:
 		FormulaNode[] fn = FormulaParser.parseFormulae("n | n * (2 log n) | n ^ 2 | n ^ 3", "\\|");
-//		GraphRenderer gr = new GraphRenderer(ri, 600, 100, 400, 400, 100, 10000, 10, 1000, fn, "n"); //TODO fix graphing module!
-//		r.put("Graphs", gr);
+		GraphRenderer gr = new GraphRenderer(ri, 600, 100, 400, 400, 100, 10000, 10, 1000, fn, "n"); //TODO fix graphing module!
+		r.put("Graphs", gr);
 		
 //		r.render((Graphics2D)f.getGraphics(), 0, 0, 800, 600);
 		

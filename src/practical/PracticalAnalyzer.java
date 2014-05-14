@@ -8,7 +8,7 @@ public class PracticalAnalyzer extends JApplet{
 	
 	public void init(){
 		add(new GUI());
-//		repaint();
+		repaint();
 	}
 
 }

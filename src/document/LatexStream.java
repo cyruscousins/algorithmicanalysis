@@ -110,7 +110,7 @@ public class LatexStream {
 		if(toc){
 			println(
 				"\\tableofcontents\n" + 
-//				"\\listoffigures\n" +
+				"\\listoffigures\n" +
 				"\\pagebreak\n");
 		}
 	}
