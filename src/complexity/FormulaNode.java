@@ -4,10 +4,10 @@ public abstract class FormulaNode {
 	
   public abstract double evaluate(VarSet v);
   
-  FormulaNode simplify(){
+  public FormulaNode takeSimplified(){
 	  return this;
   }
-  FormulaNode bigO(){
+  FormulaNode takeBigO(){
 	  return this;
   }
   
@@ -51,37 +51,6 @@ public abstract class FormulaNode {
 		  return s.substring(1, s.length() - 1);
 	  }
 	  return s;
-  }
-  
-  //Final:
-  
-  public final FormulaNode takeSimplified(){
-	  long lastHash = formulaHash(); //TODO this function is broken.  Test and debug hashing.
-	  FormulaNode lastFormula = this;
-	  while(true){
-//		  System.out.println(lastFormula.asString() + " -> " + lastHash);
-		  
-		  FormulaNode nextFormula = lastFormula.simplify();
-		  long nextHash = nextFormula.formulaHash();
-		  if(lastHash == nextHash && lastFormula.formulaEquals(nextFormula)) break;
-		  lastFormula = nextFormula;
-		  lastHash = nextHash;
-	  }
-	  return lastFormula;
-  }
-
-  public FormulaNode takeBigO(){
-	  long lastHash = formulaHash();
-	  FormulaNode lastFormula = this;
-	  while(true){
-//		  System.out.println(lastFormula.asString());
-		  FormulaNode nextFormula = lastFormula.simplify().bigO();
-		  long nextHash = nextFormula.formulaHash();
-		  if(lastHash == nextHash && lastFormula.formulaEquals(nextFormula)) break;
-		  lastFormula = nextFormula;
-		  lastHash = nextHash;
-	  }
-	  return lastFormula;
   }
   
   public FormulaNode takeBigO(String[] littles, String[] bigs){

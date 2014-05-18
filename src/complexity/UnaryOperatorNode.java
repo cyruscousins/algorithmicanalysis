@@ -30,7 +30,7 @@ public class UnaryOperatorNode extends FormulaNode {
 			  case FACTORIAL:
 				  return dfactorial(argVal);
 			  case FLOOR:
-				  return Math.ceil(argVal);
+				  return Math.floor(argVal);
 			  case CEIL:
 				  return Math.ceil(argVal);
 			  case SINE:
@@ -41,8 +41,8 @@ public class UnaryOperatorNode extends FormulaNode {
 		  System.err.println("Invalid Unary Operator");
 		  return -1;
 	  }
-	  public FormulaNode simplify(){
-		  FormulaNode argSimp = argument.simplify();
+	  public FormulaNode takeSimplified(){
+		  FormulaNode argSimp = argument.takeSimplified();
 		  if(argSimp instanceof ConstantNode){
 			  return new ConstantNode(new UnaryOperatorNode(operationType, argSimp).evaluate(null));
 		  }
@@ -52,12 +52,12 @@ public class UnaryOperatorNode extends FormulaNode {
 				&& isBoolValued[((UnaryOperatorNode)argSimp).operationType]){
 			  return argSimp;
 		  }
-		  return new UnaryOperatorNode(operationType, argument.simplify());
+		  return new UnaryOperatorNode(operationType, argument.takeSimplified());
 	  }
 	  
 	  public FormulaNode bigO(){
 		  
-		  FormulaNode simp = simplify();
+		  FormulaNode simp = takeSimplified();
 		  if(simp instanceof UnaryOperatorNode){
 			  UnaryOperatorNode nn = (UnaryOperatorNode)simp;
 			  if(nn.operationType == FACTORIAL){

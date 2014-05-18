@@ -103,11 +103,11 @@ public class OpCollectionNode extends FormulaNode{
 		}
 	}
 	
-	public FormulaNode simplify(){
+	public FormulaNode takeSimplified(){
 		
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
 		for(int i = 0; i < len; i++){
-			nodes.add(data[i].simplify());
+			nodes.add(data[i].takeSimplified());
 			//TODO slurp in children!
 			
 			//sluuuuurp
@@ -116,7 +116,7 @@ public class OpCollectionNode extends FormulaNode{
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
 				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
-				FormulaNode simp = attempt.simplify();
+				FormulaNode simp = attempt.takeSimplified();
 				if(!simp.formulaEquals(attempt)){
 					//Simplification was successful, this means that the terms were combined.
 					nodes.set(i, simp);
@@ -142,23 +142,23 @@ public class OpCollectionNode extends FormulaNode{
 	
 	public FormulaNode bigO(){
 		
-		FormulaNode simp = simplify();
+		FormulaNode simp = takeSimplified();
 
 		if(!(simp instanceof OpCollectionNode)){
-			return simp.bigO();
+			return simp.takeBigO();
 		}
 		
 		OpCollectionNode oSimp = (OpCollectionNode)simp;
 		
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
 		for(int i = 0; i < oSimp.len; i++){
-			nodes.add(oSimp.data[i].bigO());
+			nodes.add(oSimp.data[i].takeBigO());
 		}
 		
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
 				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
-				FormulaNode bigo = attempt.bigO();
+				FormulaNode bigo = attempt.takeBigO();
 				if(!bigo.formulaEquals(attempt)){
 					//Simplification was successful, this means that the terms were combined.
 					nodes.set(i, bigo);
@@ -258,12 +258,12 @@ public class OpCollectionNode extends FormulaNode{
 		};
 		OpCollectionNode o = new OpCollectionNode(data, data.length, ADD);
 		System.out.println(o.asStringRecurse());
-		System.out.println(o.simplify().asStringRecurse());
+		System.out.println(o.takeSimplified().asStringRecurse());
 		
 
 		o = new OpCollectionNode(data, data.length, MULTIPLY);
 		System.out.println(o.asStringRecurse());
-		System.out.println(o.simplify().asStringRecurse());
+		System.out.println(o.takeSimplified().asStringRecurse());
 		
 	}
 }

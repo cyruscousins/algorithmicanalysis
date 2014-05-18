@@ -96,7 +96,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener{
 			
 			fraw = Font.createFont(Font.TRUETYPE_FONT, getClass().getClassLoader().getResourceAsStream("res/font/Gregscript.ttf"));
 			f2 = fraw.deriveFont(Font.PLAIN, 32f);
-			}
+		}
 		catch(Exception e){
 			e.printStackTrace();
 		}
@@ -522,6 +522,8 @@ public class GUI extends JPanel implements ActionListener, ChangeListener{
 				loadAlgorithmToSubstitutions("ordered array", "expected");
 				addSubstitionText("\n#Binary heap functions:\n\n");
 				loadAlgorithmToSubstitutions("binary heap", "expected");
+				addSubstitionText("\n#Ternary heap functions:\n\n");
+				loadAlgorithmToSubstitutions("ternary heap", "expected");
 
 				addSubstitionText(
 						"\n#Declare e to be that of a dense graph (1/4 of all possible edges selected)\n" +
@@ -533,7 +535,7 @@ public class GUI extends JPanel implements ActionListener, ChangeListener{
 						"v -> n");
 
 				//Do formulae
-				String[] types = new String[]{"unordered_array", "ordered_array", "binary_heap"};
+				String[] types = new String[]{"unordered_array", "ordered_array", "binary_heap", "ternary_heap"};
 				String analysisType = "expected";
 				
 				for(int i = 0; i < types.length; i++){

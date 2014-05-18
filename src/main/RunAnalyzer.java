@@ -34,8 +34,8 @@ public class RunAnalyzer {
 		//Load Priority Queues
 		
 //		String[] algorithmNames = new String[]{"unordered_array"};	
-		String[] algorithmFiles = new String[]{"unordered_array", "ordered_array", "binary_heap", "fibonacci_heap", "brodal_queue"};
-		String[] algorithmNames = new String[]{"unordered array", "ordered array", "binary heap", "fibonacci heap", "brodal queue"};
+		String[] algorithmFiles = new String[]{"unordered_array", "ordered_array", "binary_heap", "ternary_heap", "fibonacci_heap", "brodal_queue"};
+		String[] algorithmNames = new String[]{"unordered array", "ordered array", "binary heap", "ternary heap", "fibonacci heap", "brodal queue"};
 //		String[] algorithmNames = new String[]{"Unordered Array", "Ordered Array", "Binary Heap", "Splay Tree", "Fibonacci Heap"};
 		
 		Algorithm[] priorityQueues = new Algorithm[algorithmNames.length];

@@ -121,7 +121,7 @@ public class Environment {
 //			loadAlgorithm(f);
 //		}
 
-		String[] strings = "binary_heap dijkstras_algorithm huffman_coding priority_queue_partial_sort brodal_queue fibonacci_heap ordered_array unordered_array".split(" ");
+		String[] strings = "binary_heap ternary_heap dijkstras_algorithm huffman_coding priority_queue_partial_sort brodal_queue fibonacci_heap ordered_array unordered_array".split(" ");
 		for(int i = 0; i < strings.length; i++){
 			loadAlgorithm(strings[i]);
 		}

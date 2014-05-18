@@ -55,7 +55,9 @@ public class LatexStream {
 				"\\newcommand{\\bigO}{\\mathcal{O}}\n" +
 
 				"\\DeclarePairedDelimiter{\\ceil}{\\lceil}{\\rceil}\n" +
-				"\\DeclarePairedDelimiter{\\floor}{\\lfloor}{\\rfloor}\n"
+				"\\DeclarePairedDelimiter{\\floor}{\\lfloor}{\\rfloor}\n" +
+				
+				"\\newcommand{\\modulus}[1]{\\:(\\text{mod}\\ #1)}\n"
 		);
 	}
 	

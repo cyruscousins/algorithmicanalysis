@@ -44,16 +44,20 @@ public class SummationNode extends FormulaNode{
 	FormulaNode ntimesnplusoneovertwo(FormulaNode f){
 		return new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, f, new BinaryOperatorNode(BinaryOperatorNode.ADD, f, ConstantNode.ONE)), ConstantNode.TWO);
 	}
-	
+
 	FormulaNode summationrange(FormulaNode bottom, FormulaNode top){
 		return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, top, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, bottom, ConstantNode.ONE));
 	}
+	FormulaNode summationrangebigO(FormulaNode bottom, FormulaNode top){
+//		return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, top, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, bottom, ConstantNode.ONE));
+		return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, top, bottom);
+	}
 	
-	public FormulaNode simplify(){
+	public FormulaNode takeSimplified(){
 
-		FormulaNode ls = lower.simplify();
-		FormulaNode us = upper.simplify();
-		FormulaNode is = inner.simplify();
+		FormulaNode ls = lower.takeSimplified();
+		FormulaNode us = upper.takeSimplified();
+		FormulaNode is = inner.takeSimplified();
 		
 		if(inner instanceof BinaryOperatorNode && ((BinaryOperatorNode)is).operationType == BinaryOperatorNode.MULTIPLY){
 			BinaryOperatorNode bi = (BinaryOperatorNode) is;
@@ -71,36 +75,38 @@ public class SummationNode extends FormulaNode{
 				constant = bi.r;
 				other = bi.l;
 			}
-			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, constant, new SummationNode(ls, us, other, varName)).simplify();
+			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, constant, new SummationNode(ls, us, other, varName)).takeSimplified();
 		}
 		//sum i from a to b of i
 		else if(is instanceof VariableNode && ((VariableNode)is).varName.equals(varName)){
-			return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, ntimesnplusoneovertwo(us), ntimesnplusoneovertwo(new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, ls, ConstantNode.ONE))).simplify();
+			return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, ntimesnplusoneovertwo(us), ntimesnplusoneovertwo(new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, ls, ConstantNode.ONE))).takeSimplified();
 		}
 		
 		return new SummationNode(ls, us, is, varName);
 	}
 	
-	public FormulaNode bigO(){
-		FormulaNode simp = simplify();
+	FormulaNode takeBigO(){
+		FormulaNode simp = takeSimplified();
 		
 		if(simp instanceof SummationNode){
 			SummationNode s = (SummationNode) simp;
 			
-//			FormulaNode count = summationrange(s.lower, s.upper);
+//			FormulaNode count = summationrange(s.lower, s.upper).takeSimplified();
+			
+//			count = summationrangebigO(s.lower, s.upper).simplify();
 //			
 //			BinaryOperatorNode b = new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, count, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)));
-////			System.out.println("\n" + count.asString());
-////			System.out.println(b.asString());
-////			System.out.println(b.bigO().asString());
+//			System.out.println("\n" + count.asString() + " \\in " + count.takeBigO().asString());
+//			System.out.println(b.asString());
+//			System.out.println(b.bigO().asString());
 //			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, count, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
 			
 			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
-			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, s.upper, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
+			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, s.upper.takeBigO(), new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).takeBigO();
 		}
 		
-		return simp;
+		return simp.takeBigO();
 	}
 	
 	public FormulaNode substitute(String s, FormulaNode f){

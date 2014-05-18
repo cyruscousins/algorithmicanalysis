@@ -68,7 +68,7 @@ public class FormulaParser {
   private static Pattern numPattern = Pattern.compile("~?(?:[0-9]+.?[0-9]*)|(?:.[0-9]+)"); //handle negative numbers (weakly).
   private static Pattern varPattern = Pattern.compile("[a-zA-Z][0-9a-zA-Z~_]*");
 
-  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose)|(?:sin)|(?:cos)|(?:floor)|(?:ceil)|(?:sum)|" +
+  private static Pattern operatorPattern = Pattern.compile("([\\(\\)+\\-*/!^]|(?:log)|(?:ln)|(?:choose)|(?:mod)|(?:sin)|(?:cos)|(?:floor)|(?:ceil)|(?:sum)|" +
   		"(?:of)|(?:from)|(?:to))");
   
   private static void substituteBinaryOperators(List<Object> s, String[] operators, int[] opTypes){

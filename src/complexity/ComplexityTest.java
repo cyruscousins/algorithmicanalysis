@@ -1,5 +1,6 @@
 package complexity;
 
+import java.io.PrintStream;
 import java.util.Random;
 
 import algorithm.Algorithm;
@@ -8,57 +9,59 @@ import algorithm.UnorderedArray;
 public class ComplexityTest {
 
 	public static void main(String[] args){
-
-		runEqualityTests();
-		runValueTests();
-		runStringTests();
-		runSimplifierTests();
-		runBigOTests();
-		runBigOSubstitutionTests();
+		runAllTests(false, System.out);
+	}
+	public static void runAllTests(boolean verbose, PrintStream out){
+		runEqualityTests(verbose, out);
+		runValueTests(verbose, out);
+		runStringTests(verbose, out);
+		runSimplifierTests(verbose, out);
+		runBigOTests(verbose, out);
+		runBigOSubstitutionTests(verbose, out);
 		
 	}
 	
-	public static void runEqualityTests(){
+	public static void runEqualityTests(boolean verbose, PrintStream out){
 		String[] formulae = "n | n ^ 2 | n * (2 log n) + 1 - 1 | (2 * (2 log (n ^ (m + l)))) + ((m * l) ^ 2)".split("\\|");
-		String fStr = formulae[0] + "|" + formulae[0];
-		for(int i = 1; i < formulae.length; i++){
-			fStr += "|" + formulae[i] + "|" + formulae[i];
+		String fStr = "";
+		for(int i = 0; i < formulae.length; i++){
+			fStr += formulae[i] + "|" + formulae[i] + "|";
 		}
 		
 		FormulaNode[] test = FormulaParser.parseFormulae(fStr, "\\|");
 
-		System.out.println("Equality Tester");
+		out.println("Equality Tester");
 		for(int i = 0; i < test.length; i += 2){
 			if(test[i + 0].formulaEquals(test[i + 1])){
-				System.out.println(test[i + 0].asStringRecurse() + " = " + test[i + 1].asStringRecurse());
+				if(verbose) out.println((i / 2) + ": Success: " + test[i + 0].asStringRecurse() + " = " + test[i + 1].asStringRecurse());
 			}
 			else{
-				System.err.println(test[i + 0].asStringRecurse() + " != " + test[i + 1].asStringRecurse());
+				out.println((i / 2) + ": Error: " + test[i + 0].asStringRecurse() + " != " + test[i + 1].asStringRecurse());
 			}
 		}
 	}
 	
-	public static void runValueTests(){
+	public static void runValueTests(boolean verbose, PrintStream out){
 		FormulaNode[] tests = FormulaParser.parseFormulae(
 				"4! | sum i from 0 to 5 of i | sum i from 0 to 4 of (i ^ i)", "\\|");
 		//= new FormulaNode[]{FormulaParser.parseFormula("4!"), new Summation(ConstantNode.ZERO, new ConstantNode(5), FormulaParser.parseFormula("i"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ 2"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ i"), "i")};
-		double[] correctValues = new double[]{24, 15, 30, 90};
+		double[] correctValues = new double[]{24, 15, 289};
 		
 		VarSet empty = new VarSet();
 		for(int i = 0; i < tests.length; i++){
 			double val = tests[i].evaluate(empty);
 			if(epsilonCompare(val, correctValues[i])){
-				System.out.println("Value test " + i + " passed: " + tests[i].asString() + " -> " + correctValues[i]);
+				if(verbose) out.println(i + ": Value test " + i + " passed: " + tests[i].asString() + " -> " + correctValues[i]);
 			}
 			else{
-				System.out.println("Value test " + i + " failed: " + tests[i].asString() + " -> " + val + " != " + correctValues[i]);
+				out.println(i + ": Value test " + i + " failed: " + tests[i].asString() + " -> " + val + " != " + correctValues[i]);
 			}
 		}
 	}
 	
-	public static void runStringTests(){
+	public static void runStringTests(boolean verbose, PrintStream out){
 
-		System.out.println("\n\nSIMPLIFIER TESTS\n");
+		out.println("\n\nSTRING TESTS\n");
 		FormulaNode[] test = FormulaParser.parseFormulae("n|n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
 				"n * n | n^2   |   n * (n * (n / n)) | n^2   |   n * n * n | n^3   |   (n * n) * (n * n) | n^4   |" +
 				"(n ^ 4) / (n ^ 2) | (n ^ 2)   |   (n ^ 4) / (n ^ 3) | n   |   (n ^ 2) / (n ^ 3) | (n ^ ~1)   |" +
@@ -73,8 +76,6 @@ public class ComplexityTest {
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
 				"", "\\|");
 		
-				//TODO add summations
-		
 		int success = 0;
 		for(int i = 0; i < test.length; i++){
 			FormulaNode res;
@@ -82,24 +83,24 @@ public class ComplexityTest {
 				res = FormulaParser.parseFormula(test[i].asString());
 			}
 			catch(Exception e){
-				System.err.println("Error parsing \"" + test[i].asString() + "\".");
+				out.println(i + ": Error parsing \"" + test[i].asString() + "\".");
 				e.printStackTrace();
 				continue;
 			}
 			if(!test[i].formulaEquals(res)){
-				System.out.println("STRING FAILURE: " + test[i].asString() + " -> " + res.asString());
+				out.println(i + ": STRING FAILURE: \"" + test[i].asString() + "\" -> \"" + res.asString() + "\"");
 			}
 			else{
-				System.out.println("STRING SUCCESS: " + test[i].asString() + " -> " + res.asString());
+				if(verbose) out.println(i + ": STRING SUCCESS: \"" + test[i].asString() + "\" -> \"" + res.asString() + "\"");
 				success++;
 			}
 		}
-		System.out.println("Success: " + success + " / " + test.length);
+		out.println("Success: " + success + " / " + test.length);
 	}
 	
-	public static void runSimplifierTests(){
+	public static void runSimplifierTests(boolean verbose, PrintStream out){
 
-		System.out.println("\n\nSIMPLIFIER TESTS\n");
+		out.println("\n\nSIMPLIFIER TESTS\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
 				"n|n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
 				"n * n | n^2   |   n * (n * (n / n)) | n^2   |   n * n * n | n^3   |   (n * n) * (n * n) | n^4   |" +
@@ -115,37 +116,53 @@ public class ComplexityTest {
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
 				"", "\\|");
 
-//		System.out.println("KEY:");
+//		out.println("KEY:");
 //		for(int i = 0; i < test.length; i+= 2){
-//			System.out.println(test[i].asString() + " -> " + test[i + 1].asString());
+//			out.println(test[i].asString() + " -> " + test[i + 1].asString());
 //		}
 		
 		int totalSuccess = 0;
 		int valueSuccess = 0;
 		for(int i = 0; i < test.length; i+= 2){
 			FormulaNode f = test[i];
-			FormulaNode s = new Formula(f).simplify();
+			FormulaNode s = f.takeSimplified();
+
+			//Test simplification completion
+			FormulaNode s2 = s.takeSimplified();
+			if(!s2.formulaEquals(s)){
+				out.println((i / 2) + ": simplifier incompletion failure: " + f.asString() + " -> " + s.asString() + " -> " + s2.asString());
+				continue;
+			}
 			
-			if(testValueEqual(new String[]{"n", "m"}, f, s)) valueSuccess++;
+			if(testValueEqual(new String[]{"n", "m"}, f, s, out)) valueSuccess++;
 			
 			FormulaNode key = test[i + 1];
-			if(!(key.equals(key.takeSimplified()))){
-				System.err.println("Simplification test error: \"" + key.asString() + "\" is not fully simplified.");
+			FormulaNode simpKey = key.takeSimplified();
+			if(!(key.formulaEquals(simpKey))){
+				out.println((i / 2) + ": Simplification key test error: \"" + key.asString() + " -> " + simpKey.asString() + "\" is not fully simplified.");
+				continue;
 			}
+			else if(!(key.equals(simpKey))){
+				//TODO go back to this!
+				if(verbose) out.println((i / 2) + ": Simplification key test warning: \"" + key.asString() + " is fully simplified, but is given new memory.");
+				
+			}
+			
+			
 			if(key.formulaEquals(s)){
-				System.out.println("Simplification success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
+				if(verbose) out.println((i / 2) + ": Simplification success: " + f.asString() + " -> " + s.asString() + " = " + key.asString());
 				totalSuccess++;
 			}
 			else{
-				System.out.println("Simplification failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
+				out.println((i / 2) + ": Simplification failure: " + f.asString() + " -> " + s.asString() + " != " + key.asString());
 			}
 		}
-		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
-		System.out.println("Value success: " + valueSuccess + " / " + test.length / 2);
+		out.println("Total success: " + totalSuccess + " / " + test.length / 2);
+		out.println("Value success: " + valueSuccess + " / " + test.length / 2);
 	}
 	
-	public static void runBigOTests(){
-		System.out.println("\n\nBIGO TESTS:\n");
+	public static void runBigOTests(boolean verbose, PrintStream out){
+		out.println("\n\nBIGO TESTS:\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
 			"n|n   |   n + (n * n)|n^2   |   2 * n|n   |   n ^ 2 - n|n ^ 2   |" +
 			"n * 3 * n / 4 * n|n^3   |   (5 + n + 4 / 3) / n + 7|1   |   (n * 4 * m / 3 + 7) / ((n + 8) * m)|1   |" +
@@ -159,7 +176,7 @@ public class ComplexityTest {
 			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n   |" +
-			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | ln n   |" + //Summations
+			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | n * ln n   |   sum i from n to (n + 5) of (log_2 n) | ln n   |" + //Summations
 			"", "\\|");
 
 		String[] args = new String[]{"n", "m"};
@@ -168,47 +185,54 @@ public class ComplexityTest {
 		int totalSuccess = 0;
 		for(int i = 0; i < test.length; i += 2){
 			FormulaNode f = test[i];
-			FormulaNode s = new Formula(f).takeBigO();
+			FormulaNode s = f.takeBigO();
+			
+			//Test bigO completion
+			FormulaNode s2 = s.takeBigO();
+			if(!s2.formulaEquals(s)){
+				out.println((i / 2) + ": bigO incompletion failure: " + f.asString() + " -> " + s.asString() + " -> " + s2.asString());
+				continue;
+			}
 			
 			//Test approximate accuracy
-			if(testBigOApprox(args, f, s)){
+			if(testBigOApprox(args, f, s, out)){
 				valueSuccess++;
 			}
 			else{
-				System.err.println("Serious error: Value failure for " + f.asLatexStringRecurse() + " -> " + s.asLatexStringRecurse());
+				out.println((i / 2) + ": Serious error: Value failure for " + f.asLatexStringRecurse() + " -> " + s.asLatexStringRecurse());
 			}
 			
 			//Test accuracy
 			FormulaNode key = test[i + 1];
 			
 			if(!key.formulaEquals(key.takeBigO())){
-				System.err.println("BigO test error: key" + key + " is not in normative form.");
+				out.println((i / 2) + ": BigO test error: key" + key + " is not in normative form.");
 			}
 			
 			if(key.formulaEquals(s)){
-				System.out.println("BigO success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
+				if(verbose) out.println((i / 2) + ": BigO success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}
 			else{
-				System.out.println("BigO failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
+				out.println((i / 2) + ": BigO failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
 			}
 		}
 		
 		for(int i = 0; i < test.length; i++){
 			//TODO Does this only holds for polynomials?  I think we need to ensure that all args are polynomial.
-			FormulaNode f = new Formula(test[i]).simplify();
-			FormulaNode fn = new Formula(new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, f, new VariableNode("n"))).simplify();
+			FormulaNode f = test[i].takeSimplified();
+			FormulaNode fn = new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, f, new VariableNode("n")).takeSimplified();
 			if(BinaryOperatorNode.xInBigOofY(f, fn)){
-				System.out.println("BigO Error: " + f.asStringRecurse() + " -> " + fn.asStringRecurse() + " is innaccurate.");
+				out.println("BigO Error: " + f.asStringRecurse() + " -> " + fn.asStringRecurse() + " is innaccurate.");
 			}
 		}
-		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
-		System.out.println("Value success: " + valueSuccess + " / " + test.length / 2);
+		out.println("Total success: " + totalSuccess + " / " + test.length / 2);
+		out.println("Value success: " + valueSuccess + " / " + test.length / 2);
 	}
 	
 	private static String[] littles = new String[]{"a", "c"}, bigs = new String[]{"b", "d"};
-	public static void runBigOSubstitutionTests(){
-		System.out.println("\n\nBIGO SUBSTITUTIONTESTS:\n");
+	public static void runBigOSubstitutionTests(boolean verbose, PrintStream out){
+		out.println("\n\nBIGO SUBSTITUTION TESTS:\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
 				"a | a   |   b | b   |   a + d | a + d   |   b - a | b   |" + //Trivial
 				"a * b | a * b   |   a + b | b   |   2 ^ (a + b) | 2 ^ b   |   a ^ b | a ^ b   |" + //Basic
@@ -225,26 +249,26 @@ public class ComplexityTest {
 			FormulaNode key = test[i + 1];
 			
 			if(!key.formulaEquals(key.takeBigO(littles, bigs))){
-				System.err.println("BIGO SUBSTITUTION TEST ERROR: key " + key.asString() + " is not in normative form.");
+				out.println("BIGO SUBSTITUTION TEST ERROR: key " + key.asString() + " is not in normative form.");
 			}
 			
 			if(s.formulaEquals(key)){
-				System.out.println("BigO substitution success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
+				if(verbose) out.println((i / 2) + ": BigO substitution success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}
 			else{
-				System.out.println("BigO substitution failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
+				out.println((i / 2) + ": BigO substitution failure: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " != " + key.asStringRecurse());
 			}
 		}
 		
-		System.out.println("Total success: " + totalSuccess + " / " + test.length / 2);
+		out.println("Total success: " + totalSuccess + " / " + test.length / 2);
 	}
 	
-	static boolean testBigOApprox(String[] args, FormulaNode f0, FormulaNode f1){
-		return testBigOApprox(args, f0, f1, 100000, 100);
+	static boolean testBigOApprox(String[] args, FormulaNode f0, FormulaNode f1, PrintStream out){
+		return testBigOApprox(args, f0, f1, 100000, 100, out);
 	}
 	
-	static boolean testBigOApprox(String[] args, FormulaNode f0, FormulaNode f1, double x, double c){
+	static boolean testBigOApprox(String[] args, FormulaNode f0, FormulaNode f1, double x, double c, PrintStream out){
 		
 		VarSet v = new VarSet();
 		
@@ -256,11 +280,11 @@ public class ComplexityTest {
 		double d1 = f1.evaluate(v) * c;
 		
 		if(d0 == Double.POSITIVE_INFINITY || d1 == Double.POSITIVE_INFINITY){
-			return testBigOApprox(args, f0, f1, x / 10, c);
+			return testBigOApprox(args, f0, f1, x / 10, c, out);
 		}
 		
 		if(d0 >= d1){
-			System.err.println("Failure: " + f0.asStringRecurse() + " -> " + d0 + " > " + f1.asStringRecurse() + " -> " + d1);
+			out.println("Failure: " + f0.asStringRecurse() + " -> " + d0 + " > " + f1.asStringRecurse() + " -> " + d1);
 		}
 		
 		return d0 < d1;
@@ -271,7 +295,7 @@ public class ComplexityTest {
 		else return Math.abs(d0 - d1) <= .00001;
 	}
 	
-	static boolean testValueEqual(String[] args, FormulaNode f, FormulaNode s){
+	static boolean testValueEqual(String[] args, FormulaNode f, FormulaNode s, PrintStream out){
 		VarSet v = new VarSet();
 		
 		Random r = new Random();
@@ -294,12 +318,12 @@ public class ComplexityTest {
 			
 			if(!epsilonCompare(d0, d1)){
 				failed = true;
-				System.err.println("Simplification Error: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " is invalid for " + v.asString() + ".  Original: " + d0 + ", Simplified: " + d1);
+				out.println("Simplification Error: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " is invalid for " + v.asString() + ".  Original: " + d0 + ", Simplified: " + d1);
 			}
 		}
 		
 		if(!failed){
-			//System.out.println("Simplification " + f.asString() + " -> " + s.asString() + " accurate.");
+			//out.println("Simplification " + f.asString() + " -> " + s.asString() + " accurate.");
 		}
 		return !failed;
 	}

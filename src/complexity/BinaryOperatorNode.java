@@ -1,10 +1,10 @@
 package complexity;
 
 public class BinaryOperatorNode extends FormulaNode{
-  public static final String[] opStrings = new String[]{"+", "-", "*", "/", "^", "log", "choose"};
+  public static final String[] opStrings = new String[]{"+", "-", "*", "/", "^", "mod", "log", "choose"};
   
   public static final int NOP = -1; //A value of NOOP represents an invalid operator.
-  public static final int ADD = 0, SUBTRACT = 1, MULTIPLY = 2, DIVIDE = 3, EXPONENTIATE = 4, LOGARITHM = 5, CHOOSE = 6;
+  public static final int ADD = 0, SUBTRACT = 1, MULTIPLY = 2, DIVIDE = 3, EXPONENTIATE = 4, MODULUS = 5, LOGARITHM = 6, CHOOSE = 7;
   
   int operationType;
   FormulaNode l, r;
@@ -41,6 +41,8 @@ public class BinaryOperatorNode extends FormulaNode{
         return v0 / v1;
       case EXPONENTIATE:
         return Math.pow(v0, v1);
+      case MODULUS:
+    	return (long)v0 % (long)v1;
       case LOGARITHM:
         return Math.log(v1) / Math.log(v0);  //log base v0 of v1.
       case CHOOSE:
@@ -57,24 +59,35 @@ public class BinaryOperatorNode extends FormulaNode{
   //TODO CHOOSE!
   
   //TODO distributative law!
-  public FormulaNode simplify(){
+  public FormulaNode takeSimplified(){
 
-	    FormulaNode nl = l.simplify();
-	    FormulaNode nr = r.simplify();
+	    FormulaNode nl = l.takeSimplified();
+	    FormulaNode nr = r.takeSimplified();
+	    
+	    FormulaNode result;
+	    if(nl == l && nr == r){
+	    	result = this;
+	    }
+	    else{
+	    	result = new BinaryOperatorNode(operationType, nl, nr);
+	    }
 	    
 	  //Simplify variable compositions.
 	  if(nl.formulaEquals(nr)){
 		  //Same variable composition.
 		  switch(operationType){
 		  	case ADD:
-			  return new BinaryOperatorNode(MULTIPLY, new ConstantNode(2), nl);
+			  return new BinaryOperatorNode(MULTIPLY, ConstantNode.TWO, nl).takeSimplified();
 		  	case SUBTRACT:
-		  		return new ConstantNode(0);
+		  		return ConstantNode.ZERO;
 		  	case MULTIPLY:
-		  		return new BinaryOperatorNode(EXPONENTIATE, nl, new ConstantNode(2));
+		  		return new BinaryOperatorNode(EXPONENTIATE, nl, ConstantNode.TWO).takeSimplified();
 		  	case DIVIDE:
 		  		if(!nr.formulaEquals(ConstantNode.ZERO)){
-			  		return new ConstantNode(1);
+			  		return ConstantNode.ONE;
+		  		}
+		  		else{
+		  			return result;
 		  		}
 		  }
 	  }
@@ -97,7 +110,7 @@ public class BinaryOperatorNode extends FormulaNode{
 				}
 				else if(operationType == DIVIDE){
 					// Divide by 0.  Must explicitly ignore it here.
-					return new BinaryOperatorNode(operationType, nl, nr);
+					return result;
 				}
 				else if(operationType == EXPONENTIATE){
 					return ConstantNode.ONE;
@@ -166,7 +179,7 @@ public class BinaryOperatorNode extends FormulaNode{
 			  //TODO exponent * exponent...
 			  if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).operationType == EXPONENTIATE){
 				  if(((BinaryOperatorNode)nl).l.formulaEquals(((BinaryOperatorNode)nr).l)){
-					  return new BinaryOperatorNode(EXPONENTIATE, ((BinaryOperatorNode)nl).l, new BinaryOperatorNode(joinOp, ((BinaryOperatorNode)nl).r, ((BinaryOperatorNode)nr).r).simplify());
+					  return new BinaryOperatorNode(EXPONENTIATE, ((BinaryOperatorNode)nl).l, new BinaryOperatorNode(joinOp, ((BinaryOperatorNode)nl).r, ((BinaryOperatorNode)nr).r)).takeSimplified();
 				  }
 			  }
 			  
@@ -180,7 +193,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		  
 		  if(exponential != null){
 			  if(other.formulaEquals(exponential.l)){
-				  return new BinaryOperatorNode(EXPONENTIATE, exponential.l, new BinaryOperatorNode(joinOp, ConstantNode.ONE, exponential.r).simplify());
+				  return new BinaryOperatorNode(EXPONENTIATE, exponential.l, new BinaryOperatorNode(joinOp, ConstantNode.ONE, exponential.r)).takeSimplified();
 			  }
 		  }
 	  }
@@ -191,6 +204,17 @@ public class BinaryOperatorNode extends FormulaNode{
 	  // convert 1 / x to x^-1
 	  if(operationType == DIVIDE && nl.formulaEquals(ConstantNode.ONE)){
 		  return new BinaryOperatorNode(EXPONENTIATE, nr, ConstantNode.MINUS_ONE);
+	  }
+	  
+	  if(operationType == MODULUS){
+		  //TODO make this safer.
+
+		  if(xInBigOofY(nl, nr)){
+			  return nl.takeBigO();
+		  }
+		  else if(xInBigOofY(nr, nl)){
+			  return ConstantNode.ONE;
+		  }
 	  }
 	  
 	  //Simplify exponents
@@ -211,7 +235,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		  
 		  //Simplify (a ^ b) ^ c to a ^ (b * c)
 		  if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).operationType == EXPONENTIATE){
-			  return new BinaryOperatorNode(EXPONENTIATE, ((BinaryOperatorNode)nl).l, new BinaryOperatorNode(MULTIPLY, ((BinaryOperatorNode)nl).r, nr)).simplify();
+			  return new BinaryOperatorNode(EXPONENTIATE, ((BinaryOperatorNode)nl).l, new BinaryOperatorNode(MULTIPLY, ((BinaryOperatorNode)nl).r, nr)).takeSimplified();
 		  }
 	  }
 
@@ -293,12 +317,12 @@ public class BinaryOperatorNode extends FormulaNode{
 		  if(nl instanceof OpCollectionNode && ((OpCollectionNode) nl).operator == collectionType){
 			  OpCollectionNode nlo = (OpCollectionNode) nl;
 			  if(nr instanceof OpCollectionNode){
-				  return nlo.combine((OpCollectionNode) nr).simplify();
+				  return nlo.combine((OpCollectionNode) nr).takeSimplified();
 			  }
-			  else return nlo.pushLast(nr).simplify();
+			  else return nlo.pushLast(nr).takeSimplified();
 		  }
 		  else if(nr instanceof OpCollectionNode && (((OpCollectionNode)nr).operator == collectionType)){
-			  return ((OpCollectionNode)nr).pushFirst(nl).simplify();
+			  return ((OpCollectionNode)nr).pushFirst(nl).takeSimplified();
 		  }
 		  
 	  }
@@ -331,7 +355,7 @@ public class BinaryOperatorNode extends FormulaNode{
 			  else{
 				  //Not the same base.  However, x may be contained in the base.
 				  
-				  //For a situation like x in bigO( a ^ b ), we must return x ^ -b in bigO(a)
+				  //For a situation like x in takeBigO( a ^ b ), we must return x ^ -b in takeBigO(a)
 				  //Here we handle b as a constant separately.
 				  if(by.r instanceof ConstantNode){
 					  return xInBigOofY(x, xExponent - ((ConstantNode)by.r).value, by.l);
@@ -353,49 +377,55 @@ public class BinaryOperatorNode extends FormulaNode{
 	  return false;
   }
   
-  public FormulaNode bigO(){
+  public FormulaNode takeBigO(){
 	  
-	  FormulaNode simp = simplify();
+	  FormulaNode simp = takeSimplified();
+	  
+//	  if(operationType == SUBTRACT){ // Avoid an "x - x" situation.
+//		  simp = this;
+//	  }
+//	  else{
+//		  simp = simplify();
+//	  }
 	  
 	  if(simp instanceof BinaryOperatorNode){
 		BinaryOperatorNode nn = (BinaryOperatorNode)simp;
 		FormulaNode nl = nn.l;
 		FormulaNode nr = nn.r;
 	  
+
+	    //One or fewer nodes could be constants, here we throw them out.
 	    if (nn.operationType == ADD || nn.operationType == MULTIPLY || nn.operationType == SUBTRACT){
-	      //One or fewer nodes could be constants, here we throw them out.
 	      if(nl instanceof ConstantNode && ((ConstantNode)nl).value > 0){
 	    	  if(nn.operationType == SUBTRACT){
-	    		  return new BinaryOperatorNode(MULTIPLY, ConstantNode.MINUS_ONE, nr.bigO()).bigO();
+	    		  return new BinaryOperatorNode(MULTIPLY, ConstantNode.MINUS_ONE, nr.takeBigO()).takeBigO();
 	    	  }
-	        return nr.bigO();
+	        return nr.takeBigO();
 	      }
 	      else if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	        	return nl.bigO();
+	        	return nl.takeBigO();
 	      }
-	      
 	    }
 	    
 	    else if (nn.operationType == DIVIDE){
 	      if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	    	  return nl.bigO();
+	    	  return nl.takeBigO();
 	      }
 	      else if(nl instanceof ConstantNode){
-	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.bigO(), ConstantNode.MINUS_ONE).bigO();
+	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.takeBigO(), ConstantNode.MINUS_ONE).takeBigO();
 	      }
 	      
-	      //TOTAL HACK:
-	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).l.formulaEquals(nr)){
-	    	  return ((BinaryOperatorNode)nl).r;
-	      }
-	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).r.formulaEquals(nr)){
-	    	  return ((BinaryOperatorNode)nl).l;
-	      }
-	      
+//	      //TOTAL HACK:
+//	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).l.formulaEquals(nr)){
+//	    	  return ((BinaryOperatorNode)nl).r;
+//	      }
+//	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).r.formulaEquals(nr)){
+//	    	  return ((BinaryOperatorNode)nl).l;
+//	      }
 	      
 	    }
 	    
-	    //Check if one op is bigo of the other.
+	    //Check if one op is in bigO of the other.
 	    if(nn.operationType == ADD){
 		      if(xInBigOofY(nl, nr)){
 		    	  return nr;
@@ -405,7 +435,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		      }
 	    }
 	    
-	    //For substitution, we must have one way containment but NOT the other.  TODO This needs to be made more formal.
+	    //For subtraction, we must have one way containment but NOT the other.  TODO This needs to be made more formal.
 	    if(nn.operationType == SUBTRACT){
 	    	if(xInBigOofY(nr, nl) && !xInBigOofY(nl, nr)){
 	    		return nl;
@@ -418,7 +448,6 @@ public class BinaryOperatorNode extends FormulaNode{
 		      if(xInBigOofY(nr, nl)){
 		    	  return nl;
 		      }
-	    	
 	    }
 	    
 	    //TODO handle these properly.
@@ -436,7 +465,7 @@ public class BinaryOperatorNode extends FormulaNode{
 				}
 			}
 			if(nr instanceof UnaryOperatorNode && (((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.CEIL || ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FLOOR)){
-				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument);
+				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument).takeBigO();
 			}
 			else return nn;
 		} else if(operationType == LOGARITHM){
@@ -451,16 +480,16 @@ public class BinaryOperatorNode extends FormulaNode{
 			
 			if(nr instanceof UnaryOperatorNode && ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FACTORIAL){
 
-				FormulaNode factoriand = ((UnaryOperatorNode)nr).argument.simplify();
-				return new BinaryOperatorNode(MULTIPLY, factoriand.bigO(), new BinaryOperatorNode(LOGARITHM, nll, factoriand));
+				FormulaNode factoriand = ((UnaryOperatorNode)nr).argument.takeSimplified();
+				return new BinaryOperatorNode(MULTIPLY, factoriand.takeBigO(), new BinaryOperatorNode(LOGARITHM, nll, factoriand).takeBigO());
 			}
 			
-			return new BinaryOperatorNode(LOGARITHM, nll, nr.takeBigO());
+			return new BinaryOperatorNode(LOGARITHM, nll, nr);
 		}
 		else if(operationType == CHOOSE){
 			
 			if(nr instanceof ConstantNode){
-				return new BinaryOperatorNode(EXPONENTIATE, nl, nr).bigO();
+				return new BinaryOperatorNode(EXPONENTIATE, nl, nr).takeBigO();
 			}
 			else{
 				return nn;
@@ -498,10 +527,16 @@ public class BinaryOperatorNode extends FormulaNode{
 		//TODO it might be a good idea to divide and determine if the result is greater than one as n -> \infty.
 
 		//TODO alternatively, write a searchAdditive function that searches an additive tree for X or X^n for some n >= 1.
-		return new BinaryOperatorNode(nn.operationType, nl.bigO(), nr.bigO());
+		
+		if(nn.formulaEquals(this)){
+			return this;
+		}
+		else{
+			return new BinaryOperatorNode(nn.operationType, nl.takeBigO(), nr.takeBigO()).takeBigO();
+		}
 	  }
 	  else{
-		  return simp.bigO();
+		  return simp.takeBigO();
 	  }
   }
 
@@ -512,8 +547,8 @@ public class BinaryOperatorNode extends FormulaNode{
 	  FormulaNode sl = l.bigOVarSub(x, y);
 	  FormulaNode sr = r.bigOVarSub(x, y);
 
-	  FormulaNode lSub = sl.substitute(x, y).bigO();
-	  FormulaNode rSub = sr.substitute(x, y).bigO();
+	  FormulaNode lSub = sl.substitute(x, y).takeBigO();
+	  FormulaNode rSub = sr.substitute(x, y).takeBigO();
 	  
 	  if(operationType == ADD){
 		  if(xInBigOofY(lSub, sr)){
@@ -528,11 +563,11 @@ public class BinaryOperatorNode extends FormulaNode{
 		  
 		  /*
 		  
-		  if(xInBigOofY(lSub, rSub)){
+		  if(xIntakeBigOofY(lSub, rSub)){
 			  return rSub;
 		  }
 
-		  if(xInBigOofY(rSub, lSub)){
+		  if(xIntakeBigOofY(rSub, lSub)){
 			  return lSub;
 		  }
 		  
@@ -547,7 +582,7 @@ public class BinaryOperatorNode extends FormulaNode{
 	  }
 	  
 //	  else if (operationType == DIVISION){
-//		  if(xInBigOofY(rSub, sl) && !xInBigOofY(sl, sr))){
+//		  if(xIntakeBigOofY(rSub, sl) && !xIntakeBigOofY(sl, sr))){
 //			  return sl;
 //		  }
 //	  }
@@ -581,6 +616,9 @@ public class BinaryOperatorNode extends FormulaNode{
 	  }
 	  else if(operationType == MULTIPLY){
 		  return "(" + l.asLatexStringRecurse() + " \\cdot " + r.asLatexStringRecurse() + ")";
+	  }
+	  else if (operationType == MODULUS){
+		  return "(" + l.asLatexStringRecurse() + "\\modulus{" + r.asLatexStringRecurse() + "}";
 	  }
 	  else if(operationType == EXPONENTIATE){
 		  String base = l.asLatexStringRecurse();
