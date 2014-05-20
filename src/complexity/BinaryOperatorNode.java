@@ -140,16 +140,32 @@ public class BinaryOperatorNode extends FormulaNode{
 	  }
 	  
 	  //Subtractive inverse
-	  if(operationType == SUBTRACT && nl.formulaEquals(nr)){
-		  return ConstantNode.ZERO;
-	  }
-	  //Divisive inverse
-	  else if(operationType == DIVIDE && nl.formulaEquals(nr)){
-		  return ConstantNode.ONE;
+	  if(operationType == SUBTRACT){
+		  if(nl.formulaEquals(nr)){
+			  return ConstantNode.ZERO;
+		  }
+		  if(nl instanceof OpCollectionNode && ((OpCollectionNode)nl).operator == OpCollectionNode.ADD){
+			  OpCollectionNode l = (OpCollectionNode) nl;
+			  
+			  FormulaNode res = l.remove(nr);
+			  if(res != null){
+				  return res;
+			  }
+		  }
 	  }
 	  
-	  //Simplify exponent division.
-	  if(operationType == DIVIDE){
+	  
+	  
+	  //Division simplification
+	  else if(operationType == DIVIDE){
+		  
+		  //Inverse
+		  if(nl.formulaEquals(nr)){
+			  return ConstantNode.ONE;
+		  }
+		  
+		  //Exponential subtraction
+		  
 		  BinaryOperatorNode exponential = null;
 		  FormulaNode other = null; //unnecessary initialization...
 		  if(nr instanceof BinaryOperatorNode && ((BinaryOperatorNode)nr).operationType == EXPONENTIATE){
@@ -171,6 +187,17 @@ public class BinaryOperatorNode extends FormulaNode{
 		  if(exponential != null){
 			  if(other.formulaEquals(exponential.l)){
 				  return new BinaryOperatorNode(EXPONENTIATE, exponential.l, new BinaryOperatorNode(SUBTRACT, ConstantNode.ONE, exponential.r)).takeSimplified();
+			  }
+		  }
+		  
+		  //Inverse with an element of an OpCollectionNode
+		  
+		  if(nl instanceof OpCollectionNode && ((OpCollectionNode) nl).operator == OpCollectionNode.MULTIPLY){
+			  OpCollectionNode l = (OpCollectionNode) nl;
+			  
+			  FormulaNode res = l.remove(nr);
+			  if(res != null){
+				  return res;
 			  }
 		  }
 	  }

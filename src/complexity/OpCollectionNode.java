@@ -10,6 +10,8 @@ public class OpCollectionNode extends FormulaNode{
 	String[] opStrings = new String[]{"+", "*"};
 	String[] latexOpStrings = new String[]{"+", "\\cdot"};
 	
+	public static final ConstantNode[] IDENTITY = new ConstantNode[]{ConstantNode.ZERO, ConstantNode.ONE};
+	
 	int len = 0;
 	public FormulaNode[] data;
 
@@ -70,6 +72,40 @@ public class OpCollectionNode extends FormulaNode{
 		OpCollectionNode newNode = new OpCollectionNode(newArray, newLen, operator);
 		return newNode;
 	}
+	
+	//Returns an FormulaNode of this minus one instance of f, if f is not contained in this OpCollectionNode, null is instead returned.
+	public FormulaNode remove(FormulaNode f){
+		int index = -1;
+		for(int i = 0; i < len; i++){
+			if(data[i].formulaEquals(f)){
+				index = i;
+			}
+		}
+		if(index == -1){
+			return null;
+		}
+		
+		int newLen = len - 1;
+		
+		if(newLen == 1){
+			if(index == 0){
+				return data[1];
+			}
+			else{
+				return data[0];
+			}
+		}
+		
+		FormulaNode[] newData = new FormulaNode[newLen];
+		
+		System.arraycopy(data, 0, newData, 0, index);
+		System.arraycopy(data, index + 1, newData, index, newLen - index);
+		
+		return new OpCollectionNode(newData, newLen, operator);
+		
+		
+	}
+	
 	
 	public FormulaNode trimConstants(){
 
@@ -142,8 +178,6 @@ public class OpCollectionNode extends FormulaNode{
 		}
 		
 		
-		
-		
 		return null;
 	}
 	
@@ -203,7 +237,11 @@ public class OpCollectionNode extends FormulaNode{
 		
 		//Need to convert the representation to a mutable list.
 		//In this step, any opcollection nodes are flattened if possible.
+		//Constants are also pulled to the front.
+
+		ConstantNode constant = IDENTITY[operator];
 		for(int i = 0; i < len; i++){
+			
 			
 			//Simplify each child
 			FormulaNode s = data[i].takeSimplified();
@@ -211,13 +249,29 @@ public class OpCollectionNode extends FormulaNode{
 			//Flatten the tree if possible.
 			if(s instanceof OpCollectionNode && ((OpCollectionNode)s).operator == operator){
 				for(int j = 0; j < ((OpCollectionNode)s).len; j++){
-					nodes.add(((OpCollectionNode)s).data[j]);
+					FormulaNode tn = ((OpCollectionNode)s).data[j];
+					if(tn instanceof ConstantNode){
+						constant = new ConstantNode(new OpCollectionNode(operator, constant, tn).evaluate(null));
+					}
+					else{
+						nodes.add(tn);
+					}
 				}
 			}
 			//Or add directly.
 			else{
-				nodes.add(data[i].takeSimplified());
+				FormulaNode tn = data[i].takeSimplified();
+				if(tn instanceof ConstantNode){
+					constant = new ConstantNode(new OpCollectionNode(operator, constant, tn).evaluate(null));
+				}
+				else{
+					nodes.add(tn);
+				}
 			}
+		}
+		
+		if(!constant.formulaEquals(IDENTITY[operator])){
+			nodes.add(0, constant);
 		}
 		
 		for(int i = 0; i < nodes.size(); i++){
@@ -246,8 +300,11 @@ public class OpCollectionNode extends FormulaNode{
 				}
 			}
 		}
-		
-		if(nodes.size() == 1){
+
+		if(nodes.size() == 0){
+			return IDENTITY[operator];
+		}
+		else if(nodes.size() == 1){
 			return nodes.get(0);
 		}
 		else{
@@ -267,11 +324,15 @@ public class OpCollectionNode extends FormulaNode{
 	      else if(r instanceof ConstantNode && ((ConstantNode)r).value > 0){
 	        	return l;
 	      }
+
+//    	  System.out.println("Evaluating bigO of " + l + " + " + r);
 		
 	      if(BinaryOperatorNode.xInBigOofY(l, r)){
+//	    	  System.out.println(l + " in bigO of " + r);
 	    	  return r;
 	      }
 	      else if(BinaryOperatorNode.xInBigOofY(r, l)){
+//	    	  System.out.println(r + " in bigO of " + l);
 	    	  return l;
 	      }
 	      
@@ -289,7 +350,7 @@ public class OpCollectionNode extends FormulaNode{
 		return null;
 	}
 	
-	public FormulaNode bigO(){
+	FormulaNode takeBigO(){
 		
 		FormulaNode simp = takeSimplified();
 
@@ -332,8 +393,8 @@ public class OpCollectionNode extends FormulaNode{
 					nodes.set(i, attempt);
 					removeSwapBack(nodes, j);
 					
-					//A change has occurred, must restart (now with a smaller number of nodes).
-					i = -1;
+					//A change has occurred (this element might have changed), so restart from this element.
+					i--;
 					break;
 				}
 			}
@@ -349,7 +410,7 @@ public class OpCollectionNode extends FormulaNode{
 				return this;
 			}
 			else{
-				return nn;
+				return nn.takeBigO();
 			}
 		}
 	}
@@ -361,7 +422,7 @@ public class OpCollectionNode extends FormulaNode{
 	  //TODO this is a heavy function, test it.
 	  
 	  
-	  FormulaNode f = bigO();
+	  FormulaNode f = takeBigO();
 	  
 	  if(f instanceof OpCollectionNode){
 		  OpCollectionNode o = (OpCollectionNode)f;
