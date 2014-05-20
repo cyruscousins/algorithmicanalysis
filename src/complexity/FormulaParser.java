@@ -35,12 +35,12 @@ public class FormulaParser {
   
   private static int parseOperator(String s){
 	  switch(s){
-		  case "+":
-			  return BinaryOperatorNode.ADD;
+//		  case "+":
+//			  return BinaryOperatorNode.ADD;
 		  case "-":
 			  return BinaryOperatorNode.SUBTRACT;
-		  case "*":
-			  return BinaryOperatorNode.MULTIPLY;
+//		  case "*":
+//			  return BinaryOperatorNode.MULTIPLY;
 		  case "/":
 			  return BinaryOperatorNode.DIVIDE;
 		  case "log":
@@ -109,64 +109,82 @@ public class FormulaParser {
 	  }
   }
   
-  //Pull * and + into groups.
-  private static FormulaNode expandOperatorTrees(FormulaNode f){
-	  if(f instanceof UnaryOperatorNode){
-		  UnaryOperatorNode u = (UnaryOperatorNode)f;
-		  return new UnaryOperatorNode(u.operationType, expandOperatorTrees(u.argument));
-	  }
-	  else if(f instanceof BinaryOperatorNode){
-		  BinaryOperatorNode b = (BinaryOperatorNode)f;
-		  int opType = b.operationType;
-		  
-		  if(!(opType == BinaryOperatorNode.ADD || opType == BinaryOperatorNode.MULTIPLY)){
-			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
-		  }
-		  
-		  List<FormulaNode> nodes = new ArrayList<FormulaNode>();
-		  
-		  nodes.add(b.l);
-		  nodes.add(b.r);
-		  
-		  for(int i = 0; i < nodes.size(); i++){
-			  if(nodes.get(i) instanceof BinaryOperatorNode){
-				  BinaryOperatorNode thisNode = (BinaryOperatorNode)nodes.get(i);
-				  if(thisNode.operationType == opType){
-					  //Expand
-					  nodes.set(i, thisNode.l);
-					  nodes.add(i + 1, thisNode.r);
-					  i--; //And process this index again.
-				  }
-				  else if (opType == BinaryOperatorNode.ADD && thisNode.operationType == BinaryOperatorNode.SUBTRACT){
-					  //TODO this.
-				  }
-			  }
-		  }
-		  
-		  if(nodes.size() == 2){
-			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
-		  }
-		  else{
-			  FormulaNode[] nodesArr = new FormulaNode[nodes.size()];
-			  for(int i = 0; i < nodes.size(); i++){
-				  nodesArr[i] = expandOperatorTrees(nodes.get(i));
-			  }
+  private static void substituteOpCollectionNode(List<Object> s, String opStr, int opType){
+	  for(int i = 1; i < s.size(); i++){
+		  if(s.get(i).equals(opStr)){
+			  List<FormulaNode> operands = new ArrayList<>();
+			  operands.add((FormulaNode)s.remove(i - 1));
+			  s.remove(i - 1);
 			  
-			  int ocOp = -1;
-			  if (opType == BinaryOperatorNode.ADD){
-				  ocOp = OpCollectionNode.ADD;
+			  while(i < s.size() && s.get(i).equals(opStr)){
+				  operands.add((FormulaNode)s.remove(i - 1));
+				  s.remove(i - 1);
 			  }
-			  else if (opType == BinaryOperatorNode.MULTIPLY){
-				  ocOp = OpCollectionNode.MULTIPLY;
-			  }
-
-			  OpCollectionNode o = new OpCollectionNode(nodesArr, nodesArr.length, ocOp);
-			  return o;
+			  operands.add((FormulaNode)s.get(i - 1));
+			  
+			  s.set(i - 1, new OpCollectionNode(operands, opType));
 		  }
-		  
 	  }
-	  else return f;
   }
+  
+  //Pull * and + into groups.
+//  private static FormulaNode expandOperatorTrees(FormulaNode f){
+//	  if(f instanceof UnaryOperatorNode){
+//		  UnaryOperatorNode u = (UnaryOperatorNode)f;
+//		  return new UnaryOperatorNode(u.operationType, expandOperatorTrees(u.argument));
+//	  }
+//	  else if(f instanceof BinaryOperatorNode){
+//		  BinaryOperatorNode b = (BinaryOperatorNode)f;
+//		  int opType = b.operationType;
+//		  
+//		  if(!(opType == BinaryOperatorNode.ADD || opType == BinaryOperatorNode.MULTIPLY)){
+//			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+//		  }
+//		  
+//		  List<FormulaNode> nodes = new ArrayList<FormulaNode>();
+//		  
+//		  nodes.add(b.l);
+//		  nodes.add(b.r);
+//		  
+//		  for(int i = 0; i < nodes.size(); i++){
+//			  if(nodes.get(i) instanceof BinaryOperatorNode){
+//				  BinaryOperatorNode thisNode = (BinaryOperatorNode)nodes.get(i);
+//				  if(thisNode.operationType == opType){
+//					  //Expand
+//					  nodes.set(i, thisNode.l);
+//					  nodes.add(i + 1, thisNode.r);
+//					  i--; //And process this index again.
+//				  }
+//				  else if (opType == BinaryOperatorNode.ADD && thisNode.operationType == BinaryOperatorNode.SUBTRACT){
+//					  //TODO this.
+//				  }
+//			  }
+//		  }
+//		  
+//		  if(nodes.size() == 2){
+//			  return new BinaryOperatorNode(opType, expandOperatorTrees(b.l), expandOperatorTrees(b.r));
+//		  }
+//		  else{
+//			  FormulaNode[] nodesArr = new FormulaNode[nodes.size()];
+//			  for(int i = 0; i < nodes.size(); i++){
+//				  nodesArr[i] = expandOperatorTrees(nodes.get(i));
+//			  }
+//			  
+//			  int ocOp = -1;
+//			  if (opType == BinaryOperatorNode.ADD){
+//				  ocOp = OpCollectionNode.ADD;
+//			  }
+//			  else if (opType == BinaryOperatorNode.MULTIPLY){
+//				  ocOp = OpCollectionNode.MULTIPLY;
+//			  }
+//
+//			  OpCollectionNode o = new OpCollectionNode(nodesArr, nodesArr.length, ocOp);
+//			  return o;
+//		  }
+//		  
+//	  }
+//	  else return f;
+//  }
 
   public static FormulaNode parseFormula(List<Object> s){
 	  //Recursively handle parens
@@ -242,9 +260,21 @@ public class FormulaParser {
 			  i--;
 		  }
 	  }
+
+	  //Divide and modulus
+	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.DIVIDE, BinaryOperatorNode.MODULUS});
+
+	  //Multiplication:
+	  substituteOpCollectionNode(s, "*", OpCollectionNode.MULTIPLY);
+
+	  //Subtraction
+	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.SUBTRACT});
+
+	  //Addition
+	  substituteOpCollectionNode(s, "+", OpCollectionNode.ADD);
 	  
-	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.MULTIPLY, BinaryOperatorNode.DIVIDE});
-	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.ADD, BinaryOperatorNode.SUBTRACT});
+//	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.MULTIPLY, BinaryOperatorNode.DIVIDE});
+//	  substituteInfixBinaryOperators(s, new int[]{BinaryOperatorNode.ADD, BinaryOperatorNode.SUBTRACT});
 	  
 //	  System.out.println("RESULT:");
 //	  for(int i = 0; i < s.size(); i++){
@@ -319,7 +349,8 @@ public class FormulaParser {
 	  }
 	  
 	  //Read variables and constants.
-	  return expandOperatorTrees(parseFormula(l));
+//	  return expandOperatorTrees(parseFormula(l));
+	  return parseFormula(l);
   }
   
   

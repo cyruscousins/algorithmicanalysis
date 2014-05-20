@@ -42,7 +42,7 @@ public class SummationNode extends FormulaNode{
 	}
 	
 	FormulaNode ntimesnplusoneovertwo(FormulaNode f){
-		return new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, f, new BinaryOperatorNode(BinaryOperatorNode.ADD, f, ConstantNode.ONE)), ConstantNode.TWO);
+		return new BinaryOperatorNode(BinaryOperatorNode.DIVIDE, new OpCollectionNode(OpCollectionNode.MULTIPLY, f, new OpCollectionNode(OpCollectionNode.ADD, f, ConstantNode.ONE)), ConstantNode.TWO);
 	}
 
 	FormulaNode summationrange(FormulaNode bottom, FormulaNode top){
@@ -59,23 +59,26 @@ public class SummationNode extends FormulaNode{
 		FormulaNode us = upper.takeSimplified();
 		FormulaNode is = inner.takeSimplified();
 		
-		if(inner instanceof BinaryOperatorNode && ((BinaryOperatorNode)is).operationType == BinaryOperatorNode.MULTIPLY){
-			BinaryOperatorNode bi = (BinaryOperatorNode) is;
-			
-			FormulaNode constant = null;
-			FormulaNode other = null;
+		if(inner instanceof OpCollectionNode && ((OpCollectionNode)is).operator == OpCollectionNode.MULTIPLY){
 
-			//TODO collect variables, recurse, ...
+			//TODO: Pull out constant.
 			
-			if(bi.l instanceof ConstantNode){
-				constant = bi.l;
-				other = bi.r;
-			}
-			else if(bi.r instanceof ConstantNode){
-				constant = bi.r;
-				other = bi.l;
-			}
-			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, constant, new SummationNode(ls, us, other, varName)).takeSimplified();
+//			OpCollectionNode bi = (OpCollectionNode) is;
+//			
+//			FormulaNode constant = null;
+//			FormulaNode other = null;
+//
+//			//TODO collect variables, recurse, ...
+//			
+//			if(bi.l instanceof ConstantNode){
+//				constant = bi.l;
+//				other = bi.r;
+//			}
+//			else if(bi.r instanceof ConstantNode){
+//				constant = bi.r;
+//				other = bi.l;
+//			}
+//			return new OpCollectionNode(OpCollectionNode.MULTIPLY, constant, new SummationNode(ls, us, other, varName)).takeSimplified();
 		}
 		//sum i from a to b of i
 		else if(is instanceof VariableNode && ((VariableNode)is).varName.equals(varName)){
@@ -103,7 +106,7 @@ public class SummationNode extends FormulaNode{
 			
 			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
-			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, s.upper.takeBigO(), new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).takeBigO();
+			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.takeBigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).takeBigO();
 		}
 		
 		return simp.takeBigO();

@@ -1,0 +1,42 @@
+Version 2 formula contract:
+
+
+Equivalence:
+
+Equivalence represents formulae that may not look the same but are identically valued throughout their domains.
+
+e1, e2 equivalent \Rightarrow dom(e1) = dom(e2), and \forall x \in dom(e1), e1(x) = e2(x).
+
+
+Equality:
+
+Equality is a stronger concept, formulae must be written the same way.
+
+e1, e2 equal \Rightarrow string(e1) = String(e2).
+
+
+Both equivalence and equality have associated hash functions such that lack of hash equivalence/equality implies lack of equivalence/equality (respectively).
+
+
+Construct (string), String(expression)
+
+Construct and String obey the following relationships for strings s and expression e (where ~ represents the relation between strings that are parsed identically):
+
+Construct(String(e)) = e
+String(Construct(s)) ~ s
+
+
+Simplify(expression):
+
+For an expression e,
+Simplify(Simplify(e)) = Simplify(e)
+
+\forall x \in dom(e), e(x) = Simplify(e(x)).
+
+
+BigO(expression):
+
+For an expression e,
+Simplify(BigO(e)) = BigO(e)
+BigO(BigO(e)) = BigO(e)
+e \in \bigO(BigO(e))

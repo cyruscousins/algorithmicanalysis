@@ -5,7 +5,6 @@ import java.util.List;
 
 public class OpCollectionNode extends FormulaNode{
 	public static final int ADD = 0, MULTIPLY = 1;
-	private static final int[] toBinOpMap = new int[]{BinaryOperatorNode.ADD, BinaryOperatorNode.MULTIPLY};
 	int operator;
 	
 	String[] opStrings = new String[]{"+", "*"};
@@ -13,24 +12,24 @@ public class OpCollectionNode extends FormulaNode{
 	
 	int len = 0;
 	public FormulaNode[] data;
-	
-	int invLen = 0;
-	public FormulaNode[] invData;
 
 	public OpCollectionNode(FormulaNode[] data, int len, int operator){
 		this.data = data;
 		this.len = len;
 		this.operator = operator;
 	}
-
-	public OpCollectionNode(FormulaNode[] data, int len, FormulaNode[] invData, int invLen, int operator){
-		this.data = data;
-		this.len = len;
-		
-		this.invData = invData;
-		this.invLen = invLen;
-		
+	
+	//Same as binaryoperatornode, for convenience.  TODO, make arg order more consistent with above.
+	public OpCollectionNode(int operator, FormulaNode a, FormulaNode b){
+		data = new FormulaNode[]{a, b};
+		len = 2;
 		this.operator = operator;
+	}
+	
+	//Convenience constructor.
+	
+	public OpCollectionNode(List<FormulaNode> l, int operator){
+		this(l.toArray(new FormulaNode[l.size()]), l.size(), operator);
 	}
 	
 	//Combine 2 OpCollectionNodes.  Assumes they have the same operator.
@@ -72,6 +71,27 @@ public class OpCollectionNode extends FormulaNode{
 		return newNode;
 	}
 	
+	public FormulaNode trimConstants(){
+
+		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
+		
+		//Stick everything except constants into a list and spit it back out.
+		for(int i = 0; i < len; i++){
+			
+			if(!(data[i] instanceof ConstantNode)){
+				nodes.add(data[i]);
+			}
+		}
+		
+		if(nodes.size() == len){
+			return this;
+		}
+		
+		return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
+		
+		
+	}
+	
 	public double evaluate(VarSet v){
 		double val;
 		switch(operator){
@@ -103,23 +123,121 @@ public class OpCollectionNode extends FormulaNode{
 		}
 	}
 	
+	//////////////////
+	//SIMPLIFICATION//
+	//////////////////
+	
+	//Returns a node representing the given pair simplified, or null if no simplification is possible.
+	FormulaNode simplifyAdditionPair(FormulaNode l, FormulaNode r){
+
+		if(l.formulaEquals(r)){
+			return new OpCollectionNode(MULTIPLY, ConstantNode.TWO, l).takeSimplified();
+		}
+		
+		if(ConstantNode.ZERO.equals(l)){
+			return r;
+		}
+		else if (ConstantNode.ZERO.equals(r)){
+			return l;
+		}
+		
+		
+		
+		
+		return null;
+	}
+	
+	FormulaNode simplifyMultiplicationPair(FormulaNode l, FormulaNode r){
+		if(l.formulaEquals(r)){
+	  		return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, l, ConstantNode.TWO).takeSimplified();
+		}
+		
+		if(ConstantNode.ZERO.equals(l) || ConstantNode.ZERO.equals(r)){
+			return ConstantNode.ZERO;
+		}
+		
+		if(ConstantNode.ONE.equals(l)){
+			return r;
+		}
+		else if(ConstantNode.ONE.equals(r)){
+			return l;
+		}
+		
+		//Attempt an exponent multiplication simplification.
+		{
+		  BinaryOperatorNode exponential = null;
+		  FormulaNode other = null; //unnecessary initialization...
+		  
+		  //If the right is an exponent.
+		  if(r instanceof BinaryOperatorNode && ((BinaryOperatorNode)r).operationType == BinaryOperatorNode.EXPONENTIATE){
+			  //If the left is also an exponent
+			  if(l instanceof BinaryOperatorNode && ((BinaryOperatorNode)l).operationType == BinaryOperatorNode.EXPONENTIATE){
+				  //If they have the same base
+				  if(((BinaryOperatorNode)l).l.formulaEquals(((BinaryOperatorNode)r).l)){
+					  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, ((BinaryOperatorNode)l).l, new OpCollectionNode(ADD, ((BinaryOperatorNode)l).r, ((BinaryOperatorNode)r).r)).takeSimplified();
+				  }
+			  }
+			  else{
+				  exponential = (BinaryOperatorNode)r;
+				  other = l;
+			  }
+		  }
+		  else if(l instanceof BinaryOperatorNode && ((BinaryOperatorNode)l).operationType == BinaryOperatorNode.EXPONENTIATE){
+			  exponential = (BinaryOperatorNode)l;
+			  other = r;
+		  }
+		  
+		  if(exponential != null){
+			  if(other.formulaEquals(exponential.l)){
+				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, exponential.l, new OpCollectionNode(ADD, ConstantNode.ONE, exponential.r)).takeSimplified();
+			  }
+		  }
+		}
+		
+		return null;
+	}
+	
 	public FormulaNode takeSimplified(){
 		
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
+		
+		//Need to convert the representation to a mutable list.
+		//In this step, any opcollection nodes are flattened if possible.
 		for(int i = 0; i < len; i++){
-			nodes.add(data[i].takeSimplified());
-			//TODO slurp in children!
 			
-			//sluuuuurp
+			//Simplify each child
+			FormulaNode s = data[i].takeSimplified();
+			
+			//Flatten the tree if possible.
+			if(s instanceof OpCollectionNode && ((OpCollectionNode)s).operator == operator){
+				for(int j = 0; j < ((OpCollectionNode)s).len; j++){
+					nodes.add(((OpCollectionNode)s).data[j]);
+				}
+			}
+			//Or add directly.
+			else{
+				nodes.add(data[i].takeSimplified());
+			}
 		}
 		
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
-				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
-				FormulaNode simp = attempt.takeSimplified();
-				if(!simp.formulaEquals(attempt)){
+				FormulaNode attempt;
+				
+				if(operator == ADD){
+					attempt = simplifyAdditionPair(nodes.get(i), nodes.get(j));
+				}
+				else if(operator == MULTIPLY){
+					attempt = simplifyMultiplicationPair(nodes.get(i), nodes.get(j));
+				}
+				else{
+					System.err.println("Invalid OCN");
+					continue;
+				}
+				
+				if(attempt != null){
 					//Simplification was successful, this means that the terms were combined.
-					nodes.set(i, simp);
+					nodes.set(i, attempt);
 					removeSwapBack(nodes, j);
 					
 					//A change has occurred, must restart (now with a smaller number of nodes).
@@ -132,12 +250,43 @@ public class OpCollectionNode extends FormulaNode{
 		if(nodes.size() == 1){
 			return nodes.get(0);
 		}
-		else if(nodes.size() == 2){
-			return new BinaryOperatorNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
-		}
 		else{
 			return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
 		}
+	}
+	
+	////////
+	//BIGO//
+	////////
+	
+	//Returns a node representing bigO(l + r), or null if it is the same as l + r is possible.
+	FormulaNode bigOAdditionPair(FormulaNode l, FormulaNode r){
+	      if(l instanceof ConstantNode && ((ConstantNode)l).value > 0){
+	    	  return r;
+	      }
+	      else if(r instanceof ConstantNode && ((ConstantNode)r).value > 0){
+	        	return l;
+	      }
+		
+	      if(BinaryOperatorNode.xInBigOofY(l, r)){
+	    	  return r;
+	      }
+	      else if(BinaryOperatorNode.xInBigOofY(r, l)){
+	    	  return l;
+	      }
+	      
+		return null;
+	}
+	
+	FormulaNode bigOMultiplicationPair(FormulaNode l, FormulaNode r){
+	      if(l instanceof ConstantNode && ((ConstantNode)l).value > 0){
+	    	  return r;
+	      }
+	      else if(r instanceof ConstantNode && ((ConstantNode)r).value > 0){
+	        	return l;
+	      }
+		
+		return null;
 	}
 	
 	public FormulaNode bigO(){
@@ -150,18 +299,37 @@ public class OpCollectionNode extends FormulaNode{
 		
 		OpCollectionNode oSimp = (OpCollectionNode)simp;
 		
+		//Condense into mutable list.  Remove any constants in this phase.
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
 		for(int i = 0; i < oSimp.len; i++){
-			nodes.add(oSimp.data[i].takeBigO());
+			FormulaNode newData = oSimp.data[i].takeBigO();
+			if(!(newData instanceof ConstantNode && (operator == ADD || ((ConstantNode)newData).value > 0))){
+				nodes.add(oSimp.data[i].takeBigO());
+			}
+		}
+		//Everything was a constant.  Scrap it.
+		if(nodes.size() == 0){
+			return ConstantNode.ONE;
 		}
 		
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
-				FormulaNode attempt = new BinaryOperatorNode(toBinOpMap[operator], nodes.get(i), nodes.get(j));
-				FormulaNode bigo = attempt.takeBigO();
-				if(!bigo.formulaEquals(attempt)){
+				FormulaNode attempt;
+				
+				if(operator == ADD){
+					attempt = bigOAdditionPair(nodes.get(i), nodes.get(j));
+				}
+				else if(operator == MULTIPLY){
+					attempt = bigOMultiplicationPair(nodes.get(i), nodes.get(j));
+				}
+				else{
+					System.err.println("Invalid OCN");
+					continue;
+				}
+				
+				if(attempt != null){
 					//Simplification was successful, this means that the terms were combined.
-					nodes.set(i, bigo);
+					nodes.set(i, attempt);
 					removeSwapBack(nodes, j);
 					
 					//A change has occurred, must restart (now with a smaller number of nodes).
@@ -174,13 +342,74 @@ public class OpCollectionNode extends FormulaNode{
 		if(nodes.size() == 1){
 			return nodes.get(0);
 		}
-		else if(nodes.size() == 2){
-			return new BinaryOperatorNode(toBinOpMap[operator], nodes.get(0), nodes.get(1));
-		}
 		else{
-			return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
+			OpCollectionNode nn = new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
+			//TODO handle this more cleanly; this is quite inefficient.
+			if(nn.formulaEquals(this)){
+				return this;
+			}
+			else{
+				return nn;
+			}
 		}
 	}
+	
+  public FormulaNode bigOVarSub(String s, FormulaNode b){
+	  
+	  if(true) return this;
+	  
+	  //TODO this is a heavy function, test it.
+	  
+	  
+	  FormulaNode f = bigO();
+	  
+	  if(f instanceof OpCollectionNode){
+		  OpCollectionNode o = (OpCollectionNode)f;
+		  List<FormulaNode> nodes = new ArrayList<FormulaNode>(o.len);
+		  List<FormulaNode> nodesSubbed = new ArrayList<FormulaNode>(o.len);
+		  for(int i = 0; i < o.data.length; i++){
+			  nodes.add(o.data[i].bigOVarSub(s, b));
+			  nodesSubbed.add(nodes.get(i).substitute(s, b));
+		  }
+		  
+		  if(operator == ADD){
+			  for(int i = 0; i < nodes.size(); i++){
+				  for(int j = i + 1; j < nodes.size(); j++){
+					  if(BinaryOperatorNode.xInBigOofY(nodesSubbed.get(i), nodes.get(j))){
+						  nodes.remove(i);
+						  nodesSubbed.remove(i);
+						  i--;
+						  break;
+					  }
+					  else if(BinaryOperatorNode.xInBigOofY(nodesSubbed.get(j), nodes.get(i))){
+						  nodes.remove(j);
+						  nodesSubbed.remove(j);
+						  break;
+					  }
+					  
+				  }
+			  }
+			  
+			  if(nodes.size() == 1){
+				  return nodes.get(0);
+			  }
+			  
+		  }
+		  
+		  OpCollectionNode ret = new OpCollectionNode(nodes, operator);
+		  if(ret.formulaEquals(this)){
+			  return this;
+		  }
+		  else{
+			  return ret;
+		  }
+	  }
+	  else{
+		  return f.bigOVarSub(s, b);
+	  }
+	  
+	  
+  }
 	
   public FormulaNode substitute(String s, FormulaNode f){
 	FormulaNode[] newData = new FormulaNode[len];
@@ -248,11 +477,7 @@ public class OpCollectionNode extends FormulaNode{
 	}
 	
 	public static void main(String[] args){
-//		FormulaNode[] data = new FormulaNode[]{
-//				ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE
-//			};
 		
-
 		FormulaNode[] data = new FormulaNode[]{
 			ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE, new VariableNode("x")
 		};
