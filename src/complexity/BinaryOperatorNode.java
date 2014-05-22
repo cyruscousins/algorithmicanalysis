@@ -351,7 +351,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		  //If x is in bigO of any element of y, it is in bigO of the whole thing.
 		  OpCollectionNode ocn = (OpCollectionNode) y;
 		  for(int i = 0; i < ocn.len; i++){
-			  if(xInBigOofY(x, ocn.data[i])){
+			  if(xInBigOofY(x, xExponent, ocn.data[i])){
 				  return true;
 			  }
 		  }
@@ -402,6 +402,12 @@ public class BinaryOperatorNode extends FormulaNode{
 	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.takeBigO(), ConstantNode.MINUS_ONE).takeBigO();
 	      }
 	      
+	      BinaryOperatorNode nno = new BinaryOperatorNode(DIVIDE, nl.takeBigO(), nr.takeBigO());
+	      if(nno.formulaEquals(this)){
+	    	  return this;
+	      }
+	      else return nno.takeBigO();
+	      
 //	      //TOTAL HACK:
 //	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).l.formulaEquals(nr)){
 //	    	  return ((BinaryOperatorNode)nl).r;
@@ -418,15 +424,15 @@ public class BinaryOperatorNode extends FormulaNode{
 	    //For subtraction, we must have one way containment but NOT the other.  TODO This needs to be made more formal.
 	    if(nn.operationType == SUBTRACT){
 	    	if(xInBigOofY(nr, nl) && !xInBigOofY(nl, nr)){
-	    		return nl;
+	    		return nl.takeBigO();
 	    	}
 	    	
 	    	//TODO this is not inaccurate, but sometimes these are 0s?
 		      if(xInBigOofY(nl, nr)){
-		    	  return nr;
+		    	  return nr.takeBigO();
 		      }
 		      if(xInBigOofY(nr, nl)){
-		    	  return nl;
+		    	  return nl.takeBigO();
 		      }
 	    }
 	    
@@ -434,9 +440,15 @@ public class BinaryOperatorNode extends FormulaNode{
 		if(nn.operationType == EXPONENTIATE){
 			if(nl instanceof ConstantNode && nr instanceof OpCollectionNode){
 				
+				
+				//TODO it would probably be best to handle this situation by splitting into multiplications.
+				
+				
+				
+				
 				//This is a bit of a hack to get rid of problems like 2 ^ (1 + n)
 				if(((OpCollectionNode)nr).operator == OpCollectionNode.ADD){
-					return ((OpCollectionNode)nr).trimConstants();
+					return new BinaryOperatorNode(EXPONENTIATE, nl, ((OpCollectionNode)nr).trimConstants());
 				}
 			}
 			if(nr instanceof UnaryOperatorNode && (((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.CEIL || ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FLOOR)){
@@ -456,7 +468,7 @@ public class BinaryOperatorNode extends FormulaNode{
 			FormulaNode newOperand = nr.takeBigO(); //TODO I believe this is OK.
 			
 			if(newOperand instanceof BinaryOperatorNode && ((BinaryOperatorNode)newOperand).operationType == BinaryOperatorNode.EXPONENTIATE){
-				return new OpCollectionNode(OpCollectionNode.MULTIPLY, ((BinaryOperatorNode)newOperand).r, new BinaryOperatorNode(LOGARITHM, newBase, ((BinaryOperatorNode)newOperand).l));
+				return new OpCollectionNode(OpCollectionNode.MULTIPLY, ((BinaryOperatorNode)newOperand).r, new BinaryOperatorNode(LOGARITHM, newBase, ((BinaryOperatorNode)newOperand).l)); //TODO .takeBigO();?
 			}
 //			if(nr instanceof UnaryOperatorNode && ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FACTORIAL){
 //

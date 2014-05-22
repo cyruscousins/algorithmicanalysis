@@ -11,6 +11,7 @@ public class OpCollectionNode extends FormulaNode{
 	String[] latexOpStrings = new String[]{"+", "\\cdot"};
 	
 	public static final ConstantNode[] IDENTITY = new ConstantNode[]{ConstantNode.ZERO, ConstantNode.ONE};
+	public static final int[] INVERSE = new int[]{BinaryOperatorNode.SUBTRACT, BinaryOperatorNode.DIVIDE};
 	
 	int len = 0;
 	public FormulaNode[] data;
@@ -231,41 +232,48 @@ public class OpCollectionNode extends FormulaNode{
 		return null;
 	}
 	
+	//Need to handle inverse operators and tree reduction.  
 	public FormulaNode takeSimplified(){
 		
-		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
+		ArrayList<FormulaNode> nodes = new ArrayList<>();
+		ConstantNode constant = IDENTITY[operator];
+		ArrayList<FormulaNode> inverseNodes = new ArrayList<FormulaNode>();
 		
 		//Need to convert the representation to a mutable list.
 		//In this step, any opcollection nodes are flattened if possible.
 		//Constants are also pulled to the front.
+		//Inverses are also pulled out and grouped together.
 
-		ConstantNode constant = IDENTITY[operator];
 		for(int i = 0; i < len; i++){
-			
+//			nodesStore.add(data[i].takeSimplified())
 			
 			//Simplify each child
 			FormulaNode s = data[i].takeSimplified();
 			
-			//Flatten the tree if possible.
-			if(s instanceof OpCollectionNode && ((OpCollectionNode)s).operator == operator){
-				for(int j = 0; j < ((OpCollectionNode)s).len; j++){
-					FormulaNode tn = ((OpCollectionNode)s).data[j];
-					if(tn instanceof ConstantNode){
-						constant = new ConstantNode(new OpCollectionNode(operator, constant, tn).evaluate(null));
-					}
-					else{
-						nodes.add(tn);
-					}
+			int top = nodes.size();
+			
+			nodes.add(s);
+			
+			//Here constants and inverses 
+			while(top < nodes.size()){
+				s = nodes.get(top);
+				if(s instanceof ConstantNode){
+					constant = new ConstantNode(new OpCollectionNode(operator, constant, s).evaluate(null));
+					nodes.remove(top);
 				}
-			}
-			//Or add directly.
-			else{
-				FormulaNode tn = data[i].takeSimplified();
-				if(tn instanceof ConstantNode){
-					constant = new ConstantNode(new OpCollectionNode(operator, constant, tn).evaluate(null));
+				else if(s instanceof BinaryOperatorNode && (INVERSE[operator] == ((BinaryOperatorNode)s).operationType)){
+					nodes.set(top, ((BinaryOperatorNode)s).l);
+					inverseNodes.add(((BinaryOperatorNode)s).r);
+				}
+				else if(s instanceof OpCollectionNode && ((OpCollectionNode)s).operator == operator){
+					nodes.remove(top);
+					for(int j = 0; j < ((OpCollectionNode)s).len; j++){
+						FormulaNode tn = ((OpCollectionNode)s).data[j];
+						nodes.add(top + j, tn);
+					}
 				}
 				else{
-					nodes.add(tn);
+					top++;
 				}
 			}
 		}
@@ -300,16 +308,29 @@ public class OpCollectionNode extends FormulaNode{
 				}
 			}
 		}
+		
+		FormulaNode l;
 
 		if(nodes.size() == 0){
-			return IDENTITY[operator];
+			l = IDENTITY[operator];
 		}
 		else if(nodes.size() == 1){
-			return nodes.get(0);
+			l = nodes.get(0);
 		}
 		else{
-			return new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
+			l = new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
 		}
+		
+		if(inverseNodes.size() > 0){
+			if(inverseNodes.size() == 1){
+				return new BinaryOperatorNode(INVERSE[operator], l, inverseNodes.get(0)).takeSimplified();
+			}
+			else{
+				return new BinaryOperatorNode(INVERSE[operator], l, new OpCollectionNode(inverseNodes, operator));
+			}
+		}
+		
+		else return l;
 	}
 	
 	////////

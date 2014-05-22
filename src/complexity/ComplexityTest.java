@@ -167,13 +167,13 @@ public class ComplexityTest {
 			"n|n   |   n + (n * n)|n^2   |   2 * n|n   |   n ^ 2 - n|n ^ 2   |" +
 			"n * 3 * n / 4 * n|n^3   |   (5 + n + 4 / 3) / n + 7|1   |   (n * 4 * m / 3 + 7) / ((n + 8) * m)|1   |" +
 			"n * log_2 n / n | ln n   |   n * m * log_2 n / n | m * ln n   |" + //Commutativity
-			"2 ^ (2 * n) | 2 ^ (2 * n)   |   n ^ (1 + (2 * m) / 2) | n ^ m   |" + //Basic exponentiation
+			"2 ^ (2 * n) | 2 ^ (2 * n)   |   n ^ (1 + (2 * m) / 2 - 1) | n ^ m   |" + //Basic exponentiation
 			"(n ^ 2) + (n ^ 3) | (n ^ 3)   |   n + (n + m) | (n + m)   |   (n ^ 2) + ((n ^ 2) + m) | (n ^ 2) + m   |   (n ^ 2) + ((n + m) ^ 2) | (n + m) ^ 2   |" +
-			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 2) * ((n ^ 2) / (n + m))   |" +
+			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 4) / (n + m)   |" +
 			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" +
 			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Multivariate bigO with exponentiation.
 			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
-			"log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //Log factorial and choose.
+			"n! | n ^ n   |   log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //factorials and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n   |" +
 			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | n * ln n   |   sum i from n to (n + 5) of (log_2 n) | ln n   |" + //Summations
@@ -206,7 +206,7 @@ public class ComplexityTest {
 			FormulaNode key = test[i + 1];
 			
 			if(!key.formulaEquals(key.takeBigO())){
-				out.println((i / 2) + ": BigO test error: key" + key + " is not in normative form.");
+				out.println((i / 2) + ": BigO test error: key " + key.asString() + " -> " + key.takeBigO().asString() + " is not in normative form.");
 			}
 			
 			if(key.formulaEquals(s)){

@@ -55,16 +55,16 @@ public class UnaryOperatorNode extends FormulaNode {
 		  return new UnaryOperatorNode(operationType, argument.takeSimplified());
 	  }
 	  
-	  public FormulaNode bigO(){
+	  FormulaNode takeBigO(){
 		  
 		  FormulaNode simp = takeSimplified();
 		  if(simp instanceof UnaryOperatorNode){
 			  UnaryOperatorNode nn = (UnaryOperatorNode)simp;
 			  if(nn.operationType == FACTORIAL){
-				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, nn.argument, nn.argument);
+				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, nn.argument, nn.argument).takeBigO();
 			  }
 			  else if(nn.operationType == CEIL || nn.operationType == FLOOR){
-				  return nn.argument;
+				  return nn.argument.takeBigO();
 			  }
 		  }
 		return simp;
