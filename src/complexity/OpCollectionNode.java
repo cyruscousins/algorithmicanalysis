@@ -77,20 +77,63 @@ public class OpCollectionNode extends FormulaNode{
 	//Returns an FormulaNode of this minus one instance of f, if f is not contained in this OpCollectionNode, null is instead returned.
 	public FormulaNode remove(FormulaNode f){
 		if(f instanceof OpCollectionNode){
-			if(((OpCollectionNode) f).operator == operator){
+			OpCollectionNode other = (OpCollectionNode)f;
+			if(other.operator == operator){
+				//System.out.println("SIMPLIFY REMOVE: " + asString() + " " +  BinaryOperatorNode.opStrings[INVERSE[operator]] + " " + other.asString());
 				//Trying to remove a set of items
 				
+				List<FormulaNode> left = new ArrayList<FormulaNode>();
+				List<FormulaNode> right = new ArrayList<FormulaNode>();
 				
+				for(int i = 0; i < len; i++){
+					left.add(data[i]);
+				}
 				
+				for(int i = 0; i < other.len; i++){
+					right.add(other.data[i]);
+				}
 				
+				for(int i = 0; i < left.size(); i++){
+					for(int j = 0; j < right.size(); j++){
+						
+						BinaryOperatorNode bn = new BinaryOperatorNode(INVERSE[operator], left.get(i), right.get(j));
+						FormulaNode bns = bn.takeSimplified();
+						
+						//If things cancel to the identity, throw it out.
+						if(bns.formulaEquals(IDENTITY[operator])){
+							left.remove(i);
+							right.remove(j);
+							i--;
+							break;
+						}
+						if(!bns.formulaEquals(bn)){
+							left.set(i, bns);
+							right.remove(j);
+							i--;
+							j = -1;
+							break;
+						}
+					}
+				}
 				
+				//Everything from right was removed:
+				if(right.size() == 0){
+					if(left.size() == 0){
+						return IDENTITY[operator];
+					}
+					return new OpCollectionNode(left, operator).takeSimplified();
+				}
+				else if (left.size() == 0){
+					return new BinaryOperatorNode(INVERSE[operator], IDENTITY[operator], new OpCollectionNode(right, operator)).takeSimplified();
+				}
+				//Nothing from right was removed:
+				else if(right.size() == other.len){
+					return null;
+				}
 				
+				return new BinaryOperatorNode(INVERSE[operator], new OpCollectionNode(left, operator).takeSimplified(), new OpCollectionNode(right, operator).takeSimplified()).takeSimplified();
 				
-				
-				
-				
-				
-				
+				//38 26 11
 			}
 		}
 		int index = -1;
@@ -363,7 +406,7 @@ public class OpCollectionNode extends FormulaNode{
 				return new BinaryOperatorNode(INVERSE[operator], l, inverseNodes.get(0)).takeSimplified();
 			}
 			else{
-				return new BinaryOperatorNode(INVERSE[operator], l, new OpCollectionNode(inverseNodes, operator));
+				return new BinaryOperatorNode(INVERSE[operator], l, new OpCollectionNode(inverseNodes, operator)).takeSimplified();
 			}
 		}
 		

@@ -126,7 +126,7 @@ public class BinaryOperatorNode extends FormulaNode{
 					// 0/0.  Don't handle it here.
 					return this;
 				}
-				else return ConstantNode.MINUS_ONE;
+				else return ConstantNode.ZERO;
 			}
 			else if(operationType == EXPONENTIATE){
 				return ConstantNode.ZERO;
@@ -145,9 +145,9 @@ public class BinaryOperatorNode extends FormulaNode{
 			  return ConstantNode.ZERO;
 		  }
 		  if(nl instanceof OpCollectionNode && ((OpCollectionNode)nl).operator == OpCollectionNode.ADD){
-			  OpCollectionNode l = (OpCollectionNode) nl;
+			  OpCollectionNode ol = (OpCollectionNode) nl;
 			  
-			  FormulaNode res = l.remove(nr);
+			  FormulaNode res = ol.remove(nr);
 			  if(res != null){
 				  return res;
 			  }

@@ -116,7 +116,8 @@ public class ComplexityTest {
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
 				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
-				"(1 / n ^ 2) * (n + 1) * (n - 1) + 1 / (n ^ 2) | 1   |   (n + m - n + 1 - m) | 1   |   (n * m / m * 1 * (1 / n)) - 1 | 1   |" + //Complex
+				"(n + m) - (n + m + 1) | ~1   |   (n * m) / (n * m * 2) | (1 / 2)   |   (n + m) - (2 * n) | (m - n)   |" +//OpCollectionNode
+				"(1 / n ^ 2) * (n + 1) * (n - 1) + 1 / (n ^ 2) | 1   |   (n + m - n + 1 - m) | 1   |   (n + 1 - n + n + ~1 - m) * n * m / ((n - m) * n * n) | (m / n)   |   (n * m / m * 1 * (1 / n)) - 1 | 1   |" + //Complex
 				"|", splitter);
 
 //		out.println("KEY:");
