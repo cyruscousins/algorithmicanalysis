@@ -21,8 +21,10 @@ public class ComplexityTest {
 		
 	}
 	
+	public static final String splitter = "\\s*\\|\\s*";
+	
 	public static void runEqualityTests(boolean verbose, PrintStream out){
-		String[] formulae = "n | n ^ 2 | n * (2 log n) + 1 - 1 | (2 * (2 log (n ^ (m + l)))) + ((m * l) ^ 2)".split("\\|");
+		String[] formulae = "n | n ^ 2 | n * (2 log n) + 1 - 1 | (2 * (2 log (n ^ (m + l)))) + ((m * l) ^ 2)".split(splitter);
 		String fStr = "";
 		for(int i = 0; i < formulae.length; i++){
 			fStr += formulae[i] + "|" + formulae[i] + "|";
@@ -43,7 +45,7 @@ public class ComplexityTest {
 	
 	public static void runValueTests(boolean verbose, PrintStream out){
 		FormulaNode[] tests = FormulaParser.parseFormulae(
-				"4! | sum i from 0 to 5 of i | sum i from 0 to 4 of (i ^ i)", "\\|");
+				"4! | sum i from 0 to 5 of i | sum i from 0 to 4 of (i ^ i)", splitter);
 		//= new FormulaNode[]{FormulaParser.parseFormula("4!"), new Summation(ConstantNode.ZERO, new ConstantNode(5), FormulaParser.parseFormula("i"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ 2"), "i"), new Summation(ConstantNode.ZERO, new ConstantNode(4), FormulaParser.parseFormula("i ^ i"), "i")};
 		double[] correctValues = new double[]{24, 15, 289};
 		
@@ -70,11 +72,11 @@ public class ComplexityTest {
 				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
 				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
 				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
-				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
+				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose npi) | 1   |" +
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
 				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
-				"", "\\|");
+				"|", splitter);
 		
 		int success = 0;
 		for(int i = 0; i < test.length; i++){
@@ -110,11 +112,12 @@ public class ComplexityTest {
 				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
 				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
 				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
-				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose 2) | (npi ^ 2 - npi) / 2   |   (npi choose npi) | 1   |" +
+				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose npi) | 1   |" +
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
 				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
-				"", "\\|");
+				"(1 / n ^ 2) * (n + 1) * (n - 1) + 1 / (n ^ 2) | 1   |   (n + m - n + 1 - m) | 1   |   (n * m / m * 1 * (1 / n)) - 1 | 1   |" + //Complex
+				"|", splitter);
 
 //		out.println("KEY:");
 //		for(int i = 0; i < test.length; i+= 2){
@@ -177,7 +180,8 @@ public class ComplexityTest {
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n   |" +
 			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | n * ln n   |   sum i from n to (n + 5) of (log_2 n) | ln n   |" + //Summations
-			"", "\\|");
+			"n + log_2 n | n   |   n ^ (3 / 2) + n * (log_2 n) ^ 2 | n ^ (3 / 2)   |   n * (log_2 (log_2 n)) | n   |   log_3 ((log_2 n) ^ 2) | ln ((ln n) ^ 2)   |   (log_2 n) ^ 2 + (log_2 ((log_2 n) ^ 3)) | (ln n) ^ 2   |   n * m - (n + m) | n * m " + //Complex
+			"|", splitter);
 
 		String[] args = new String[]{"n", "m"};
 		
@@ -199,7 +203,7 @@ public class ComplexityTest {
 				valueSuccess++;
 			}
 			else{
-				out.println((i / 2) + ": Serious error: Value failure for " + f.asLatexStringRecurse() + " -> " + s.asLatexStringRecurse());
+				out.println((i / 2) + ": Serious error: Value failure for " + f.asString() + " -> " + s.asString());
 			}
 			
 			//Test accuracy
@@ -239,7 +243,8 @@ public class ComplexityTest {
 				"a ^ (b + a) | a ^ b   |   a ^ (b - a) | a ^ b   |   a ^ (a - b) | a ^ (a - b)   |   a * b + b ^ 2 | b ^ 2   |   a * b + b | a * b   |   (a * b ^ 2) + (a * b) | a * b ^ 2   |" + //Complicated
 				"b + a * log_2(b) | b + a * ln b   |   (a + b) + (a * log_2(b)) | b + a * ln b   |" +
 				"(a * c) + (b * d) | b * d   |   (a * c) + (b * d ^ 2) | b * d ^ 2   |"	+	//Multivariate
-				"", "\\|");
+				"a * (a + b - 1) | (a * b)   |   b * (a + b - 1) | b ^ 2   |" +
+				"|", splitter);
 		
 		int totalSuccess = 0;
 		

@@ -59,8 +59,14 @@ public class SummationNode extends FormulaNode{
 		FormulaNode us = upper.takeSimplified();
 		FormulaNode is = inner.takeSimplified();
 		
-		if(inner instanceof OpCollectionNode && ((OpCollectionNode)is).operator == OpCollectionNode.MULTIPLY){
-
+		if(is instanceof OpCollectionNode && ((OpCollectionNode)is).operator == OpCollectionNode.MULTIPLY){
+			
+			OpCollectionNode ois = (OpCollectionNode)is;
+			
+			if(ois.data[0] instanceof ConstantNode){
+				return new OpCollectionNode(OpCollectionNode.MULTIPLY, ois.data[0], new SummationNode(ls, us, ois.trimConstants(), varName)).takeSimplified();
+			}
+			
 			//TODO: Pull out constant.
 			
 //			OpCollectionNode bi = (OpCollectionNode) is;

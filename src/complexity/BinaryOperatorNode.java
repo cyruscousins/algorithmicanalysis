@@ -344,7 +344,6 @@ public class BinaryOperatorNode extends FormulaNode{
 				  //TODO we are testing this with ((n * m) + (n ^ m)) -> ((n * m) + (n ^ m)) != (n ^ m).  I believe the error is in SIMPLIFY, in that (n * m) / m is not properly simplified to n.
 				  else return xInBigOofY(new BinaryOperatorNode(EXPONENTIATE, x, new OpCollectionNode(OpCollectionNode.MULTIPLY, ConstantNode.MINUS_ONE, by.r)), xExponent, by.l); //This is the dodgiest line of code here; must test.
 			  }
-			  
 		  }
 	  }
 	  else if (y instanceof OpCollectionNode){
@@ -355,6 +354,19 @@ public class BinaryOperatorNode extends FormulaNode{
 				  return true;
 			  }
 		  }
+	  }
+	  
+	  //If x is things that are added, check if each one is individually in bigO of y.  
+	  //Used for things like x = n + m, y = n * m
+	  //I'm not sure that this ever actually happens, because (x + y) for the above becomes n + m + (n * m), which is resolved by the OpCollectionNode.
+	  if(x instanceof OpCollectionNode && ((OpCollectionNode)x).operator == OpCollectionNode.ADD){
+		  OpCollectionNode o = (OpCollectionNode)x;
+		  for(int i = 0; i < o.len; i++){
+			  if(!xInBigOofY(o.data[i], xExponent, y)){
+				  return false;
+			  }
+		  }
+		  return true;
 	  }
 	  return false;
   }

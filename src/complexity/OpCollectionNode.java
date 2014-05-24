@@ -76,6 +76,23 @@ public class OpCollectionNode extends FormulaNode{
 	
 	//Returns an FormulaNode of this minus one instance of f, if f is not contained in this OpCollectionNode, null is instead returned.
 	public FormulaNode remove(FormulaNode f){
+		if(f instanceof OpCollectionNode){
+			if(((OpCollectionNode) f).operator == operator){
+				//Trying to remove a set of items
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+				
+			}
+		}
 		int index = -1;
 		for(int i = 0; i < len; i++){
 			if(data[i].formulaEquals(f)){
@@ -282,6 +299,26 @@ public class OpCollectionNode extends FormulaNode{
 			nodes.add(0, constant);
 		}
 		
+		//Apply distributative rule.
+		
+		//TODO I don't know how this handles a case where distribution needs to occur multiple times.
+		if(operator == MULTIPLY){
+			for(int i = 0; i < nodes.size(); i++){
+				if(nodes.get(i) instanceof OpCollectionNode && ((OpCollectionNode)nodes.get(i)).operator == ADD){
+//					System.out.println("DISTRIBUTING " + this.asString());
+					OpCollectionNode oPlus = (OpCollectionNode)nodes.remove(i);
+					List<FormulaNode> plusNodes = new ArrayList<>();
+					for(int j = 0; j < oPlus.len; j++){
+						nodes.add(oPlus.data[j]);
+						plusNodes.add(new OpCollectionNode(nodes, MULTIPLY));
+						nodes.remove(nodes.size() - 1);
+					}
+					return new OpCollectionNode(plusNodes, ADD).takeSimplified();
+				}
+			}
+		}
+		
+		//Attempt to intersimplify between nodes.
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
 				FormulaNode attempt;
@@ -558,19 +595,19 @@ public class OpCollectionNode extends FormulaNode{
 		return s;
 	}
 	
-	public static void main(String[] args){
-		
-		FormulaNode[] data = new FormulaNode[]{
-			ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE, new VariableNode("x")
-		};
-		OpCollectionNode o = new OpCollectionNode(data, data.length, ADD);
-		System.out.println(o.asStringRecurse());
-		System.out.println(o.takeSimplified().asStringRecurse());
-		
-
-		o = new OpCollectionNode(data, data.length, MULTIPLY);
-		System.out.println(o.asStringRecurse());
-		System.out.println(o.takeSimplified().asStringRecurse());
-		
-	}
+//	public static void main(String[] args){
+//		
+//		FormulaNode[] data = new FormulaNode[]{
+//			ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE, new VariableNode("x")
+//		};
+//		OpCollectionNode o = new OpCollectionNode(data, data.length, ADD);
+//		System.out.println(o.asStringRecurse());
+//		System.out.println(o.takeSimplified().asStringRecurse());
+//		
+//
+//		o = new OpCollectionNode(data, data.length, MULTIPLY);
+//		System.out.println(o.asStringRecurse());
+//		System.out.println(o.takeSimplified().asStringRecurse());
+//		
+//	}
 }
