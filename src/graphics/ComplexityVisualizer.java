@@ -51,7 +51,7 @@ public class ComplexityVisualizer implements Renderable{
 		  g.drawString(analysisType + " analysis of algorithm " + algorithmName, x0, yRun);
 		  yRun += textHeight;
 		  
-		  g.drawString(algorithm.asString() + " = bigO(" + new Formula(algorithm).takeBigO().asString() + ")", x0, yRun);
+		  g.drawString(algorithm.asString() + " = bigO(" + algorithm.takeBigO().asString() + ")", x0, yRun);
 		  yRun += textHeight;
 		  
 		  for(int i = 0; i < algorithms.length; i++){

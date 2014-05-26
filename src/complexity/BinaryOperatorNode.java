@@ -91,7 +91,7 @@ public class BinaryOperatorNode extends FormulaNode{
 	  
 	  //Simplify constant compositions.
 	  if(nl instanceof ConstantNode && nr instanceof ConstantNode){
-		  if(((ConstantNode)nr).value != 0) return new ConstantNode(new BinaryOperatorNode(operationType, nl, nr).evaluate(null));
+		  return new ConstantNode(new BinaryOperatorNode(operationType, nl, nr).evaluate(null));
 	  }
 	  
 	  //Operation with constant properties.
@@ -117,7 +117,7 @@ public class BinaryOperatorNode extends FormulaNode{
 	  }
 	  
 	  if(nl instanceof ConstantNode){
-		if(((ConstantNode)nl).value == 0){
+		if(ConstantNode.ZERO.formulaEquals(nl)){
 			if(operationType == SUBTRACT){
 				return new OpCollectionNode(OpCollectionNode.MULTIPLY, ConstantNode.MINUS_ONE, nr).takeSimplified();
 			}
@@ -141,9 +141,9 @@ public class BinaryOperatorNode extends FormulaNode{
 	  
 	  //Subtractive inverse
 	  if(operationType == SUBTRACT){
-		  if(nl.formulaEquals(nr)){
-			  return ConstantNode.ZERO;
-		  }
+//		  if(nl.formulaEquals(nr)){
+//			  return ConstantNode.ZERO;
+//		  }
 		  if(nl instanceof OpCollectionNode && ((OpCollectionNode)nl).operator == OpCollectionNode.ADD){
 			  OpCollectionNode ol = (OpCollectionNode) nl;
 			  
@@ -159,10 +159,7 @@ public class BinaryOperatorNode extends FormulaNode{
 	  //Division simplification
 	  else if(operationType == DIVIDE){
 		  
-		  //Inverse
-		  if(nl.formulaEquals(nr)){
-			  return ConstantNode.ONE;
-		  }
+//		  System.out.println("DIVISION REACHED");
 		  
 		  //Exponential subtraction
 		  
@@ -214,7 +211,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		  //TODO make this safer.
 
 		  if(xInBigOofY(nl, nr)){
-			  return nl.takeBigO();
+			  return nl.bigO();
 		  }
 		  else if(xInBigOofY(nr, nl)){
 			  return ConstantNode.ONE;
@@ -371,7 +368,7 @@ public class BinaryOperatorNode extends FormulaNode{
 	  return false;
   }
   
-  public FormulaNode takeBigO(){
+  public FormulaNode bigO(){
 	  
 	  FormulaNode simp = takeSimplified();
 	  
@@ -399,26 +396,26 @@ public class BinaryOperatorNode extends FormulaNode{
 	    //One or fewer nodes could be constants, here we throw them out.
 	    if (nn.operationType == SUBTRACT){
 	      if(nl instanceof ConstantNode && ((ConstantNode)nl).value > 0){
-	    		 return new OpCollectionNode(OpCollectionNode.MULTIPLY, ConstantNode.MINUS_ONE, nr.takeBigO()).takeBigO();
+	    		 return new OpCollectionNode(OpCollectionNode.MULTIPLY, ConstantNode.MINUS_ONE, nr.bigO()).bigO();
 	      }
 	      else if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	        	return nl.takeBigO();
+	        	return nl.bigO();
 	      }
 	    }
 	    
 	    else if (nn.operationType == DIVIDE){
 	      if(nr instanceof ConstantNode && ((ConstantNode)nr).value > 0){
-	    	  return nl.takeBigO();
+	    	  return nl.bigO();
 	      }
 	      else if(nl instanceof ConstantNode){
-	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.takeBigO(), ConstantNode.MINUS_ONE).takeBigO();
+	    	  return new BinaryOperatorNode(EXPONENTIATE, nr.bigO(), ConstantNode.MINUS_ONE).bigO();
 	      }
 	      
-	      BinaryOperatorNode nno = new BinaryOperatorNode(DIVIDE, nl.takeBigO(), nr.takeBigO());
+	      BinaryOperatorNode nno = new BinaryOperatorNode(DIVIDE, nl.bigO(), nr.bigO());
 	      if(nno.formulaEquals(this)){
 	    	  return this;
 	      }
-	      else return nno.takeBigO();
+	      else return nno.bigO();
 	      
 //	      //TOTAL HACK:
 //	      else if(nl instanceof BinaryOperatorNode && ((BinaryOperatorNode)nl).l.formulaEquals(nr)){
@@ -436,15 +433,15 @@ public class BinaryOperatorNode extends FormulaNode{
 	    //For subtraction, we must have one way containment but NOT the other.  TODO This needs to be made more formal.
 	    if(nn.operationType == SUBTRACT){
 	    	if(xInBigOofY(nr, nl) && !xInBigOofY(nl, nr)){
-	    		return nl.takeBigO();
+	    		return nl.bigO();
 	    	}
 	    	
 	    	//TODO this is not inaccurate, but sometimes these are 0s?
 		      if(xInBigOofY(nl, nr)){
-		    	  return nr.takeBigO();
+		    	  return nr.bigO();
 		      }
 		      if(xInBigOofY(nr, nl)){
-		    	  return nl.takeBigO();
+		    	  return nl.bigO();
 		      }
 	    }
 	    
@@ -464,7 +461,7 @@ public class BinaryOperatorNode extends FormulaNode{
 				}
 			}
 			if(nr instanceof UnaryOperatorNode && (((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.CEIL || ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FLOOR)){
-				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument).takeBigO();
+				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument).bigO();
 			}
 			else return nn;
 		} else if(operationType == LOGARITHM){
@@ -477,7 +474,7 @@ public class BinaryOperatorNode extends FormulaNode{
 				newBase = nl;
 			}
 			
-			FormulaNode newOperand = nr.takeBigO(); //TODO I believe this is OK.
+			FormulaNode newOperand = nr.bigO(); //TODO I believe this is OK.
 			
 			if(newOperand instanceof BinaryOperatorNode && ((BinaryOperatorNode)newOperand).operationType == BinaryOperatorNode.EXPONENTIATE){
 				return new OpCollectionNode(OpCollectionNode.MULTIPLY, ((BinaryOperatorNode)newOperand).r, new BinaryOperatorNode(LOGARITHM, newBase, ((BinaryOperatorNode)newOperand).l)); //TODO .takeBigO();?
@@ -493,7 +490,7 @@ public class BinaryOperatorNode extends FormulaNode{
 		else if(operationType == CHOOSE){
 			
 			if(nr instanceof ConstantNode){
-				return new BinaryOperatorNode(EXPONENTIATE, nl, nr).takeBigO();
+				return new BinaryOperatorNode(EXPONENTIATE, nl, nr).bigO();
 			}
 			else{
 				return nn;
@@ -538,11 +535,11 @@ public class BinaryOperatorNode extends FormulaNode{
 			return this;
 		}
 		else{
-			return new BinaryOperatorNode(nn.operationType, nl.takeBigO(), nr.takeBigO()).takeBigO();
+			return new BinaryOperatorNode(nn.operationType, nl.bigO(), nr.bigO()).bigO();
 		}
 	  }
 	  else{
-		  return simp.takeBigO();
+		  return simp.bigO();
 	  }
   }
 
@@ -553,8 +550,8 @@ public class BinaryOperatorNode extends FormulaNode{
 	  FormulaNode sl = l.bigOVarSub(x, y);
 	  FormulaNode sr = r.bigOVarSub(x, y);
 
-	  FormulaNode lSub = sl.substitute(x, y).takeBigO();
-	  FormulaNode rSub = sr.substitute(x, y).takeBigO();
+	  FormulaNode lSub = sl.substitute(x, y).bigO();
+	  FormulaNode rSub = sr.substitute(x, y).bigO();
 	  
 	  if(operationType == SUBTRACT){
 		  if(xInBigOofY(rSub, sl) && !xInBigOofY(sl, sr)){

@@ -24,6 +24,7 @@ import complexity.BinaryOperatorNode;
 import complexity.ConstantNode;
 import complexity.FormulaNode;
 import complexity.FormulaParser;
+import complexity.OpCollectionNode;
 import complexity.VariableNode;
 
 public class ComplexityAnalyzerTest {
@@ -93,7 +94,7 @@ public class ComplexityAnalyzerTest {
 		r.put("Hex", RenderableShape.regularPolygon(400, 400, 6, 100));
 		r.put("Circle", RenderableShape.regularPolygon(500, 500, 100, 100));
 		
-		FormulaNode form = new BinaryOperatorNode(BinaryOperatorNode.ADD, new VariableNode("n"), new BinaryOperatorNode(BinaryOperatorNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
+		FormulaNode form = new OpCollectionNode(OpCollectionNode.ADD, new VariableNode("n"), new BinaryOperatorNode(BinaryOperatorNode.LOGARITHM, new ConstantNode(2), new VariableNode("m")));
 		
 		r.put("Formula", new FormulaRenderer(form, 100, 50));
 		

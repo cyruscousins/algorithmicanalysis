@@ -243,6 +243,7 @@ public class OpCollectionNode extends FormulaNode{
 	}
 	
 	FormulaNode simplifyMultiplicationPair(FormulaNode l, FormulaNode r){
+		
 		if(l.formulaEquals(r)){
 	  		return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, l, ConstantNode.TWO).takeSimplified();
 		}
@@ -295,6 +296,10 @@ public class OpCollectionNode extends FormulaNode{
 	//Need to handle inverse operators and tree reduction.  
 	public FormulaNode takeSimplified(){
 		
+//		if(operator == ADD) return this; 
+		
+//		System.out.println("SIMPLIFYING: " + asString());
+		
 		ArrayList<FormulaNode> nodes = new ArrayList<>();
 		ConstantNode constant = IDENTITY[operator];
 		ArrayList<FormulaNode> inverseNodes = new ArrayList<FormulaNode>();
@@ -342,25 +347,6 @@ public class OpCollectionNode extends FormulaNode{
 			nodes.add(0, constant);
 		}
 		
-		//Apply distributative rule.
-		
-		//TODO I don't know how this handles a case where distribution needs to occur multiple times.
-		if(operator == MULTIPLY){
-			for(int i = 0; i < nodes.size(); i++){
-				if(nodes.get(i) instanceof OpCollectionNode && ((OpCollectionNode)nodes.get(i)).operator == ADD){
-//					System.out.println("DISTRIBUTING " + this.asString());
-					OpCollectionNode oPlus = (OpCollectionNode)nodes.remove(i);
-					List<FormulaNode> plusNodes = new ArrayList<>();
-					for(int j = 0; j < oPlus.len; j++){
-						nodes.add(oPlus.data[j]);
-						plusNodes.add(new OpCollectionNode(nodes, MULTIPLY));
-						nodes.remove(nodes.size() - 1);
-					}
-					return new OpCollectionNode(plusNodes, ADD).takeSimplified();
-				}
-			}
-		}
-		
 		//Attempt to intersimplify between nodes.
 		for(int i = 0; i < nodes.size(); i++){
 			for(int j = i + 1; j < nodes.size(); j++){
@@ -388,6 +374,28 @@ public class OpCollectionNode extends FormulaNode{
 				}
 			}
 		}
+
+		//Apply distributative rule.
+		
+		//TODO I don't know how this handles a case where distribution needs to occur multiple times.
+		if(operator == MULTIPLY){
+			for(int i = 0; i < nodes.size(); i++){
+				if(nodes.get(i) instanceof OpCollectionNode && ((OpCollectionNode)nodes.get(i)).operator == ADD){
+//					System.out.println("DISTRIBUTING " + this.asString());
+					OpCollectionNode sum = (OpCollectionNode)nodes.remove(i);
+					List<FormulaNode> plusNodes = new ArrayList<>();
+					for(int j = 0; j < sum.len; j++){
+						nodes.add(sum.data[j]);
+						plusNodes.add(new OpCollectionNode(nodes, MULTIPLY).takeSimplified());
+						nodes.remove(nodes.size() - 1);
+					}
+					
+//					FormulaNode o = new OpCollectionNode(plusNodes, ADD).takeSimplified();
+//					System.out.println(asString() + " -DISTRIBUTION> " + o.asString());
+					return new OpCollectionNode(plusNodes, ADD).takeSimplified();
+				}
+			}
+		}
 		
 		FormulaNode l;
 
@@ -400,6 +408,9 @@ public class OpCollectionNode extends FormulaNode{
 		else{
 			l = new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
 		}
+		
+		
+//		System.out.println(asString() + " -> " + l.asString() + " / " + inverseNodes);
 		
 		if(inverseNodes.size() > 0){
 			if(inverseNodes.size() == 1){
@@ -451,12 +462,12 @@ public class OpCollectionNode extends FormulaNode{
 		return null;
 	}
 	
-	FormulaNode takeBigO(){
+	FormulaNode bigO(){
 		
 		FormulaNode simp = takeSimplified();
 
 		if(!(simp instanceof OpCollectionNode)){
-			return simp.takeBigO();
+			return simp.bigO();
 		}
 		
 		OpCollectionNode oSimp = (OpCollectionNode)simp;
@@ -464,9 +475,9 @@ public class OpCollectionNode extends FormulaNode{
 		//Condense into mutable list.  Remove any constants in this phase.
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
 		for(int i = 0; i < oSimp.len; i++){
-			FormulaNode newData = oSimp.data[i].takeBigO();
+			FormulaNode newData = oSimp.data[i].bigO();
 			if(!(newData instanceof ConstantNode && (operator == ADD || ((ConstantNode)newData).value > 0))){
-				nodes.add(oSimp.data[i].takeBigO());
+				nodes.add(oSimp.data[i].bigO());
 			}
 		}
 		//Everything was a constant.  Scrap it.
@@ -511,7 +522,7 @@ public class OpCollectionNode extends FormulaNode{
 				return this;
 			}
 			else{
-				return nn.takeBigO();
+				return nn.bigO();
 			}
 		}
 	}
@@ -523,7 +534,7 @@ public class OpCollectionNode extends FormulaNode{
 	  //TODO this is a heavy function, test it.
 	  
 	  
-	  FormulaNode f = takeBigO();
+	  FormulaNode f = bigO();
 	  
 	  if(f instanceof OpCollectionNode){
 		  OpCollectionNode o = (OpCollectionNode)f;

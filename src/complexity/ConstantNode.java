@@ -32,7 +32,7 @@ public class ConstantNode extends FormulaNode{
 	  if(frac < .001){
 		  return ("" + (lval)).replace("-", "~");
 	  }
-	  return ("" + (lval)).replace("-", "~");
+	  return ("" + (value)).replace("-", "~");
   }
   
   public String asLatexStringRecurse(){

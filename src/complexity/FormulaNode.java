@@ -7,7 +7,12 @@ public abstract class FormulaNode {
   public FormulaNode takeSimplified(){
 	  return this;
   }
-  FormulaNode takeBigO(){
+  
+  public FormulaNode takeBigO(){
+	  return bigO(); //TODO simplified bits.
+  }
+  
+  FormulaNode bigO(){
 	  return this;
   }
   
@@ -54,13 +59,13 @@ public abstract class FormulaNode {
   }
   
   public FormulaNode takeBigO(String[] littles, String[] bigs){
-	  FormulaNode cur = takeBigO();
+	  FormulaNode cur = bigO();
 	  if(littles == null){
 		  return cur;
 	  }
 	  
 	  for(int i = 0; i < littles.length; i++){
-		  cur = cur.bigOVarSub(littles[i], new VariableNode(bigs[i])).takeBigO();
+		  cur = cur.bigOVarSub(littles[i], new VariableNode(bigs[i])).bigO();
 	  }
 	  return cur;
   }

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import complexity.Formula;
 import complexity.FormulaNode;
 import complexity.FormulaParser;
 import complexity.VariableMapping;

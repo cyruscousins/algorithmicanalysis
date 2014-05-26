@@ -10,6 +10,8 @@ public class ComplexityTest {
 
 	public static void main(String[] args){
 		runAllTests(false, System.out);
+//		runSimplifierTests(true, System.out);
+//		runSimplifierTests(false, System.out);
 	}
 	public static void runAllTests(boolean verbose, PrintStream out){
 		runEqualityTests(verbose, out);
@@ -104,20 +106,20 @@ public class ComplexityTest {
 
 		out.println("\n\nSIMPLIFIER TESTS\n");
 		FormulaNode[] test = FormulaParser.parseFormulae(
-				"n|n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
+				"n | n   |   n + (1 - 1)|n   |   n + (1 - 1 + 1 - 1 + 1 - 1)|n   |   n + 1 - 1|n   |   (n * m) / m | n   |" +
 				"n * n | n^2   |   n * (n * (n / n)) | n^2   |   n * n * n | n^3   |   (n * n) * (n * n) | n^4   |" +
 				"(n ^ 4) / (n ^ 2) | (n ^ 2)   |   (n ^ 4) / (n ^ 3) | n   |   (n ^ 2) / (n ^ 3) | (n ^ ~1)   |" +
 				"(2 * n * (2 log (n ^ 2))) - (2 * n * (2 log (n ^ 2)))|0   |   (2 * n * m) / (2 * n * m)|1   |" +
 				"(n + m) - (m + n) | 0   |   ((n + m) * (m + n)) / ((m + n) * (n + m)) | 1   |   ((n + m) ^ 1) * (1 / (n + m)) | 1   |" +
 				"0 * (0 - 1)|0   |   (1 / 3) + (1 / 3) + (1 / 3)|1   |   (0 / 0) | (0 / 0)   |" +
-				"n * ((1 / n) + 1)|1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
-				"np ^ (np log mp)|mp   |   (np log (np ^ mp))|mp   |" +
+				"n * ((1 / n) + 1) | 1 + n   |   n * ((1 / n) + (1 / m)) * m | n + m   |   ((n * m) * ((1 / n) + (1 / m))) / (n + m) | 1   |" +
+				"np ^ (np log mp) | mp   |   (np log (np ^ mp))|mp   |" +
 				"(npi choose 0) | 1   |   (npi choose 1) | npi   |   (npi choose npi) | 1   |" +
 				"ceil(2.5) | 3   |   floor(4 / 5) | 0   |   ceil(n) | ceil(n)   |" + //ceil and floor
 				"ceil(ceil(n)) | ceil(n)   |   ceil(floor(n)) | floor(n)   |   floor(ceil(n)) | ceil(n)   |   floor(floor(n)) | floor(n)   |   floor(ceil(npi!)) | npi!   |" + //ceil and floor
 				"sum i from 1 to 3 of (5 * i ^ 2) | 5 * sum i from 1 to 3 of (i ^ 2)  |   sum i from 1 to 3 of i | 6   |   sum i from 2 to 5 of (i * 2) | 28   |" + //Summations
-				"(n + m) - (n + m + 1) | ~1   |   (n * m) / (n * m * 2) | (1 / 2)   |   (n + m) - (2 * n) | (m - n)   |" +//OpCollectionNode
-				"(1 / n ^ 2) * (n + 1) * (n - 1) + 1 / (n ^ 2) | 1   |   (n + m - n + 1 - m) | 1   |   (n + 1 - n + n + ~1 - m) * n * m / ((n - m) * n * n) | (m / n)   |   (n * m / m * 1 * (1 / n)) - 1 | 1   |" + //Complex
+				"(n + m) - (n + m + 1) | ~1   |   (n * m) / (n * m * 2) | (1 / 2)   |   (n + m) - (2 * n) | (m - n)   |" + //OpCollectionNode
+				"(1 / n ^ 2) * (n + 1) * (n - 1) + 1 / (n ^ 2) | 1   |   (n + m - n + 1 - m) | 1   |   (n + 1 - n + n + ~1 - m) * n * m / ((n - m) * n * n) | (m / n)   |   (n * m / m * 1 * (1 / n)) - 1 | 0   |" + //Complex
 				"|", splitter);
 
 //		out.println("KEY:");
@@ -190,10 +192,10 @@ public class ComplexityTest {
 		int totalSuccess = 0;
 		for(int i = 0; i < test.length; i += 2){
 			FormulaNode f = test[i];
-			FormulaNode s = f.takeBigO();
+			FormulaNode s = f.bigO();
 			
 			//Test bigO completion
-			FormulaNode s2 = s.takeBigO();
+			FormulaNode s2 = s.bigO();
 			if(!s2.formulaEquals(s)){
 				out.println((i / 2) + ": bigO incompletion failure: " + f.asString() + " -> " + s.asString() + " -> " + s2.asString());
 				continue;
@@ -210,8 +212,8 @@ public class ComplexityTest {
 			//Test accuracy
 			FormulaNode key = test[i + 1];
 			
-			if(!key.formulaEquals(key.takeBigO())){
-				out.println((i / 2) + ": BigO test error: key " + key.asString() + " -> " + key.takeBigO().asString() + " is not in normative form.");
+			if(!key.formulaEquals(key.bigO())){
+				out.println((i / 2) + ": BigO test error: key " + key.asString() + " -> " + key.bigO().asString() + " is not in normative form.");
 			}
 			
 			if(key.formulaEquals(s)){

@@ -94,7 +94,7 @@ public class SummationNode extends FormulaNode{
 		return new SummationNode(ls, us, is, varName);
 	}
 	
-	FormulaNode takeBigO(){
+	FormulaNode bigO(){
 		FormulaNode simp = takeSimplified();
 		
 		if(simp instanceof SummationNode){
@@ -112,10 +112,10 @@ public class SummationNode extends FormulaNode{
 			
 			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
-			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.takeBigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).takeBigO();
+			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
 		}
 		
-		return simp.takeBigO();
+		return simp.bigO();
 	}
 	
 	public FormulaNode substitute(String s, FormulaNode f){
