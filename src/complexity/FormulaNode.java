@@ -69,4 +69,16 @@ public abstract class FormulaNode {
 	  }
 	  return cur;
   }
+  
+  
+  
+  public boolean isConstant(){
+	  if(this instanceof ConstantNode){
+		  return true;
+	  }
+	  
+	  return false;
+  }
+  
+  //TODO:  CollectVariables, CollectOperators, ...
 }

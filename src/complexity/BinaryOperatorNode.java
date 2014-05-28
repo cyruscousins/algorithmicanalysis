@@ -318,6 +318,60 @@ public class BinaryOperatorNode extends FormulaNode{
 	  return xInBigOofY(x, xExponent, y);
   }
   private static boolean xInBigOofY(FormulaNode x, double xExponent, FormulaNode y){
+	  
+	  if(x instanceof BinaryOperatorNode && ((BinaryOperatorNode)x).operationType == EXPONENTIATE && ((BinaryOperatorNode)x).r instanceof ConstantNode) { //Could be a while and a *, for multiplicative rule, but simplifier should take care of that.
+	      return xInBigOofY(((BinaryOperatorNode)x).l, xExponent * ((ConstantNode)(((BinaryOperatorNode)x).r)).value, y);
+	  }
+	  //Remove common factors / addands
+	  
+	  //TODO this isn't particularly useful in this form.
+	  if(x instanceof OpCollectionNode){
+		  
+
+//		  System.out.println("ASK: " + x.asString() + " \\in O(" + y.asString() + ")");
+		  
+		  OpCollectionNode ox = (OpCollectionNode)x;
+		  
+		  if(y instanceof OpCollectionNode && ((OpCollectionNode)x).operator == ((OpCollectionNode)y).operator){
+			  OpCollectionNode oy = (OpCollectionNode)y;
+			  
+			  for(int i = 0; i < oy.len; i++){
+				  FormulaNode nx = ox.remove(oy.data[i]);
+				  if(nx != null){
+					  return xInBigOofY(nx, xExponent, oy.remove(i));
+				  }
+			  }
+		  }
+		  else if(ox.operator == OpCollectionNode.MULTIPLY && y instanceof BinaryOperatorNode){
+			  BinaryOperatorNode by =  ((BinaryOperatorNode)y);
+			  if(by.operationType == EXPONENTIATE && by.r.isConstant() && by.r.evaluate(null) > 1){
+				  FormulaNode newX = ox.remove(by.l);
+				  
+//				  System.out.println("Got here.  Now asking: " + newX + " in " + new BinaryOperatorNode(EXPONENTIATE, by.l, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, by.r, ConstantNode.ONE).takeSimplified()).takeSimplified());
+//				  System.out.println("Answer: " + xInBigOofY(newX, xExponent, new BinaryOperatorNode(EXPONENTIATE, by.l, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, by.r, ConstantNode.ONE).takeSimplified()).takeSimplified()));
+				  if(newX != null){
+					  return xInBigOofY(newX, xExponent, new BinaryOperatorNode(EXPONENTIATE, by.l, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, by.r, ConstantNode.ONE).takeSimplified()).takeSimplified());
+				  }
+			  }
+		  }
+	  }
+	  
+	  
+	  //Handle logarithms:
+	  if(x instanceof BinaryOperatorNode && ((BinaryOperatorNode)x).operationType == LOGARITHM && ((BinaryOperatorNode)x).l.isConstant()){
+		  if(y instanceof BinaryOperatorNode && ((BinaryOperatorNode)y).operationType == LOGARITHM && ((BinaryOperatorNode)y).l.isConstant()){
+			  return xInBigOofY(((BinaryOperatorNode)x).r.takeBigO(), xExponent, ((BinaryOperatorNode)y).r.takeBigO());
+		  }
+		  else{
+			  
+			  //x is a log, y is not.
+			  
+			  //TODO generalize.
+			  return xInBigOofY(((BinaryOperatorNode)x).r.takeBigO(), -1000000, y); //X is given a low exponent.  (-infinity makes sense).  TODO, new function for this.
+		  }
+		  
+	  }
+	  
 	  if(y.formulaEquals(x)){
 		  if(xExponent <= 1) return true;
 	  }
@@ -457,11 +511,14 @@ public class BinaryOperatorNode extends FormulaNode{
 				
 				//This is a bit of a hack to get rid of problems like 2 ^ (1 + n)
 				if(((OpCollectionNode)nr).operator == OpCollectionNode.ADD){
-					return new BinaryOperatorNode(EXPONENTIATE, nl, ((OpCollectionNode)nr).trimConstants());
+					FormulaNode nrt = ((OpCollectionNode)nr).trimConstants();
+					if(!(nrt.formulaEquals(nr))){
+						return new BinaryOperatorNode(EXPONENTIATE, nl, nrt).takeBigO();
+					}
 				}
 			}
 			if(nr instanceof UnaryOperatorNode && (((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.CEIL || ((UnaryOperatorNode)nr).operationType == UnaryOperatorNode.FLOOR)){
-				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument).bigO();
+				return new BinaryOperatorNode(EXPONENTIATE, nl, ((UnaryOperatorNode)nr).argument).takeBigO();
 			}
 			else return nn;
 		} else if(operationType == LOGARITHM){

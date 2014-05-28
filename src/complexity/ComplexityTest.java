@@ -10,6 +10,7 @@ public class ComplexityTest {
 
 	public static void main(String[] args){
 		runAllTests(false, System.out);
+//		runBigOTests(false, System.out);
 //		runSimplifierTests(true, System.out);
 //		runSimplifierTests(false, System.out);
 	}
@@ -176,16 +177,27 @@ public class ComplexityTest {
 			"2 ^ (2 * n) | 2 ^ (2 * n)   |   n ^ (1 + (2 * m) / 2 - 1) | n ^ m   |" + //Basic exponentiation
 			"(n ^ 2) + (n ^ 3) | (n ^ 3)   |   n + (n + m) | (n + m)   |   (n ^ 2) + ((n ^ 2) + m) | (n ^ 2) + m   |   (n ^ 2) + ((n + m) ^ 2) | (n + m) ^ 2   |" +
 			"(n ^ 1.5) + (n * m) | (n ^ 1.5) + (n * m)   |   (n ^ 2) * ((n ^ 2) / (n + m)) | (n ^ 4) / (n + m)   |" +
-			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" +
+			"(n * n) + (n * ((2 log n) ^ 4)) | (n ^ 2)   |   (n ^ 3) + (n ^ 2 * (1 + (n ^ .5) + (2 log n) ^ 2)) | (n ^ 3)   |" + //Logarithms
+			"n ^ 2 + (n * log_2 n) | n ^ 2   |   n + (log_2 n) ^ 4 | n   |   (n * n * m) + (n * (log_2(n) ^ 4) * log_2 ( log_2 m )) | n ^ 2 * m   |" + //More Logarithms
 			"n + (n ^ m) | (n ^ m)   |   (n + m) + (n ^ m) | (n ^ m)   |" + //Multivariate bigO with exponentiation.
-			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //More logarithms
+			"n + log_2 n | n   |   n * log_2 n - n | n * ln n  |" + //Even more logarithms
 			"n! | n ^ n   |   log_2 (n!) | n * ln n   |   (n choose 2) | n ^ 2   |" + //factorials and choose.
 			"ceil(log_2 n) | ln n   |   2 ^ (floor n)   |   2 ^ n   |   n ^ (ceil 2.5) | n ^ 3   |" + //Floor and ceil
 			"n * (1 + (ceil(log_2 n) - 1)) | n * ln n   |   2 ^ (1 + ceil (log_2 n)) | n   |" +
 			"sum i from 1 to n of (5 * i ^ 5) | n ^ 6   |   sum i from n to (n * 2) of (log_2 n) | n * ln n   |   sum i from n to (n + 5) of (log_2 n) | ln n   |" + //Summations
-			"n + log_2 n | n   |   n ^ (3 / 2) + n * (log_2 n) ^ 2 | n ^ (3 / 2)   |   n * (log_2 (log_2 n)) | n   |   log_3 ((log_2 n) ^ 2) | ln ((ln n) ^ 2)   |   (log_2 n) ^ 2 + (log_2 ((log_2 n) ^ 3)) | (ln n) ^ 2   |   n * m - (n + m) | n * m " + //Complex
+			"n + log_2 n | n   |   n ^ (3 / 2) + n * (log_2 n) ^ 2 | n ^ (3 / 2)   |   n * (log_2 (log_2 n)) | n * (ln (ln n))   |   log_3 ((log_2 n) ^ 2) | ln ((ln n))   |   (log_2 n) ^ 2 + (log_2 ((log_2 n) ^ 3)) | (ln n) ^ 2   |   n * m - (n + m) | n * m " + //Complex
 			"|", splitter);
+		
+//		test = FormulaParser.parseFormulae(
+//				"n + log_2 n | n   |   n + (log_2 n) ^ 2 | n   |   n + (log_2 (log_2 n)) | n", splitter);
+//
+//		test = FormulaParser.parseFormulae(
+//				"n ^ 2 + (log_2 n) ^ 3 | n ^ 2", splitter);
 
+//		test = FormulaParser.parseFormulae(
+//				"n ^ 2 + (n * log_2 n) | n ^ 2   |   n + (log_2 n) ^ 4 | n   |   (n * n) + (n * (log_2(n) ^ 4)) | n ^ 2", splitter);
+		
+		
 		String[] args = new String[]{"n", "m"};
 		
 		int valueSuccess = 0;

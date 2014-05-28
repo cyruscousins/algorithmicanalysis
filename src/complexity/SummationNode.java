@@ -111,8 +111,27 @@ public class SummationNode extends FormulaNode{
 //			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, count, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
 			
 			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
-			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
+			System.out.println(asString() + " -> " + new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).asString()); 
+			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).bigO()).bigO();
 		}
 		
 		return simp.bigO();

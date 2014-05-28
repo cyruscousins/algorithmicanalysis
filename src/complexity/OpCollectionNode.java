@@ -35,6 +35,14 @@ public class OpCollectionNode extends FormulaNode{
 		this(l.toArray(new FormulaNode[l.size()]), l.size(), operator);
 	}
 	
+	public List<FormulaNode> asList(){
+		List<FormulaNode> l = new ArrayList<>(len);
+		for(int i = 0; i < len; i++){
+			l.add(data[i]);
+		}
+		return l;
+	}
+	
 	//Combine 2 OpCollectionNodes.  Assumes they have the same operator.
 	public OpCollectionNode combine(OpCollectionNode l){
 		//Make a new array and copy into it.
@@ -72,6 +80,43 @@ public class OpCollectionNode extends FormulaNode{
 		
 		OpCollectionNode newNode = new OpCollectionNode(newArray, newLen, operator);
 		return newNode;
+	}
+	
+	
+	//Helper function for remove.
+	//Returns success if the element was removed from the list.
+	private boolean removeFromList(List<FormulaNode> list, FormulaNode elem){
+		
+		FormulaNode eexp = ConstantNode.ONE;
+		if(elem instanceof BinaryOperatorNode && ((BinaryOperatorNode) elem).operationType == BinaryOperatorNode.EXPONENTIATE && ((BinaryOperatorNode)elem).r.isConstant()){
+			eexp = ((BinaryOperatorNode)elem).r;
+			elem = ((BinaryOperatorNode)elem).l;
+		}
+		
+		for(int i = 0; i < list.size(); i++){
+			FormulaNode l = list.get(i);
+			FormulaNode lexp = ConstantNode.ONE;
+			if(l instanceof BinaryOperatorNode && ((BinaryOperatorNode) l).operationType == BinaryOperatorNode.EXPONENTIATE && ((BinaryOperatorNode)l).r.isConstant()){
+				lexp = ((BinaryOperatorNode)l).r;
+				l =    ((BinaryOperatorNode)l).l;
+			}
+			
+			if(l.formulaEquals(elem)){
+				if(lexp.evaluate(null) >= eexp.evaluate(null)){
+					if(lexp.formulaEquals(eexp)){
+						list.remove(i);
+						return true;
+					}
+					else{
+						list.set(i, new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, l, new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, lexp, eexp).takeSimplified()).takeSimplified());
+						return true;
+					}
+				}
+			}
+			
+			//TODO could short circuit.
+		}
+		return false;
 	}
 	
 	//Returns an FormulaNode of this minus one instance of f, if f is not contained in this OpCollectionNode, null is instead returned.
@@ -136,37 +181,56 @@ public class OpCollectionNode extends FormulaNode{
 				//38 26 11
 			}
 		}
-		int index = -1;
-		for(int i = 0; i < len; i++){
-			if(data[i].formulaEquals(f)){
-				index = i;
-			}
+		
+		List<FormulaNode> l = asList();
+		if(removeFromList(l, f)){
+//			System.out.println("REMOVE " + f.asString() + " FROM " + asString() + " -> " + new OpCollectionNode(l, operator).asString());
+			return new OpCollectionNode(l, operator).takeSimplified();
 		}
-		if(index == -1){
-			return null;
-		}
+//		System.out.println("CAN'T REMOVE " + f.asString() + " FROM " + asString());
 		
-		int newLen = len - 1;
+		return null;
 		
-		if(newLen == 1){
-			if(index == 0){
-				return data[1];
-			}
-			else{
-				return data[0];
-			}
-		}
+		//Simple remove:
 		
-		FormulaNode[] newData = new FormulaNode[newLen];
-		
-		System.arraycopy(data, 0, newData, 0, index);
-		System.arraycopy(data, index + 1, newData, index, newLen - index);
-		
-		return new OpCollectionNode(newData, newLen, operator);
-		
+//		int index = -1;
+//		for(int i = 0; i < len; i++){
+//			if(data[i].formulaEquals(f)){
+//				index = i;
+//			}
+//		}
+//		if(index == -1){
+//			return null;
+//		}
+//		
+//		int newLen = len - 1;
+//		
+//		if(newLen == 1){
+//			if(index == 0){
+//				return data[1];
+//			}
+//			else{
+//				return data[0];
+//			}
+//		}
+//		
+//		FormulaNode[] newData = new FormulaNode[newLen];
+//		
+//		System.arraycopy(data, 0, newData, 0, index);
+//		System.arraycopy(data, index + 1, newData, index, newLen - index);
+//		
+//		return new OpCollectionNode(newData, newLen, operator);
 		
 	}
 	
+	public FormulaNode remove(int index){
+		FormulaNode[] newData = new FormulaNode[len - 1];
+		
+		System.arraycopy(data, 0, newData, 0, index);
+		System.arraycopy(data, index + 1, newData, index, len - 1 - index);
+		
+		return new OpCollectionNode(newData, len - 1, operator);
+	}
 	
 	public FormulaNode trimConstants(){
 
@@ -608,7 +672,7 @@ public class OpCollectionNode extends FormulaNode{
 			return false;
 		}
 		OpCollectionNode o = (OpCollectionNode)f;
-		if(o.len != len){
+		if(o.len != len || o.operator != operator){
 			return false;
 		}
 		
