@@ -540,7 +540,10 @@ public class GUI extends JPanel implements ActionListener, ChangeListener{
 				
 				for(int i = 0; i < types.length; i++){
 					String prefix = types[i] + "_" + analysisType;
-					inputs[i].setText(prefix + "_construct + e * " + prefix + "_decrease_key"); //TODO this is where sum goes!
+					
+					//TODO debug this.
+//					inputs[i].setText(prefix + "_construct + e * " + prefix + "_decrease_key"); //TODO this is where sum goes!
+					inputs[i].setText(prefix + "_construct + sum i from 0 to e of " + prefix + "_decrease_key"); //TODO this is where sum goes!
 				}
 				
 				for(int i = types.length; i < INPUTS; i++){

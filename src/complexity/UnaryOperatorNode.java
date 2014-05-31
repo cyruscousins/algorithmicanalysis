@@ -41,7 +41,7 @@ public class UnaryOperatorNode extends FormulaNode {
 		  System.err.println("Invalid Unary Operator");
 		  return -1;
 	  }
-	  public FormulaNode takeSimplified(){
+	  public FormulaNode simplify(){
 		  FormulaNode argSimp = argument.takeSimplified();
 		  if(argSimp instanceof ConstantNode){
 			  return new ConstantNode(new UnaryOperatorNode(operationType, argSimp).evaluate(null));
@@ -114,6 +114,10 @@ public class UnaryOperatorNode extends FormulaNode {
 	  }
 	  public boolean formulaEquals(FormulaNode f){
 		  return (f instanceof UnaryOperatorNode && ((UnaryOperatorNode)f).operationType == operationType && ((UnaryOperatorNode)f).argument.formulaEquals(argument));
+	  }
+	  
+	  public boolean isConstant(){
+		  return argument.isConstant();
 	  }
 	
 }

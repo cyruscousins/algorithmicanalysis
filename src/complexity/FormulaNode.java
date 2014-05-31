@@ -1,18 +1,30 @@
 package complexity;
 
 public abstract class FormulaNode {
-	
   public abstract double evaluate(VarSet v);
+
+  //Simplification and bigO
   
-  public FormulaNode takeSimplified(){
-	  return this;
+  public boolean isSimplified, isBigO;
+	
+  public final FormulaNode takeSimplified(){
+	  if(isSimplified) return this;
+	  FormulaNode f = simplify();
+	  f.isBigO = true;
+	  return f;
   }
   
-  public FormulaNode takeBigO(){
-	  return bigO(); //TODO simplified bits.
+  public final FormulaNode takeBigO(){
+	  if(isBigO) return this;
+	  FormulaNode f = bigO();
+	  f.isBigO = true;
+	  return f;
   }
   
   FormulaNode bigO(){
+	  return this;
+  }
+  FormulaNode simplify(){
 	  return this;
   }
   
@@ -72,13 +84,7 @@ public abstract class FormulaNode {
   
   
   
-  public boolean isConstant(){
-	  if(this instanceof ConstantNode){
-		  return true;
-	  }
-	  
-	  return false;
-  }
+  public abstract boolean isConstant();
   
   //TODO:  CollectVariables, CollectOperators, ...
 }

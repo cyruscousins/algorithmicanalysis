@@ -41,5 +41,9 @@ public class VariableNode extends FormulaNode{
   public boolean formulaWeakEquals(FormulaNode f){
 	  return (f instanceof VariableNode) && ((VariableNode)f).varName.equals(varName);
   }
+  
+  public boolean isConstant(){
+	  return false;
+  }
 
 }

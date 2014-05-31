@@ -358,7 +358,7 @@ public class OpCollectionNode extends FormulaNode{
 	}
 	
 	//Need to handle inverse operators and tree reduction.  
-	public FormulaNode takeSimplified(){
+	public FormulaNode simplify(){
 		
 //		if(operator == ADD) return this; 
 		
@@ -713,19 +713,17 @@ public class OpCollectionNode extends FormulaNode{
 		return s;
 	}
 	
-//	public static void main(String[] args){
-//		
-//		FormulaNode[] data = new FormulaNode[]{
-//			ConstantNode.ONE, new VariableNode("x"), ConstantNode.MINUS_ONE, new VariableNode("x")
-//		};
-//		OpCollectionNode o = new OpCollectionNode(data, data.length, ADD);
-//		System.out.println(o.asStringRecurse());
-//		System.out.println(o.takeSimplified().asStringRecurse());
-//		
-//
-//		o = new OpCollectionNode(data, data.length, MULTIPLY);
-//		System.out.println(o.asStringRecurse());
-//		System.out.println(o.takeSimplified().asStringRecurse());
-//		
-//	}
+	public boolean isConstant(){
+		FormulaNode s = takeSimplified();
+		if(s instanceof OpCollectionNode){
+			for(int i = 0; i < ((OpCollectionNode)s).len; i++){
+				if(!((OpCollectionNode)s).data[i].isConstant()){
+					return false;
+				}
+			}
+			return true;
+		}
+		return s.isConstant();
+		
+	}
 }

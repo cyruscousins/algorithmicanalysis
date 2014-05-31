@@ -52,4 +52,8 @@ public class ConstantNode extends FormulaNode{
   public boolean formulaEquals(FormulaNode f){
 	  return (f instanceof ConstantNode) && ((ConstantNode)f).value == value;
   }
+  
+  public boolean isConstant(){
+	  return true;
+  }
 }

@@ -53,7 +53,7 @@ public class SummationNode extends FormulaNode{
 		return new BinaryOperatorNode(BinaryOperatorNode.SUBTRACT, top, bottom);
 	}
 	
-	public FormulaNode takeSimplified(){
+	public FormulaNode simplify(){
 
 		FormulaNode ls = lower.takeSimplified();
 		FormulaNode us = upper.takeSimplified();
@@ -101,25 +101,15 @@ public class SummationNode extends FormulaNode{
 			SummationNode s = (SummationNode) simp;
 			
 //			FormulaNode count = summationrange(s.lower, s.upper).takeSimplified();
-			
-//			count = summationrangebigO(s.lower, s.upper).simplify();
+			FormulaNode count = summationrangebigO(s.lower, s.upper).takeBigO();
 //			
-//			BinaryOperatorNode b = new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, count, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)));
+			FormulaNode b = new OpCollectionNode(OpCollectionNode.MULTIPLY, count, new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).takeBigO()).takeBigO();
 //			System.out.println("\n" + count.asString() + " \\in " + count.takeBigO().asString());
 //			System.out.println(b.asString());
 //			System.out.println(b.bigO().asString());
-//			return new BinaryOperatorNode(BinaryOperatorNode.MULTIPLY, count, new BinaryOperatorNode(BinaryOperatorNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).bigO();
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
-			
+//			System.out.println(asString() + " IN " + b.asString());
+			return b;
+//			return new OpCollectionNode(OpCollectionNode.MULTIPLY, count, new BinaryOperatorNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).takeBigO()).takeBigO();
 			
 			
 			
@@ -130,8 +120,8 @@ public class SummationNode extends FormulaNode{
 			
 			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
-			System.out.println(asString() + " -> " + new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).asString()); 
-			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).bigO()).bigO();
+//			System.out.println(asString() + " -> " + new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).asString()); 
+//			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).bigO()).bigO();
 		}
 		
 		return simp.bigO();
@@ -163,5 +153,15 @@ public class SummationNode extends FormulaNode{
 	
 	public String asLatexStringRecurse() {
 		return "\\sum_{" + varName + " =  " + trimParens(lower.asLatexString()) + "}^{" + trimParens(upper.asLatexString()) + "}\\big(" + trimParens(inner.asLatexString()) + "\\big)";
+	}
+	
+	//TODO pull out all the simplifier stuff into another helper.
+	public boolean isConstant(){
+		FormulaNode s = takeSimplified();
+		if(s instanceof SummationNode){
+			SummationNode ss = (SummationNode)s;
+			return ss.lower.isConstant() && ss.upper.isConstant() && ss.inner.isConstant();
+		}
+		return s.isConstant();
 	}
 }

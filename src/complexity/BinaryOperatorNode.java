@@ -52,10 +52,7 @@ public class BinaryOperatorNode extends FormulaNode{
   //SIMPLIFICATION//
   //////////////////
   
-  //TODO CHOOSE!
-  
-  //TODO distributative law!
-  public FormulaNode takeSimplified(){
+  public FormulaNode simplify(){
 
 	    FormulaNode nl = l.takeSimplified();
 	    FormulaNode nr = r.takeSimplified();
@@ -686,8 +683,17 @@ public class BinaryOperatorNode extends FormulaNode{
 	  return (f instanceof BinaryOperatorNode) && ((BinaryOperatorNode)f).operationType == operationType && 
 			  ((l.formulaEquals(((BinaryOperatorNode)f).l) && r.formulaEquals(((BinaryOperatorNode)f).r)) ||
 			   (l.formulaEquals(((BinaryOperatorNode)f).r) && r.formulaEquals(((BinaryOperatorNode)f).l)));
-//	  return (f instanceof BinOpNode) && ((BinOpNode)f).operationType == operationType && l.formulaEquals(((BinOpNode)f).l) && r.formulaEquals(((BinOpNode)f).r);
+	//	  return (f instanceof BinOpNode) && ((BinOpNode)f).operationType == operationType && l.formulaEquals(((BinOpNode)f).l) && r.formulaEquals(((BinOpNode)f).r);
   }
   
   //TODO rather than strongHash and strongEquals, need to have a standardization technique, possibly using hashes?
+
+  public boolean isConstant(){
+
+	FormulaNode s = takeSimplified();
+	if(s instanceof BinaryOperatorNode){
+		return l.isConstant() && r.isConstant();
+	}
+	else return s.isConstant();
+  }
 }
