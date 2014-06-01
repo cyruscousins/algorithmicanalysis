@@ -61,10 +61,10 @@ public class UnaryOperatorNode extends FormulaNode {
 		  if(simp instanceof UnaryOperatorNode){
 			  UnaryOperatorNode nn = (UnaryOperatorNode)simp;
 			  if(nn.operationType == FACTORIAL){
-				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, nn.argument, nn.argument).bigO();
+				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, nn.argument, nn.argument).takeBigO();
 			  }
 			  else if(nn.operationType == CEIL || nn.operationType == FLOOR){
-				  return nn.argument.bigO();
+				  return nn.argument.takeBigO();
 			  }
 		  }
 		return simp;
@@ -109,14 +109,23 @@ public class UnaryOperatorNode extends FormulaNode {
 		  return new UnaryOperatorNode(operationType, argument.substitute(s, f));
 	  }
 
-	  public long formulaHash(){
-		  return operationType * 27 ^ circShiftL(argument.formulaHash(), 7);
+	  public long formulaWeakHash(){
+		  return operationType * 27 ^ circShiftL(argument.formulaWeakHash(), 7);
+	  }	  
+	  
+	  public long formulaStrongHash(){
+		  return operationType * 27 ^ circShiftL(argument.formulaStrongHash(), 7);
 	  }
-	  public boolean formulaEquals(FormulaNode f){
-		  return (f instanceof UnaryOperatorNode && ((UnaryOperatorNode)f).operationType == operationType && ((UnaryOperatorNode)f).argument.formulaEquals(argument));
+
+	  public boolean formulaWeakEquals(FormulaNode f){
+		  return (f instanceof UnaryOperatorNode && ((UnaryOperatorNode)f).operationType == operationType && ((UnaryOperatorNode)f).argument.formulaWeakEquals(argument));
 	  }
 	  
-	  public boolean isConstant(){
+	  public boolean formulaStrongEquals(FormulaNode f){
+		  return (f instanceof UnaryOperatorNode && ((UnaryOperatorNode)f).operationType == operationType && ((UnaryOperatorNode)f).argument.formulaStrongEquals(argument));
+	  }
+	  
+	  public boolean isConstantRecurse(){
 		  return argument.isConstant();
 	  }
 	

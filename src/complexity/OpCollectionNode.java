@@ -101,9 +101,9 @@ public class OpCollectionNode extends FormulaNode{
 				l =    ((BinaryOperatorNode)l).l;
 			}
 			
-			if(l.formulaEquals(elem)){
+			if(l.formulaWeakEquals(elem)){
 				if(lexp.evaluate(null) >= eexp.evaluate(null)){
-					if(lexp.formulaEquals(eexp)){
+					if(lexp.formulaWeakEquals(eexp)){
 						list.remove(i);
 						return true;
 					}
@@ -145,13 +145,13 @@ public class OpCollectionNode extends FormulaNode{
 						FormulaNode bns = bn.takeSimplified();
 						
 						//If things cancel to the identity, throw it out.
-						if(bns.formulaEquals(IDENTITY[operator])){
+						if(bns.formulaWeakEquals(IDENTITY[operator])){
 							left.remove(i);
 							right.remove(j);
 							i--;
 							break;
 						}
-						if(!bns.formulaEquals(bn)){
+						if(!bns.formulaWeakEquals(bn)){
 							left.set(i, bns);
 							right.remove(j);
 							i--;
@@ -291,7 +291,7 @@ public class OpCollectionNode extends FormulaNode{
 	//Returns a node representing the given pair simplified, or null if no simplification is possible.
 	FormulaNode simplifyAdditionPair(FormulaNode l, FormulaNode r){
 
-		if(l.formulaEquals(r)){
+		if(l.formulaWeakEquals(r)){
 			return new OpCollectionNode(MULTIPLY, ConstantNode.TWO, l).takeSimplified();
 		}
 		
@@ -308,7 +308,7 @@ public class OpCollectionNode extends FormulaNode{
 	
 	FormulaNode simplifyMultiplicationPair(FormulaNode l, FormulaNode r){
 		
-		if(l.formulaEquals(r)){
+		if(l.formulaWeakEquals(r)){
 	  		return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, l, ConstantNode.TWO).takeSimplified();
 		}
 		
@@ -333,7 +333,7 @@ public class OpCollectionNode extends FormulaNode{
 			  //If the left is also an exponent
 			  if(l instanceof BinaryOperatorNode && ((BinaryOperatorNode)l).operationType == BinaryOperatorNode.EXPONENTIATE){
 				  //If they have the same base
-				  if(((BinaryOperatorNode)l).l.formulaEquals(((BinaryOperatorNode)r).l)){
+				  if(((BinaryOperatorNode)l).l.formulaWeakEquals(((BinaryOperatorNode)r).l)){
 					  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, ((BinaryOperatorNode)l).l, new OpCollectionNode(ADD, ((BinaryOperatorNode)l).r, ((BinaryOperatorNode)r).r)).takeSimplified();
 				  }
 			  }
@@ -348,7 +348,7 @@ public class OpCollectionNode extends FormulaNode{
 		  }
 		  
 		  if(exponential != null){
-			  if(other.formulaEquals(exponential.l)){
+			  if(other.formulaWeakEquals(exponential.l)){
 				  return new BinaryOperatorNode(BinaryOperatorNode.EXPONENTIATE, exponential.l, new OpCollectionNode(ADD, ConstantNode.ONE, exponential.r)).takeSimplified();
 			  }
 		  }
@@ -407,7 +407,7 @@ public class OpCollectionNode extends FormulaNode{
 			}
 		}
 		
-		if(!constant.formulaEquals(IDENTITY[operator])){
+		if(!constant.formulaWeakEquals(IDENTITY[operator])){
 			nodes.add(0, constant);
 		}
 		
@@ -528,20 +528,12 @@ public class OpCollectionNode extends FormulaNode{
 	
 	FormulaNode bigO(){
 		
-		FormulaNode simp = takeSimplified();
-
-		if(!(simp instanceof OpCollectionNode)){
-			return simp.bigO();
-		}
-		
-		OpCollectionNode oSimp = (OpCollectionNode)simp;
-		
 		//Condense into mutable list.  Remove any constants in this phase.
 		ArrayList<FormulaNode> nodes = new ArrayList<FormulaNode>();
-		for(int i = 0; i < oSimp.len; i++){
-			FormulaNode newData = oSimp.data[i].bigO();
+		for(int i = 0; i < len; i++){
+			FormulaNode newData = data[i].takeBigO();
 			if(!(newData instanceof ConstantNode && (operator == ADD || ((ConstantNode)newData).value > 0))){
-				nodes.add(oSimp.data[i].bigO());
+				nodes.add(data[i].takeBigO());
 			}
 		}
 		//Everything was a constant.  Scrap it.
@@ -582,23 +574,23 @@ public class OpCollectionNode extends FormulaNode{
 		else{
 			OpCollectionNode nn = new OpCollectionNode(nodes.toArray(new FormulaNode[nodes.size()]), nodes.size(), operator);
 			//TODO handle this more cleanly; this is quite inefficient.
-			if(nn.formulaEquals(this)){
+			if(nn.formulaWeakEquals(this)){
 				return this;
 			}
 			else{
-				return nn.bigO();
+				return nn.takeBigO();
 			}
 		}
 	}
 	
-  public FormulaNode bigOVarSub(String s, FormulaNode b){
+	public FormulaNode bigOVarSub(String s, FormulaNode b){
 	  
-	  if(true) return this;
+//	  if(true) return this;
 	  
 	  //TODO this is a heavy function, test it.
 	  
 	  
-	  FormulaNode f = bigO();
+	  FormulaNode f = takeBigO();
 	  
 	  if(f instanceof OpCollectionNode){
 		  OpCollectionNode o = (OpCollectionNode)f;
@@ -634,7 +626,7 @@ public class OpCollectionNode extends FormulaNode{
 		  }
 		  
 		  OpCollectionNode ret = new OpCollectionNode(nodes, operator);
-		  if(ret.formulaEquals(this)){
+		  if(ret.formulaWeakEquals(this)){
 			  return this;
 		  }
 		  else{
@@ -646,7 +638,7 @@ public class OpCollectionNode extends FormulaNode{
 	  }
 	  
 	  
-  }
+	}
 	
   public FormulaNode substitute(String s, FormulaNode f){
 	FormulaNode[] newData = new FormulaNode[len];
@@ -658,16 +650,26 @@ public class OpCollectionNode extends FormulaNode{
   }
 
 	@Override
-	public long formulaHash() {
+	public long formulaWeakHash() {
 		long val = 0;
 		for(int i = 0; i < len; i++){
-			val ^= circShiftL(data[i].formulaHash(), i * 7);
+			val ^= data[i].formulaWeakHash();
 		}
 		return val;
 	}
 	
 	@Override
-	public boolean formulaEquals(FormulaNode f) {
+	public long formulaStrongHash(){
+		long val = 0;
+		for(int i = 0; i < len; i++){
+			val ^= circShiftL(data[i].formulaWeakHash(), i * 7);
+		}
+		return val;
+	}
+	
+	@Override
+	public boolean formulaWeakEquals(FormulaNode f) {
+		
 		if(!(f instanceof OpCollectionNode)){
 			return false;
 		}
@@ -683,7 +685,7 @@ public class OpCollectionNode extends FormulaNode{
 			boolean found = false;
 			for(int j = 0; j < len; j++){
 				if(used[j]) continue;
-				if(data[i].formulaEquals(o.data[j])){
+				if(data[i].formulaWeakEquals(o.data[j])){
 					used[j] = found = true;
 					break;
 				}
@@ -691,6 +693,23 @@ public class OpCollectionNode extends FormulaNode{
 			if(!found){
 				return false;
 			}
+		}
+		
+		return true;
+	}
+	
+	public boolean formulaStrongEquals(FormulaNode f){
+
+		if(!(f instanceof OpCollectionNode)){
+			return false;
+		}
+		OpCollectionNode o = (OpCollectionNode)f;
+		if(o.len != len || o.operator != operator){
+			return false;
+		}
+		
+		for(int i = 0; i < len; i++){
+			if(data[i].formulaStrongEquals(o.data[i])) return false;
 		}
 		return true;
 	}
@@ -713,7 +732,7 @@ public class OpCollectionNode extends FormulaNode{
 		return s;
 	}
 	
-	public boolean isConstant(){
+	public boolean isConstantRecurse(){
 		FormulaNode s = takeSimplified();
 		if(s instanceof OpCollectionNode){
 			for(int i = 0; i < ((OpCollectionNode)s).len; i++){
@@ -724,6 +743,5 @@ public class OpCollectionNode extends FormulaNode{
 			return true;
 		}
 		return s.isConstant();
-		
 	}
 }

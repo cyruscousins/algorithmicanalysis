@@ -37,7 +37,7 @@ public class ComplexityTest {
 
 		out.println("Equality Tester");
 		for(int i = 0; i < test.length; i += 2){
-			if(test[i + 0].formulaEquals(test[i + 1])){
+			if(test[i + 0].formulaWeakEquals(test[i + 1])){
 				if(verbose) out.println((i / 2) + ": Success: " + test[i + 0].asStringRecurse() + " = " + test[i + 1].asStringRecurse());
 			}
 			else{
@@ -92,7 +92,7 @@ public class ComplexityTest {
 				e.printStackTrace();
 				continue;
 			}
-			if(!test[i].formulaEquals(res)){
+			if(!test[i].formulaWeakEquals(res)){
 				out.println(i + ": STRING FAILURE: \"" + test[i].asString() + "\" -> \"" + res.asString() + "\"");
 			}
 			else{
@@ -136,7 +136,7 @@ public class ComplexityTest {
 
 			//Test simplification completion
 			FormulaNode s2 = s.takeSimplified();
-			if(!s2.formulaEquals(s)){
+			if(!s2.formulaWeakEquals(s)){
 				out.println((i / 2) + ": simplifier incompletion failure: " + f.asString() + " -> " + s.asString() + " -> " + s2.asString());
 				continue;
 			}
@@ -145,7 +145,7 @@ public class ComplexityTest {
 			
 			FormulaNode key = test[i + 1];
 			FormulaNode simpKey = key.takeSimplified();
-			if(!(key.formulaEquals(simpKey))){
+			if(!(key.formulaWeakEquals(simpKey))){
 				out.println((i / 2) + ": Simplification key test error: \"" + key.asString() + " -> " + simpKey.asString() + "\" is not fully simplified.");
 				continue;
 			}
@@ -156,7 +156,7 @@ public class ComplexityTest {
 			}
 			
 			
-			if(key.formulaEquals(s)){
+			if(key.formulaWeakEquals(s)){
 				if(verbose) out.println((i / 2) + ": Simplification success: " + f.asString() + " -> " + s.asString() + " = " + key.asString());
 				totalSuccess++;
 			}
@@ -208,7 +208,7 @@ public class ComplexityTest {
 			
 			//Test bigO completion
 			FormulaNode s2 = s.bigO();
-			if(!s2.formulaEquals(s)){
+			if(!s2.formulaWeakEquals(s)){
 				out.println((i / 2) + ": bigO incompletion failure: " + f.asString() + " -> " + s.asString() + " -> " + s2.asString());
 				continue;
 			}
@@ -224,11 +224,11 @@ public class ComplexityTest {
 			//Test accuracy
 			FormulaNode key = test[i + 1];
 			
-			if(!key.formulaEquals(key.bigO())){
+			if(!key.formulaWeakEquals(key.bigO())){
 				out.println((i / 2) + ": BigO test error: key " + key.asString() + " -> " + key.bigO().asString() + " is not in normative form.");
 			}
 			
-			if(key.formulaEquals(s)){
+			if(key.formulaWeakEquals(s)){
 				if(verbose) out.println((i / 2) + ": BigO success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}
@@ -268,11 +268,11 @@ public class ComplexityTest {
 			FormulaNode s = f.takeBigO(littles, bigs);
 			FormulaNode key = test[i + 1];
 			
-			if(!key.formulaEquals(key.takeBigO(littles, bigs))){
+			if(!key.formulaWeakEquals(key.takeBigO(littles, bigs))){
 				out.println("BIGO SUBSTITUTION TEST ERROR: key " + key.asString() + " is not in normative form.");
 			}
 			
-			if(s.formulaEquals(key)){
+			if(s.formulaWeakEquals(key)){
 				if(verbose) out.println((i / 2) + ": BigO substitution success: " + f.asStringRecurse() + " -> " + s.asStringRecurse() + " = " + key.asStringRecurse());
 				totalSuccess++;
 			}

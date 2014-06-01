@@ -26,23 +26,15 @@ public class VariableNode extends FormulaNode{
 	else return this;
   }
 
-  public long formulaHash(){
+  public long formulaStrongHash(){
 	  return varName.hashCode();
   }
 
-  public long formulaWeakHash(){
-	  return varName.hashCode();
-  }
-
-  public boolean formulaEquals(FormulaNode f){
-	  return (f instanceof VariableNode) && ((VariableNode)f).varName.equals(varName);
-  }
-
-  public boolean formulaWeakEquals(FormulaNode f){
+  public boolean formulaStrongEquals(FormulaNode f){
 	  return (f instanceof VariableNode) && ((VariableNode)f).varName.equals(varName);
   }
   
-  public boolean isConstant(){
+  public boolean isConstantRecurse(){
 	  return false;
   }
 

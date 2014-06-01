@@ -45,15 +45,15 @@ public class ConstantNode extends FormulaNode{
 	  return "" + value;
   }
   
-  public long formulaHash(){
+  public long formulaStrongHash(){
 	  return Double.doubleToLongBits(value);
   }
   
-  public boolean formulaEquals(FormulaNode f){
+  public boolean formulaStrongEquals(FormulaNode f){
 	  return (f instanceof ConstantNode) && ((ConstantNode)f).value == value;
   }
   
-  public boolean isConstant(){
+  public boolean isConstantRecurse(){
 	  return true;
   }
 }

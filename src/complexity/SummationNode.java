@@ -95,10 +95,8 @@ public class SummationNode extends FormulaNode{
 	}
 	
 	FormulaNode bigO(){
-		FormulaNode simp = takeSimplified();
 		
-		if(simp instanceof SummationNode){
-			SummationNode s = (SummationNode) simp;
+			SummationNode s = (SummationNode) this;
 			
 //			FormulaNode count = summationrange(s.lower, s.upper).takeSimplified();
 			FormulaNode count = summationrangebigO(s.lower, s.upper).takeBigO();
@@ -115,16 +113,9 @@ public class SummationNode extends FormulaNode{
 			
 			
 			
-			
-			
-			
-			
 			//TODO the subtraction stuff would be good for something like i = n to n + 5, but it causes problems.  Need to improve simplifier first.
 //			System.out.println(asString() + " -> " + new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper))).asString()); 
 //			return new OpCollectionNode(OpCollectionNode.MULTIPLY, s.upper.bigO(), new OpCollectionNode(OpCollectionNode.ADD, s.inner.substitute(varName, lower), s.inner.substitute(varName, upper)).bigO()).bigO();
-		}
-		
-		return simp.bigO();
 	}
 	
 	public FormulaNode substitute(String s, FormulaNode f){
@@ -132,36 +123,47 @@ public class SummationNode extends FormulaNode{
 		//TODO reuse this if no change.
 		return new SummationNode(lower.substitute(s, f), upper.substitute(s, f), inner.substitute(s, f), varName);
 	}
+	
 	@Override
-	public long formulaHash() {
-		return circShiftL(lower.formulaHash(), 3) ^ circShiftL(upper.formulaHash(), 5) ^ circShiftL(inner.formulaHash(), 7);
+	public long formulaWeakHash() {
+		return circShiftL(lower.formulaWeakHash(), 3) ^ circShiftL(upper.formulaWeakHash(), 5) ^ circShiftL(inner.formulaWeakHash(), 7);
 	}
+
 	@Override
-	public boolean formulaEquals(FormulaNode f) {
+	public long formulaStrongHash(){
+		return circShiftL(lower.formulaStrongHash(), 3) ^ circShiftL(upper.formulaStrongHash(), 5) ^ circShiftL(inner.formulaStrongHash(), 7);
+	}
+	
+	@Override
+	public boolean formulaWeakEquals(FormulaNode f) {
 		if(f instanceof SummationNode){
 			SummationNode s = (SummationNode)f;
-			return varName.equals(s.varName) && lower.formulaEquals(s.lower) && upper.formulaEquals(s.upper) && inner.formulaEquals(s.inner);
+			return varName.equals(s.varName) && lower.formulaWeakEquals(s.lower) && upper.formulaWeakEquals(s.upper) && inner.formulaWeakEquals(s.inner);
 		}
 		return false;
 	}
+	
 	@Override
-	public String asStringRecurse() {
-		
-		return "(" + "sum " + varName + " from " + lower.asStringRecurse() + " to " + upper.asStringRecurse() + " of " + inner.asStringRecurse() + ")";
-		
+	public boolean formulaStrongEquals(FormulaNode f) {
+		if(f instanceof SummationNode){
+			SummationNode s = (SummationNode)f;
+			return varName.equals(s.varName) && lower.formulaStrongEquals(s.lower) && upper.formulaStrongEquals(s.upper) && inner.formulaStrongEquals(s.inner);
+		}
+		return false;
 	}
 	
+	@Override
+	public String asStringRecurse() {
+		return "(" + "sum " + varName + " from " + lower.asStringRecurse() + " to " + upper.asStringRecurse() + " of " + inner.asStringRecurse() + ")";
+	}
+	
+	@Override
 	public String asLatexStringRecurse() {
 		return "\\sum_{" + varName + " =  " + trimParens(lower.asLatexString()) + "}^{" + trimParens(upper.asLatexString()) + "}\\big(" + trimParens(inner.asLatexString()) + "\\big)";
 	}
 	
 	//TODO pull out all the simplifier stuff into another helper.
-	public boolean isConstant(){
-		FormulaNode s = takeSimplified();
-		if(s instanceof SummationNode){
-			SummationNode ss = (SummationNode)s;
-			return ss.lower.isConstant() && ss.upper.isConstant() && ss.inner.isConstant();
-		}
-		return s.isConstant();
+	public boolean isConstantRecurse(){
+		return lower.isConstant() && upper.isConstant() && inner.isConstant();
 	}
 }
